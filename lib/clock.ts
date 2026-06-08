@@ -1,27 +1,26 @@
 /**
- * Clock geometry + silhouette alignment constants.
+ * Clock geometry constants.
  *
- * The silhouette (CheyBody + CheyArm) and the numeral ring all live in a shared
- * 1000×1000 design space rendered into a single centered square "stage". The
- * arm pivot — the figure's raised shoulder — sits at the exact centre of that
- * space, which is also the centre of the numeral ring, so the arm reads as a
- * true clock hand pointing at whichever numeral is selected.
+ * The clock hand (ClockHand), the tick face (ClockFace) and the numeral ring
+ * all live in a shared 1000×1000 design space rendered into a single centred
+ * square "stage". The hand pivot sits at the exact centre of that space, which
+ * is also the centre of the numeral ring, so the hand points cleanly at
+ * whichever numeral is selected.
  */
 
-/** The shared SVG viewBox edge length for body + arm. */
+/** The shared SVG viewBox edge length for the hand + face. */
 export const VIEWBOX = 1000;
 
-/** The pivot (raised shoulder) in viewBox units — the centre of the stage. */
+/** The hand pivot in viewBox units — the centre of the stage. */
 export const PIVOT = { x: VIEWBOX / 2, y: VIEWBOX / 2 } as const;
 
 /**
- * CSS transform-origin for the arm, expressed as percentages of the stage.
+ * CSS transform-origin for the clock hand, as percentages of the stage.
  * ── TUNING ──────────────────────────────────────────────────────────────
- * This is the single knob for the arm's rotation pivot. It maps to PIVOT
- * above (50% 50% == centre of the 1000×1000 space). Adjust both together if
- * you ever move the shoulder.
+ * The single knob for the hand's rotation pivot. Maps to PIVOT above
+ * (50% 50% == centre of the 1000×1000 space).
  */
-export const ARM_TRANSFORM_ORIGIN = `${(PIVOT.x / VIEWBOX) * 100}% ${
+export const HAND_TRANSFORM_ORIGIN = `${(PIVOT.x / VIEWBOX) * 100}% ${
   (PIVOT.y / VIEWBOX) * 100
 }%`;
 
@@ -55,8 +54,8 @@ export function getNumeralPositions(radius = 0.86): NumeralPosition[] {
   });
 }
 
-/** Spring used for the arm sweep — overshoots slightly, settles naturally. */
-export const ARM_SPRING = {
+/** Spring used for the hand sweep — overshoots slightly, settles naturally. */
+export const HAND_SPRING = {
   type: "spring" as const,
   stiffness: 45,
   damping: 14,

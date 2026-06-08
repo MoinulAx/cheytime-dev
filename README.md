@@ -1,6 +1,6 @@
 # Chey Time — *Chey's Time*
 
-An immersive, single-interaction artist site for **Chey** — "Hip Hop's Princess," a Staten Island rapper. The entire experience is a full-screen interactive clock: a silhouette of Chey stands at the centre, her raised arm is the clock hand, and diamond Roman numerals form the navigation. Selecting a numeral rotates the arm to that hour and reveals a frosted-glass content panel.
+An immersive, single-interaction artist site for **Chey** — "Hip Hop's Princess," a Staten Island rapper. The entire experience is a full-screen interactive clock: a faceted diamond hand sits at the centre over a tick dial, and diamond Roman numerals form the navigation. Selecting a numeral sweeps the hand to that hour and reveals a frosted-glass content panel.
 
 Built as a ground-up rebuild of the legacy `chey-music` site. See [`MIGRATION_REPORT.md`](./MIGRATION_REPORT.md) for the full discovery/content audit.
 
@@ -30,10 +30,10 @@ app/
   icon.svg          favicon (clock motif)
 components/
   CosmicBackground  z-0  · next/image backdrop + animated CSS smoke/stars
-  CheyBody          z-10 · figure silhouette (body only)
-  CheyArm           z-20 · raised arm only (the clock hand)
+  ClockFace         z-2  · static tick dial (60 ticks, hours elongated)
+  ClockHand         z-20 · the faceted diamond hand (rotates)
   RomanNumerals     z-30 · 12 numerals on a polar ring, 6 interactive
-  CheysClock             · orchestrator: measures stage, rotates arm, state
+  CheysClock             · orchestrator: measures stage, rotates hand, state
   ContentPanel      z-40 · glass slide-over (desktop) / bottom sheet (mobile)
   SectionContent         · per-section renderers (about/music/store/…)
 lib/
@@ -49,17 +49,17 @@ Only the clock and panel are client components; everything else is server-render
 
 Everything is driven by the typed `SECTIONS` array in [`lib/sections.ts`](./lib/sections.ts) — `{ id, numeral, hourIndex, angle, title, subtitle, data }`. Angles are derived once from `hourIndex` via `angleForHour()`; nothing re-declares them. Add a section by adding one entry (and a `case` in `SectionContent`).
 
-## Tuning the arm
+## Tuning the hand
 
-The arm pivot — the figure's raised shoulder — is the single knob, in [`lib/clock.ts`](./lib/clock.ts):
+The hand pivot is the single knob, in [`lib/clock.ts`](./lib/clock.ts):
 
 ```ts
-export const PIVOT = { x: 500, y: 500 };          // in the 1000×1000 design space
-export const ARM_TRANSFORM_ORIGIN = "50% 50%";    // == PIVOT as % of the stage
-export const ARM_SPRING = { type: "spring", stiffness: 45, damping: 14, mass: 1.1 };
+export const PIVOT = { x: 500, y: 500 };           // in the 1000×1000 design space
+export const HAND_TRANSFORM_ORIGIN = "50% 50%";    // == PIVOT as % of the stage
+export const HAND_SPRING = { type: "spring", stiffness: 45, damping: 14, mass: 1.1 };
 ```
 
-`CheyBody` and `CheyArm` share that 1000×1000 space, so the shoulder always aligns. The arm animates **rotation only** (`will-change: transform`); position/size never animate. `XII = 0°` (straight up); selecting XII / closing returns home to 0°.
+`ClockHand` and `ClockFace` share that 1000×1000 space, so the hand always centres. The hand animates **rotation only** (`will-change: transform`); position/size never animate. `XII = 0°` (straight up); selecting XII / closing returns home to 0°.
 
 ## Performance & accessibility
 

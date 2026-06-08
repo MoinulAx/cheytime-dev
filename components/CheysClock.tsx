@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import CheyBody from "./CheyBody";
-import CheyArm from "./CheyArm";
+import ClockFace from "./ClockFace";
+import ClockHand from "./ClockHand";
 import RomanNumerals from "./RomanNumerals";
 import ContentPanel from "./ContentPanel";
 import { HOME_SECTION, sectionById, sectionByHour } from "@/lib/sections";
-import { ARM_SPRING, ARM_TRANSFORM_ORIGIN } from "@/lib/clock";
+import { HAND_SPRING, HAND_TRANSFORM_ORIGIN } from "@/lib/clock";
 import type { SectionKind } from "@/types/section";
 
 /** Measure a square clock stage that always fits the viewport. */
@@ -47,22 +47,22 @@ function useMediaQuery(query: string) {
 /**
  * CheysClock — the full interactive experience.
  *
- * Layers (z): 0 background (page) · 1 face ring · 10 body · 20 arm · 30
- * numerals · 40 content panel. The arm rotates (only) to the selected
- * section's angle on a soft overshooting spring; selecting XII / closing the
- * panel returns it home to 0°.
+ * Layers (z): 0 background (page) · 1 face rings · 2 tick face · 20 hand ·
+ * 21 hub · 30 numerals · 40 content panel. The hand rotates (only) to the
+ * selected section's angle on a soft overshooting spring; selecting XII /
+ * closing the panel returns it home to 0°.
  */
 export default function CheysClock() {
   const reduce = useReducedMotion();
   const { ref, size: stageSize } = useStageSize();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
-  // null === Home / base immersive state (arm at 0°, no panel).
+  // null === Home / base immersive state (hand at 0°, no panel).
   const [selectedId, setSelectedId] = useState<SectionKind | null>(null);
 
   const selected = (selectedId ? sectionById(selectedId) : null) ?? null;
   const activeHour = selected ? selected.hourIndex : HOME_SECTION.hourIndex;
-  const armAngle = selected ? selected.angle : HOME_SECTION.angle;
+  const handAngle = selected ? selected.angle : HOME_SECTION.angle;
   const isOpen = selected !== null;
 
   const handleSelect = useCallback((hourIndex: number) => {
@@ -130,21 +130,41 @@ export default function CheysClock() {
               style={{ width: ringDiameter * 1.06, height: ringDiameter * 1.06 }}
             />
 
-            {/* z-10 — body silhouette */}
-            <div className="absolute inset-0 z-10 drop-glow">
-              <CheyBody className="h-full w-full" />
+            {/* z-2 — static dial face (tick marks) */}
+            <div className="absolute inset-0 z-[2]">
+              <ClockFace className="h-full w-full" />
             </div>
 
-            {/* z-20 — arm (rotates only, around the shared shoulder pivot) */}
+            {/* z-20 — clock hand (rotates only, around the central pivot) */}
             <motion.div
-              className="absolute inset-0 z-20 will-change-transform"
-              style={{ transformOrigin: ARM_TRANSFORM_ORIGIN }}
+              className="absolute inset-0 z-20 drop-glow will-change-transform"
+              style={{ transformOrigin: HAND_TRANSFORM_ORIGIN }}
               initial={false}
-              animate={{ rotate: armAngle }}
-              transition={reduce ? { duration: 0 } : ARM_SPRING}
+              animate={{ rotate: handAngle }}
+              transition={reduce ? { duration: 0 } : HAND_SPRING}
             >
-              <CheyArm className="h-full w-full" />
+              <ClockHand className="h-full w-full" />
             </motion.div>
+
+            {/* z-[21] — jewelled centre hub (static, sits over the hand base) */}
+            <div
+              aria-hidden="true"
+              className="absolute left-1/2 top-1/2 z-[21] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                width: stageSize * 0.05,
+                height: stageSize * 0.05,
+                background:
+                  "radial-gradient(circle at 38% 32%, #ffffff 0%, #cdd2da 38%, #5b626e 100%)",
+                boxShadow:
+                  "0 0 18px rgba(168,85,247,0.7), inset 0 0 6px rgba(0,0,0,0.4)",
+                border: "1px solid rgba(255,255,255,0.5)",
+              }}
+            >
+              <span
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cosmic-500"
+                style={{ width: "34%", height: "34%" }}
+              />
+            </div>
 
             {/* z-30 — numerals */}
             <RomanNumerals
