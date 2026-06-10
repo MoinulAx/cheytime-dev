@@ -52,7 +52,7 @@ export default function RomanNumerals({
             aria-current={isCurrent ? "true" : undefined}
             tabIndex={isInteractive ? 0 : -1}
             className={[
-              "absolute font-display font-bold metallic select-none",
+              "absolute font-display font-bold metallic select-none touch-manipulation",
               "rounded-full px-1 leading-none",
               "transition-[filter,opacity] duration-300",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-cosmic-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
@@ -85,6 +85,14 @@ export default function RomanNumerals({
                 : { type: "spring", stiffness: 320, damping: 18 }
             }
           >
+            {/* Invisible touch hit-area — keeps tap targets ≥44px on mobile
+                without altering the numeral's visual size. Hidden on desktop. */}
+            {isInteractive && (
+              <span
+                aria-hidden="true"
+                className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2 lg:hidden"
+              />
+            )}
             {numeral}
           </motion.button>
         );

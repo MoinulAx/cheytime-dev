@@ -192,7 +192,7 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
 
   return (
     <Stagger>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 min-[380px]:grid-cols-2">
         {products.map((p) => {
           const isReserved = reserved.has(p.id);
           return (
@@ -214,7 +214,7 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
                   <p className="mt-0.5 font-sans text-[10px] uppercase tracking-wide2 text-diamond-500">
                     {p.material}
                   </p>
-                  <div className="mt-auto flex items-center justify-between pt-3">
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-3">
                     <span className="font-display text-lg metallic">${p.price}</span>
                     <button
                       type="button"
@@ -348,8 +348,9 @@ function ContactBlock({
     }
   };
 
+  // text-base below lg keeps iOS Safari from auto-zooming on focus (<16px inputs).
   const field =
-    "w-full rounded-lg border border-diamond-300/15 bg-void-900/50 px-3 py-2.5 font-sans text-sm text-diamond-50 outline-none transition-colors placeholder:text-diamond-500 focus:border-cosmic-400";
+    "w-full rounded-lg border border-diamond-300/15 bg-void-900/50 px-3 py-2.5 font-sans text-base lg:text-sm text-diamond-50 outline-none transition-colors placeholder:text-diamond-500 focus:border-cosmic-400";
 
   return (
     <Stagger>

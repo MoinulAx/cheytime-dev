@@ -89,7 +89,7 @@ export default function CheysClock() {
   return (
     <div
       ref={ref}
-      className="relative z-10 flex h-dvh w-full items-center justify-center overflow-hidden pb-24 md:pb-20"
+      className="relative z-10 flex h-dvh w-full items-center justify-center overflow-hidden pb-32 md:pb-20 [@media(max-height:480px)_and_(max-width:1023px)]:pb-10"
     >
       {/* Brand mark — always visible */}
       <div className="pointer-events-none fixed left-5 top-5 z-40 md:left-8 md:top-7">
@@ -181,13 +181,13 @@ export default function CheysClock() {
         {!isOpen && stageSize > 0 && (
           <motion.div
             key="home-overlay"
-            className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex flex-col items-center bg-gradient-to-t from-void via-void/85 to-transparent px-6 pb-7 pt-28 text-center"
+            className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex flex-col items-center bg-gradient-to-t from-void via-void/85 to-transparent px-6 pb-7 pt-28 text-center [@media(max-height:480px)_and_(max-width:1023px)]:pb-4 [@media(max-height:480px)_and_(max-width:1023px)]:pt-10"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="max-w-sm font-sans text-[13px] leading-relaxed text-diamond-300/75">
+            <p className="max-w-sm font-sans text-[13px] leading-relaxed text-diamond-300/75 [@media(max-height:420px)_and_(max-width:1023px)]:hidden">
               {homeData?.intro}
             </p>
             <p className="eyebrow mt-3 animate-pulse-glow">{homeData?.cue}</p>
