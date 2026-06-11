@@ -9,15 +9,17 @@ const POSITIONS = getNumeralPositions(); // constant unit fractions — compute 
 interface RomanNumeralsProps {
   /** Pixel edge length of the square clock stage. */
   stageSize: number;
-  /** Hour index currently selected (the arm points here). */
+  /** Hour index currently selected (the hand points here). */
   activeHour: number;
   onSelect: (hourIndex: number) => void;
 }
 
 /**
- * RomanNumerals — z-30. Twelve diamond/silver numerals laid out on a ring via
- * polar geometry. The six mapped to sections are interactive buttons; the rest
- * are visible-but-inactive (disabled) buttons. States: default · hover · active.
+ * RomanNumerals — z-30. Twelve numerals laid out on a ring via polar
+ * geometry, set in solid bone serif — no gradients, no glows. Every hour now
+ * opens a section or a gallery, so all twelve are interactive; each carries a
+ * small uppercase label naming its destination (an index, not just a dial).
+ * The active hour is inked in violet.
  */
 export default function RomanNumerals({
   stageSize,
@@ -26,6 +28,8 @@ export default function RomanNumerals({
 }: RomanNumeralsProps) {
   const reduce = useReducedMotion();
   const fontSize = Math.max(13, stageSize * 0.05);
+  // Labels need room below each numeral — hide them on small stages.
+  const showLabels = stageSize >= 480;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-30">
@@ -34,6 +38,9 @@ export default function RomanNumerals({
         const section = sectionByHour(hourIndex);
         const isInteractive = Boolean(section);
         const isCurrent = activeHour === hourIndex;
+        const isGallery = section?.data.kind === "gallery";
+        const label =
+          section?.id === "home" ? "Reset" : isGallery ? "Gallery" : section?.title;
 
         const left = x * stageSize;
         const top = y * stageSize;
@@ -52,33 +59,18 @@ export default function RomanNumerals({
             aria-current={isCurrent ? "true" : undefined}
             tabIndex={isInteractive ? 0 : -1}
             className={[
-              "absolute font-display font-bold metallic select-none touch-manipulation",
-              "rounded-full px-1 leading-none",
-              "transition-[filter,opacity] duration-300",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-cosmic-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
-              isInteractive
-                ? "pointer-events-auto cursor-pointer"
-                : "opacity-30",
-              isCurrent ? "drop-glow" : "",
+              "absolute flex select-none touch-manipulation flex-col items-center px-1 leading-none",
+              "transition-colors duration-300",
+              "focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent",
+              isInteractive ? "pointer-events-auto cursor-pointer" : "opacity-30",
             ].join(" ")}
-            style={{
-              left,
-              top,
-              fontSize,
-              x: "-50%",
-              y: "-50%",
-              filter: isCurrent
-                ? "drop-shadow(0 0 16px rgba(168,85,247,0.85))"
-                : isInteractive
-                ? "drop-shadow(0 0 5px rgba(168,85,247,0.25))"
-                : "none",
-            }}
+            style={{ left, top, x: "-50%", y: "-50%" }}
             initial={false}
-            animate={{ scale: isCurrent ? (reduce ? 1 : 1.18) : 1 }}
+            animate={{ scale: isCurrent ? (reduce ? 1 : 1.12) : 1 }}
             whileHover={
-              isInteractive && !reduce ? { scale: isCurrent ? 1.2 : 1.14 } : undefined
+              isInteractive && !reduce ? { scale: isCurrent ? 1.14 : 1.08 } : undefined
             }
-            whileTap={isInteractive ? { scale: 1.04 } : undefined}
+            whileTap={isInteractive ? { scale: 1.02 } : undefined}
             transition={
               reduce
                 ? { duration: 0 }
@@ -93,7 +85,29 @@ export default function RomanNumerals({
                 className="absolute left-1/2 top-1/2 h-11 w-11 -translate-x-1/2 -translate-y-1/2 lg:hidden"
               />
             )}
-            {numeral}
+            <span
+              className={[
+                "font-display font-bold",
+                isCurrent
+                  ? "text-cosmic-400"
+                  : isGallery
+                    ? "text-bone-300"
+                    : "text-bone-100",
+              ].join(" ")}
+              style={{ fontSize }}
+            >
+              {numeral}
+            </span>
+            {showLabels && label && (
+              <span
+                className={[
+                  "mt-1.5 font-sans text-[8px] uppercase tracking-[0.22em]",
+                  isCurrent ? "text-cosmic-400" : "text-bone-400",
+                ].join(" ")}
+              >
+                {label}
+              </span>
+            )}
           </motion.button>
         );
       })}

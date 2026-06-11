@@ -19,7 +19,7 @@
   body {
     /* Solid black fallback beneath the cosmic background layer. */
     background-color: #050208;
-    color: theme("colors.diamond.200");
+    color: theme("colors.bone.100");
     font-family: var(--font-inter), Inter, system-ui, sans-serif;
     overflow: hidden; /* the clock is a full-viewport, fixed experience */
     -webkit-font-smoothing: antialiased;
@@ -41,14 +41,13 @@
   /* Custom slim scrollbar for the content panel only. */
   .panel-scroll {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.cosmic.700") transparent;
+    scrollbar-color: theme("colors.bone.600") transparent;
   }
   .panel-scroll::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
   .panel-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(theme("colors.cosmic.600"), theme("colors.cosmic.900"));
-    border-radius: 9999px;
+    background: theme("colors.bone.600");
   }
   .panel-scroll::-webkit-scrollbar-track {
     background: transparent;
@@ -56,49 +55,30 @@
 }
 
 @layer components {
-  /* Frosted glass surface for the content panel. */
-  .glass {
-    background: linear-gradient(
-      155deg,
-      rgba(20, 11, 38, 0.72) 0%,
-      rgba(7, 3, 16, 0.82) 100%
-    );
-    backdrop-filter: blur(26px) saturate(140%);
-    -webkit-backdrop-filter: blur(26px) saturate(140%);
-    border: 1px solid rgba(168, 85, 247, 0.18);
-    box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-      inset 0 0 60px 0 rgba(124, 58, 237, 0.08),
-      0 30px 80px -20px rgba(0, 0, 0, 0.8);
-  }
-
-  /* Diamond / silver metallic text used for numerals and headings. */
-  .metallic {
-    background: linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #e5e7eb 28%,
-      #aab0bc 52%,
-      #ffffff 74%,
-      #cdd2da 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .metallic-cosmic {
-    background: linear-gradient(180deg, #fff 0%, #d6c6fb 45%, #a855f7 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  /* Solid editorial surface for the content panel — opaque paper-on-night,
+     no backdrop blur, hairline border. */
+  .panel {
+    background-color: #0a0613;
+    border-color: rgba(236, 232, 223, 0.14);
   }
 
   /* Editorial eyebrow label. */
   .eyebrow {
-    @apply font-sans uppercase text-diamond-500;
+    @apply font-sans uppercase text-bone-400;
     font-size: 0.625rem;
     letter-spacing: 0.35em;
+  }
+
+  /* Hairline rule — the recurring editorial divider. */
+  .rule {
+    @apply h-px w-full;
+    background-color: rgba(236, 232, 223, 0.14);
+  }
+
+  /* Sharp editorial button: hairline border, uppercase, inverts on hover. */
+  .btn-editorial {
+    @apply inline-flex items-center gap-2 border border-bone-100/30 px-5 py-2.5 font-sans text-[11px] uppercase tracking-wide2 text-bone-100 transition-colors;
+    @apply hover:bg-bone-100 hover:text-void focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100 focus-visible:ring-offset-2 focus-visible:ring-offset-void;
   }
 }
 
@@ -113,8 +93,14 @@
     line-height: 0.98;
     letter-spacing: -0.015em;
   }
-  .drop-glow {
-    filter: drop-shadow(0 0 22px rgba(124, 58, 237, 0.45));
+  /* Film-grain texture for photography and the page background. */
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+  /* Editorial photo treatment — desaturated, slightly lifted blacks. */
+  .photo-treatment {
+    filter: grayscale(0.85) contrast(1.06) brightness(0.92);
   }
 }
 

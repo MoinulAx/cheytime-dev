@@ -4,27 +4,24 @@ import { VIEWBOX } from "@/lib/clock";
 const C = VIEWBOX / 2; // centre
 
 /**
- * ClockFace — static dial: 60 minute ticks (every 5th elongated for the hours)
- * just inside the numeral ring, plus a faint guide circle. Decorative; the
+ * ClockFace — static dial, kept deliberately quiet: twelve short hour marks
+ * just inside the numeral ring and a single hairline guide circle. The
  * interactive numerals live in {@link RomanNumerals}.
  */
 export default function ClockFace(props: SVGProps<SVGSVGElement>) {
-  const ticks = Array.from({ length: 60 }, (_, i) => {
-    const major = i % 5 === 0;
-    return (
-      <line
-        key={i}
-        x1={C}
-        y1={major ? 86 : 94}
-        x2={C}
-        y2={major ? 112 : 102}
-        transform={`rotate(${i * 6} ${C} ${C})`}
-        stroke={major ? "rgba(229,231,235,0.7)" : "rgba(170,176,188,0.35)"}
-        strokeWidth={major ? 3 : 1.5}
-        strokeLinecap="round"
-      />
-    );
-  });
+  const marks = Array.from({ length: 12 }, (_, i) => (
+    <line
+      key={i}
+      x1={C}
+      y1={96}
+      x2={C}
+      y2={118}
+      transform={`rotate(${i * 30} ${C} ${C})`}
+      stroke="rgba(236,232,223,0.4)"
+      strokeWidth={2}
+      strokeLinecap="butt"
+    />
+  ));
 
   return (
     <svg
@@ -34,16 +31,16 @@ export default function ClockFace(props: SVGProps<SVGSVGElement>) {
       focusable="false"
       {...props}
     >
-      {/* faint inner guide circle */}
+      {/* hairline guide circle */}
       <circle
         cx={C}
         cy={C}
         r={364}
         fill="none"
-        stroke="rgba(168,85,247,0.12)"
+        stroke="rgba(236,232,223,0.14)"
         strokeWidth="1"
       />
-      {ticks}
+      {marks}
     </svg>
   );
 }

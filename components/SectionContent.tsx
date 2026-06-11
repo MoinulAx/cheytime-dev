@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type {
   Credit,
   EventItem,
+  GalleryImage,
   MusicVideo,
   Product,
   Section,
@@ -46,8 +47,59 @@ function Item({ children }: { children: React.ReactNode }) {
   );
 }
 
-const linkBtn =
-  "inline-flex items-center gap-2 rounded-full border border-cosmic-400/40 px-5 py-2.5 font-sans text-[11px] uppercase tracking-wide2 text-diamond-100 transition-colors hover:border-cosmic-400 hover:bg-cosmic-600/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-cosmic-400";
+/* ── GALLERY ──────────────────────────────────────────────────────────── */
+
+function GalleryBlock({
+  description,
+  images,
+}: {
+  description?: string;
+  images: GalleryImage[];
+}) {
+  return (
+    <Stagger>
+      {description && (
+        <Item>
+          <p className="font-display text-lg italic leading-snug text-bone-200">
+            {description}
+          </p>
+        </Item>
+      )}
+      <div className="mt-6 space-y-8">
+        {images.map((img, i) => (
+          <Item key={`${img.src}-${i}`}>
+            <figure>
+              <div className="flex items-baseline justify-between pb-2">
+                <span className="font-display text-sm italic text-bone-400">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                  {img.meta}
+                </span>
+              </div>
+              <div className="relative aspect-[4/5] w-full overflow-hidden border border-bone-100/10">
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 480px"
+                  className="photo-treatment object-cover"
+                  style={{ objectPosition: img.position ?? "50% 50%" }}
+                />
+                <div className="grain absolute inset-0 opacity-[0.08] mix-blend-overlay" />
+              </div>
+              {img.caption && (
+                <figcaption className="mt-2 border-l border-bone-100/20 pl-3 font-sans text-[11px] leading-snug text-bone-300">
+                  {img.caption}
+                </figcaption>
+              )}
+            </figure>
+          </Item>
+        ))}
+      </div>
+    </Stagger>
+  );
+}
 
 /* ── ABOUT ────────────────────────────────────────────────────────────── */
 
@@ -64,27 +116,27 @@ function AboutBlock({
     <Stagger>
       {bio.map((p, i) => (
         <Item key={i}>
-          <p className="mb-4 font-sans text-[15px] leading-relaxed text-diamond-200/90">
+          <p className="mb-4 font-sans text-[15px] leading-relaxed text-bone-200/90">
             {p}
           </p>
         </Item>
       ))}
       <Item>
-        <blockquote className="my-8 border-l-2 border-cosmic-400/60 pl-5">
-          <p className="font-display text-xl italic leading-snug text-diamond-50">
+        <blockquote className="my-8 border-l border-bone-100/40 pl-5">
+          <p className="font-display text-xl italic leading-snug text-bone-50">
             “{quote}”
           </p>
         </blockquote>
       </Item>
       <Item>
         <p className="eyebrow mb-3">Credits</p>
-        <dl className="divide-y divide-diamond-300/10">
+        <dl className="divide-y divide-bone-100/10 border-y border-bone-100/10">
           {credits.map((c) => (
             <div key={c.role} className="flex justify-between py-3">
-              <dt className="font-sans text-xs uppercase tracking-wide2 text-diamond-500">
+              <dt className="font-sans text-xs uppercase tracking-wide2 text-bone-500">
                 {c.role}
               </dt>
-              <dd className="font-sans text-sm text-diamond-100">{c.name}</dd>
+              <dd className="font-sans text-sm text-bone-100">{c.name}</dd>
             </div>
           ))}
         </dl>
@@ -98,7 +150,7 @@ function AboutBlock({
 function LiteYouTube({ video }: { video: MusicVideo }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-cosmic-400/20 bg-black">
+    <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10 bg-black">
       {open ? (
         <iframe
           src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
@@ -120,13 +172,14 @@ function LiteYouTube({ video }: { video: MusicVideo }) {
             src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
             alt=""
             fill
-            sizes="(max-width: 1024px) 100vw, 420px"
-            className="object-cover opacity-65 transition-opacity duration-300 group-hover:opacity-90"
+            sizes="(max-width: 1024px) 100vw, 440px"
+            className="object-cover opacity-60 grayscale-[0.4] transition-opacity duration-300 group-hover:opacity-90"
           />
+          {/* play affordance echoes the clock: a thin ring, nothing frosted */}
           <span className="absolute inset-0 grid place-items-center">
-            <span className="grid h-14 w-14 place-items-center rounded-full border border-diamond-50/40 bg-black/40 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
-              <svg width="18" height="20" viewBox="0 0 18 20" aria-hidden="true">
-                <path d="M0 0l18 10L0 20z" fill="#fff" />
+            <span className="grid h-14 w-14 place-items-center rounded-full border border-bone-50/60 bg-black/50 transition-transform duration-300 group-hover:scale-110">
+              <svg width="16" height="18" viewBox="0 0 18 20" aria-hidden="true">
+                <path d="M0 0l18 10L0 20z" fill="#f6f3ec" />
               </svg>
             </span>
           </span>
@@ -150,17 +203,27 @@ function MusicBlock({
   return (
     <Stagger>
       <Item>
-        <a href={channelUrl} target="_blank" rel="noopener noreferrer" className={linkBtn}>
-          ▶ Subscribe — {channelLabel}
+        <a
+          href={channelUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-editorial"
+        >
+          Subscribe — {channelLabel}
         </a>
       </Item>
-      <div className="mt-7 space-y-7">
-        {videos.map((v) => (
+      <div className="mt-7 space-y-8">
+        {videos.map((v, i) => (
           <Item key={v.id}>
-            <div className="mb-2 flex items-baseline justify-between">
-              <p className="font-sans text-sm text-diamond-100">{v.title}</p>
+            <div className="mb-2 flex items-baseline justify-between border-b border-bone-100/10 pb-2">
+              <p className="font-sans text-sm text-bone-100">
+                <span className="mr-3 font-display italic text-bone-400">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {v.title}
+              </p>
               {v.year && (
-                <span className="font-sans text-[11px] uppercase tracking-wide2 text-diamond-500">
+                <span className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
                   {v.year}
                 </span>
               )}
@@ -171,7 +234,7 @@ function MusicBlock({
       </div>
       {note && (
         <Item>
-          <p className="mt-6 font-sans text-xs italic text-diamond-500">{note}</p>
+          <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
         </Item>
       )}
     </Stagger>
@@ -192,39 +255,41 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
 
   return (
     <Stagger>
-      <div className="grid grid-cols-1 gap-4 min-[380px]:grid-cols-2">
-        {products.map((p) => {
+      <div className="grid grid-cols-1 gap-5 min-[380px]:grid-cols-2">
+        {products.map((p, i) => {
           const isReserved = reserved.has(p.id);
           return (
             <Item key={p.id}>
-              <div className="group flex h-full flex-col overflow-hidden rounded-xl border border-diamond-300/10 bg-void-800/40">
+              <div className="group flex h-full flex-col border border-bone-100/10">
                 {/* placeholder product visual (no product imagery in source) */}
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-cosmic-900/50 to-void-900">
-                  <span className="absolute inset-0 grid place-items-center font-display text-4xl metallic opacity-40">
-                    {p.title.charAt(0)}
+                <div className="relative aspect-square overflow-hidden border-b border-bone-100/10 bg-void-800">
+                  <span className="absolute inset-0 grid place-items-center font-display text-5xl italic text-bone-100/15">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="absolute left-2 top-2 rounded-full bg-black/40 px-2 py-0.5 font-sans text-[9px] uppercase tracking-wide2 text-diamond-400">
+                  <span className="absolute left-0 top-0 border-b border-r border-bone-100/10 bg-void px-2 py-1 font-sans text-[9px] uppercase tracking-wide2 text-bone-500">
                     Preview
                   </span>
                 </div>
                 <div className="flex flex-1 flex-col p-3">
-                  <p className="font-sans text-[13px] leading-tight text-diamond-100">
+                  <p className="font-sans text-[13px] leading-tight text-bone-100">
                     {p.title}
                   </p>
-                  <p className="mt-0.5 font-sans text-[10px] uppercase tracking-wide2 text-diamond-500">
+                  <p className="mt-0.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
                     {p.material}
                   </p>
                   <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-3">
-                    <span className="font-display text-lg metallic">${p.price}</span>
+                    <span className="font-display text-lg italic text-bone-50">
+                      ${p.price}
+                    </span>
                     <button
                       type="button"
                       onClick={() => toggle(p.id)}
                       aria-pressed={isReserved}
                       className={[
-                        "rounded-full border px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cosmic-400",
+                        "border px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100",
                         isReserved
-                          ? "border-cosmic-400 bg-cosmic-600/30 text-white"
-                          : "border-diamond-300/25 text-diamond-200 hover:border-cosmic-400/70",
+                          ? "border-bone-100 bg-bone-100 text-void"
+                          : "border-bone-100/25 text-bone-200 hover:border-bone-100",
                       ].join(" ")}
                     >
                       {isReserved ? "Reserved ✓" : "Reserve"}
@@ -238,7 +303,7 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
       </div>
       {note && (
         <Item>
-          <p className="mt-6 font-sans text-xs italic text-diamond-500">{note}</p>
+          <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
         </Item>
       )}
     </Stagger>
@@ -256,29 +321,27 @@ function EventsBlock({
 }) {
   if (events.length === 0) {
     return (
-      <div className="flex flex-col items-center py-12 text-center">
-        <div className="mb-5 grid h-16 w-16 place-items-center rounded-full border border-cosmic-400/30">
-          <span className="font-display text-2xl metallic">VIII</span>
-        </div>
-        <p className="max-w-xs font-sans text-sm leading-relaxed text-diamond-300/80">
+      <div className="border-y border-bone-100/10 py-12 text-center">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
-        <span className="eyebrow mt-5">Placeholder — no dates confirmed</span>
+        <span className="eyebrow mt-5 block">Placeholder — no dates confirmed</span>
       </div>
     );
   }
   return (
     <Stagger>
-      <div className="space-y-4">
+      <div className="divide-y divide-bone-100/10 border-y border-bone-100/10">
         {events.map((e) => (
           <Item key={e.id}>
-            <div className="rounded-xl border border-diamond-300/10 p-4">
-              <p className="font-sans text-[11px] uppercase tracking-wide2 text-diamond-500">
+            <div className="py-5">
+              <p className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
                 {e.dateLabel} · {e.location}
               </p>
-              <h3 className="mt-1 font-display text-lg text-diamond-50">{e.title}</h3>
+              <h3 className="mt-1 font-display text-lg text-bone-50">{e.title}</h3>
               {e.description && (
-                <p className="mt-2 font-sans text-sm text-diamond-200/80">
+                <p className="mt-2 font-sans text-sm text-bone-200/80">
                   {e.description}
                 </p>
               )}
@@ -287,7 +350,7 @@ function EventsBlock({
                   href={e.ticketUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${linkBtn} mt-4`}
+                  className="btn-editorial mt-4"
                 >
                   Get Tickets
                 </a>
@@ -350,15 +413,15 @@ function ContactBlock({
 
   // text-base below lg keeps iOS Safari from auto-zooming on focus (<16px inputs).
   const field =
-    "w-full rounded-lg border border-diamond-300/15 bg-void-900/50 px-3 py-2.5 font-sans text-base lg:text-sm text-diamond-50 outline-none transition-colors placeholder:text-diamond-500 focus:border-cosmic-400";
+    "w-full border-0 border-b border-bone-100/20 bg-transparent px-0 py-2.5 font-sans text-base lg:text-sm text-bone-50 outline-none transition-colors placeholder:text-bone-500 focus:border-bone-100";
 
   return (
     <Stagger>
       <Item>
-        <p className="font-sans text-sm leading-relaxed text-diamond-200/90">{blurb}</p>
+        <p className="font-sans text-sm leading-relaxed text-bone-200/90">{blurb}</p>
         <a
           href={`mailto:${email}`}
-          className="mt-2 inline-block font-sans text-sm text-cosmic-200 underline-offset-4 hover:underline"
+          className="mt-2 inline-block font-display text-base italic text-bone-50 underline decoration-bone-100/30 underline-offset-4 hover:decoration-bone-100"
         >
           {email}
         </a>
@@ -366,16 +429,16 @@ function ContactBlock({
 
       <Item>
         {sent ? (
-          <div className="mt-6 rounded-xl border border-cosmic-400/40 bg-cosmic-600/10 p-5">
+          <div className="mt-6 border-y border-bone-100/20 py-6">
             <p className="eyebrow">Transmission received</p>
-            <p className="mt-2 font-display text-xl text-diamond-50">Thank you.</p>
-            <p className="mt-1 font-sans text-sm text-diamond-300/80">{sla}</p>
+            <p className="mt-2 font-display text-xl italic text-bone-50">Thank you.</p>
+            <p className="mt-1 font-sans text-sm text-bone-300/80">{sla}</p>
           </div>
         ) : (
-          <form onSubmit={onSubmit} noValidate className="mt-6 space-y-3">
+          <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
             {(["name", "email", "subject"] as const).map((key) => (
               <div key={key}>
-                <label htmlFor={key} className="eyebrow mb-1.5 block">
+                <label htmlFor={key} className="eyebrow mb-1 block">
                   {key}
                 </label>
                 <input
@@ -389,12 +452,12 @@ function ContactBlock({
                   autoComplete="off"
                 />
                 {errors[key] && (
-                  <p className="mt-1 font-sans text-[11px] text-cosmic-200">{errors[key]}</p>
+                  <p className="mt-1 font-sans text-[11px] text-cosmic-400">{errors[key]}</p>
                 )}
               </div>
             ))}
             <div>
-              <label htmlFor="message" className="eyebrow mb-1.5 block">
+              <label htmlFor="message" className="eyebrow mb-1 block">
                 message
               </label>
               <textarea
@@ -407,10 +470,10 @@ function ContactBlock({
                 placeholder="Your message"
               />
               {errors.message && (
-                <p className="mt-1 font-sans text-[11px] text-cosmic-200">{errors.message}</p>
+                <p className="mt-1 font-sans text-[11px] text-cosmic-400">{errors.message}</p>
               )}
             </div>
-            <button type="submit" className={`${linkBtn} mt-2`}>
+            <button type="submit" className="btn-editorial mt-2">
               Send Transmission →
             </button>
           </form>
@@ -428,14 +491,14 @@ function ContactBlock({
                   href={s.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-diamond-300/20 px-3 py-1.5 font-sans text-[11px] uppercase tracking-wide2 text-diamond-200 transition-colors hover:border-cosmic-400/70 hover:text-white"
+                  className="border border-bone-100/25 px-3 py-1.5 font-sans text-[11px] uppercase tracking-wide2 text-bone-200 transition-colors hover:bg-bone-100 hover:text-void"
                 >
                   {s.label}
                 </a>
               ) : (
                 <span
                   key={s.label}
-                  className="rounded-full border border-diamond-300/10 px-3 py-1.5 font-sans text-[11px] uppercase tracking-wide2 text-diamond-500"
+                  className="border border-bone-100/10 px-3 py-1.5 font-sans text-[11px] uppercase tracking-wide2 text-bone-500"
                   title="Link coming soon"
                 >
                   {s.label} · soon
@@ -451,19 +514,28 @@ function ContactBlock({
           <p className="eyebrow mb-3">The Archive</p>
           <div className="grid grid-cols-2 gap-3">
             {archive.map((a, i) => (
-              <div
-                key={i}
-                className="relative aspect-[4/3] overflow-hidden rounded-lg border border-diamond-300/10 bg-gradient-to-br from-void-700 to-void-900"
-              >
-                <div className="absolute inset-0 flex flex-col justify-end p-2">
-                  <p className="font-sans text-[11px] leading-tight text-diamond-200">
+              <figure key={i} className="border border-bone-100/10">
+                <div className="relative aspect-[4/3] overflow-hidden bg-void-800">
+                  {a.src && (
+                    <Image
+                      src={a.src}
+                      alt={a.alt}
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 220px"
+                      className="photo-treatment object-cover"
+                      style={{ objectPosition: a.position ?? "50% 50%" }}
+                    />
+                  )}
+                </div>
+                <figcaption className="border-t border-bone-100/10 p-2">
+                  <p className="font-sans text-[11px] leading-tight text-bone-200">
                     {a.alt}
                   </p>
-                  <p className="font-sans text-[9px] uppercase tracking-wide2 text-diamond-500">
+                  <p className="mt-0.5 font-sans text-[9px] uppercase tracking-wide2 text-bone-500">
                     {a.meta}
                   </p>
-                </div>
-              </div>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
@@ -502,9 +574,11 @@ export default function SectionContent({ section }: { section: Section }) {
           archive={data.archive}
         />
       );
+    case "gallery":
+      return <GalleryBlock description={data.description} images={data.images} />;
     case "home":
       return (
-        <p className="font-sans text-sm leading-relaxed text-diamond-200/90">
+        <p className="font-sans text-sm leading-relaxed text-bone-200/90">
           {data.intro}
         </p>
       );

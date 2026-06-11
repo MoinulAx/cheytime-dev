@@ -12,7 +12,41 @@ export type SectionKind =
   | "music"
   | "store"
   | "events"
-  | "contact";
+  | "contact"
+  | "gallery";
+
+/**
+ * Stable section ids. The six named sections sit on the even hours; the six
+ * gallery chapters sit on the odd hours so every numeral on the dial opens
+ * something.
+ */
+export type SectionId =
+  | "home"
+  | "about"
+  | "music"
+  | "store"
+  | "events"
+  | "contact"
+  | `gallery-${string}`;
+
+/** A single editorial photograph (used by galleries and panel banners). */
+export interface GalleryImage {
+  src: string;
+  alt: string;
+  caption?: string;
+  meta?: string;
+  /** CSS object-position so one photograph can serve several crops. */
+  position?: string;
+}
+
+/** The photograph shown at the top of a section's panel. */
+export interface SectionImage {
+  src: string;
+  alt: string;
+  /** CSS object-position so one photograph can serve several crops. */
+  position?: string;
+  meta?: string;
+}
 
 /** A credit line (role → name) used on the About section. */
 export interface Credit {
@@ -47,10 +81,13 @@ export interface EventItem {
   ticketUrl?: string;
 }
 
-/** An archive/gallery entry (caption + meta). */
+/** An archive/gallery entry (caption + meta, optional photograph). */
 export interface ArchiveItem {
   alt: string;
   meta: string;
+  src?: string;
+  /** CSS object-position so one photograph can serve several crops. */
+  position?: string;
 }
 
 /** A social or platform link. `url: null` => known channel, URL still missing. */
@@ -101,11 +138,16 @@ export type SectionData =
       sla: string;
       socials: SocialLink[];
       archive: ArchiveItem[];
+    }
+  | {
+      kind: "gallery";
+      description?: string;
+      images: GalleryImage[];
     };
 
 export interface Section {
   /** Stable id used as React key and aria targets. */
-  id: SectionKind;
+  id: SectionId;
   /** Roman numeral shown on the clock face (e.g. "XII"). */
   numeral: string;
   /** Position on the 12-hour dial (0 = XII at top, clockwise). */
@@ -122,6 +164,8 @@ export interface Section {
   subtitle: string;
   /** `true` when the data is a clearly-labeled placeholder. */
   placeholder?: boolean;
+  /** Photograph shown as the panel's opening image (varies per section). */
+  image?: SectionImage;
   /** Typed, renderable content. */
   data: SectionData;
 }

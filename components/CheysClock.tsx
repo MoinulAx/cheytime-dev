@@ -8,7 +8,7 @@ import RomanNumerals from "./RomanNumerals";
 import ContentPanel from "./ContentPanel";
 import { HOME_SECTION, sectionById, sectionByHour } from "@/lib/sections";
 import { HAND_SPRING, HAND_TRANSFORM_ORIGIN } from "@/lib/clock";
-import type { SectionKind } from "@/types/section";
+import type { SectionId } from "@/types/section";
 
 /** Measure a square clock stage that always fits the viewport. */
 function useStageSize() {
@@ -20,9 +20,9 @@ function useStageSize() {
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
-      // Reserve vertical room (≈26%) below the clock for the home text so the
-      // numerals/figure never collide with it.
-      setSize(Math.min(width * 0.92, height * 0.74, 720));
+      // Reserve vertical room (≈28%) below the clock for the home copy so the
+      // numerals and their labels never collide with it.
+      setSize(Math.min(width * 0.92, height * 0.72, 720));
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -45,12 +45,15 @@ function useMediaQuery(query: string) {
 }
 
 /**
- * CheysClock — the full interactive experience.
+ * CheysClock — the full interactive experience, set like a magazine spread:
+ * masthead rule across the top, the quiet dial centre-stage over Chey's
+ * portrait, and the home copy anchored to the bottom corners (never centred
+ * under the dial, so nothing overlaps the numerals).
  *
- * Layers (z): 0 background (page) · 1 face rings · 2 tick face · 20 hand ·
+ * Layers (z): 0 background (page) · 1 face ring · 2 dial marks · 20 hand ·
  * 21 hub · 30 numerals · 40 content panel. The hand rotates (only) to the
- * selected section's angle on a soft overshooting spring; selecting XII /
- * closing the panel returns it home to 0°.
+ * selected section's angle on a soft spring; selecting XII / closing the
+ * panel returns it home to 0°.
  */
 export default function CheysClock() {
   const reduce = useReducedMotion();
@@ -58,7 +61,7 @@ export default function CheysClock() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   // null === Home / base immersive state (hand at 0°, no panel).
-  const [selectedId, setSelectedId] = useState<SectionKind | null>(null);
+  const [selectedId, setSelectedId] = useState<SectionId | null>(null);
 
   const selected = (selectedId ? sectionById(selectedId) : null) ?? null;
   const activeHour = selected ? selected.hourIndex : HOME_SECTION.hourIndex;
@@ -89,17 +92,21 @@ export default function CheysClock() {
   return (
     <div
       ref={ref}
-      className="relative z-10 flex h-dvh w-full items-center justify-center overflow-hidden pb-32 md:pb-20 [@media(max-height:480px)_and_(max-width:1023px)]:pb-10"
+      className="relative z-10 flex h-dvh w-full items-center justify-center overflow-hidden pb-28 pt-10 md:pb-24 [@media(max-height:480px)_and_(max-width:1023px)]:pb-10"
     >
-      {/* Brand mark — always visible */}
-      <div className="pointer-events-none fixed left-5 top-5 z-40 md:left-8 md:top-7">
-        <p className="font-display text-lg font-bold metallic leading-none md:text-xl">
-          Chey&apos;s&nbsp;Time
-        </p>
-        <p className="mt-1 font-sans text-[9px] uppercase tracking-[0.28em] text-diamond-500">
-          Hip Hop&apos;s Princess
-        </p>
-      </div>
+      {/* Masthead — full-width editorial header rule, always visible */}
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-40 px-5 pt-4 md:px-8 md:pt-5">
+        <div className="flex items-baseline justify-between pb-3">
+          <p className="font-display text-xl font-bold italic leading-none text-bone-50 md:text-2xl">
+            Chey&apos;s&nbsp;Time
+          </p>
+          <p className="eyebrow hidden sm:block">
+            Hip Hop&apos;s Princess&ensp;—&ensp;Staten Island, NY
+          </p>
+          <p className="eyebrow sm:hidden">Hip Hop&apos;s Princess</p>
+        </div>
+        <div className="rule" />
+      </header>
 
       {/* The clock stage — lifted above the backdrop while open so the lit
           clock stays interactive (you can jump straight to another hour). */}
@@ -113,31 +120,21 @@ export default function CheysClock() {
       >
         {stageSize > 0 && (
           <>
-            {/* z-1 — face ring */}
+            {/* z-1 — single hairline face ring */}
             <div
               aria-hidden="true"
-              className="absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cosmic-400/20"
-              style={{
-                width: ringDiameter,
-                height: ringDiameter,
-                boxShadow:
-                  "inset 0 0 80px rgba(124,58,237,0.18), 0 0 60px rgba(109,40,217,0.12)",
-              }}
-            />
-            <div
-              aria-hidden="true"
-              className="absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 rounded-full border border-diamond-200/5"
-              style={{ width: ringDiameter * 1.06, height: ringDiameter * 1.06 }}
+              className="absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 rounded-full border border-bone-100/15"
+              style={{ width: ringDiameter, height: ringDiameter }}
             />
 
-            {/* z-2 — static dial face (tick marks) */}
+            {/* z-2 — static dial marks */}
             <div className="absolute inset-0 z-[2]">
               <ClockFace className="h-full w-full" />
             </div>
 
             {/* z-20 — clock hand (rotates only, around the central pivot) */}
             <motion.div
-              className="absolute inset-0 z-20 drop-glow will-change-transform"
+              className="absolute inset-0 z-20 will-change-transform"
               style={{ transformOrigin: HAND_TRANSFORM_ORIGIN }}
               initial={false}
               animate={{ rotate: handAngle }}
@@ -146,25 +143,12 @@ export default function CheysClock() {
               <ClockHand className="h-full w-full" />
             </motion.div>
 
-            {/* z-[21] — jewelled centre hub (static, sits over the hand base) */}
+            {/* z-[21] — plain centre hub (static, sits over the hand base) */}
             <div
               aria-hidden="true"
-              className="absolute left-1/2 top-1/2 z-[21] -translate-x-1/2 -translate-y-1/2 rounded-full"
-              style={{
-                width: stageSize * 0.05,
-                height: stageSize * 0.05,
-                background:
-                  "radial-gradient(circle at 38% 32%, #ffffff 0%, #cdd2da 38%, #5b626e 100%)",
-                boxShadow:
-                  "0 0 18px rgba(168,85,247,0.7), inset 0 0 6px rgba(0,0,0,0.4)",
-                border: "1px solid rgba(255,255,255,0.5)",
-              }}
-            >
-              <span
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cosmic-500"
-                style={{ width: "34%", height: "34%" }}
-              />
-            </div>
+              className="absolute left-1/2 top-1/2 z-[21] -translate-x-1/2 -translate-y-1/2 rounded-full border border-bone-100 bg-void"
+              style={{ width: stageSize * 0.028, height: stageSize * 0.028 }}
+            />
 
             {/* z-30 — numerals */}
             <RomanNumerals
@@ -176,21 +160,30 @@ export default function CheysClock() {
         )}
       </motion.div>
 
-      {/* Home / base overlay — fades out when a section opens */}
+      {/* Home / base copy — anchored to the bottom corners (clear of the
+          dial), fades out when a section opens */}
       <AnimatePresence>
         {!isOpen && stageSize > 0 && (
           <motion.div
             key="home-overlay"
-            className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex flex-col items-center bg-gradient-to-t from-void via-void/85 to-transparent px-6 pb-7 pt-28 text-center [@media(max-height:480px)_and_(max-width:1023px)]:pb-4 [@media(max-height:480px)_and_(max-width:1023px)]:pt-10"
+            className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-5 pb-6 md:px-8 md:pb-7"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="max-w-sm font-sans text-[13px] leading-relaxed text-diamond-300/75 [@media(max-height:420px)_and_(max-width:1023px)]:hidden">
-              {homeData?.intro}
-            </p>
-            <p className="eyebrow mt-3 animate-pulse-glow">{homeData?.cue}</p>
+            <div className="rule mb-4" />
+            <div className="flex items-end justify-between gap-8">
+              <p className="hidden max-w-sm text-left font-sans text-[13px] leading-relaxed text-bone-200/85 md:block">
+                {homeData?.intro}
+              </p>
+              <div className="flex w-full items-baseline justify-between md:w-auto md:flex-col md:items-end md:gap-1.5">
+                <p className="eyebrow text-bone-100">{homeData?.cue}</p>
+                <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                  {homeData?.location}
+                </p>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

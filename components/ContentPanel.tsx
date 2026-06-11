@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import SectionContent from "./SectionContent";
 import type { Section } from "@/types/section";
@@ -16,10 +17,11 @@ const FOCUSABLE =
 
 /**
  * ContentPanel — z-40. Desktop: slides from the right. Mobile: rises as a
- * bottom sheet. Frosted glass, AnimatePresence entry/exit, and three close
- * affordances (button · Escape · backdrop). Implements a focus trap and
- * restores focus to the trigger on close. Honours prefers-reduced-motion
- * (simple fade instead of spring).
+ * bottom sheet. A solid editorial surface (no blur, square corners, hairline
+ * border) that opens on the section's own photograph. AnimatePresence
+ * entry/exit and three close affordances (button · Escape · backdrop).
+ * Implements a focus trap and restores focus to the trigger on close.
+ * Honours prefers-reduced-motion (simple fade instead of spring).
  */
 export default function ContentPanel({
   section,
@@ -111,14 +113,15 @@ export default function ContentPanel({
     <AnimatePresence mode="wait">
       {isOpen && section && (
         <>
-          {/* Backdrop — kept light on desktop so the clock stays visible */}
+          {/* Backdrop — a plain darken, no blur; kept light on desktop so
+              the clock stays visible */}
           <motion.button
             key="backdrop"
             type="button"
             aria-label="Close panel"
             tabIndex={-1}
             onClick={onClose}
-            className="fixed inset-0 z-40 cursor-default bg-black/30 backdrop-blur-[2px] lg:bg-black/20"
+            className="fixed inset-0 z-40 cursor-default bg-black/40 lg:bg-black/25"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -133,10 +136,10 @@ export default function ContentPanel({
             aria-label={`${section.title} — ${section.subtitle}`}
             tabIndex={-1}
             className={[
-              "glass panel-scroll fixed z-50 overflow-y-auto outline-none",
+              "panel panel-scroll fixed z-50 overflow-y-auto outline-none",
               isDesktop
-                ? "right-0 top-0 h-dvh w-full max-w-[460px] border-l"
-                : "inset-x-0 bottom-0 max-h-[88dvh] rounded-t-3xl border-t",
+                ? "right-0 top-0 h-dvh w-full max-w-[480px] border-l"
+                : "inset-x-0 bottom-0 max-h-[88dvh] border-t",
             ].join(" ")}
             variants={panelVariants}
             initial="initial"
@@ -147,29 +150,26 @@ export default function ContentPanel({
             {/* mobile grab handle */}
             {!isDesktop && (
               <div className="sticky top-0 z-10 flex justify-center pt-3">
-                <span className="h-1 w-10 rounded-full bg-diamond-300/30" />
+                <span className="h-0.5 w-12 bg-bone-300/40" />
               </div>
             )}
 
-            <div className="px-7 pb-16 pt-7 md:px-9 md:pt-9">
-              {/* Header */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="font-display text-3xl font-bold metallic-cosmic">
-                    {section.numeral}
-                  </span>
-                  <h2 className="mt-2 font-display text-3xl font-bold leading-none text-diamond-50 md:text-4xl">
-                    {section.title}
-                  </h2>
-                  <p className="eyebrow mt-2">{section.subtitle}</p>
-                </div>
+            <div className="px-6 pb-16 pt-6 md:px-8 md:pt-8">
+              {/* Header — index row, then the title like a chapter opener */}
+              <div className="flex items-baseline justify-between gap-4">
+                <p className="eyebrow">
+                  Hour {section.numeral}&ensp;·&ensp;
+                  {String(section.hourIndex === 0 ? 12 : section.hourIndex).padStart(2, "0")}
+                  /12
+                </p>
                 <button
                   type="button"
                   onClick={onClose}
                   aria-label="Close"
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-diamond-300/20 text-diamond-200 transition-colors hover:border-cosmic-400/60 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cosmic-400"
+                  className="pointer-events-auto -mr-1 inline-flex shrink-0 items-center gap-2 px-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-300 transition-colors hover:text-bone-50 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  Close
+                  <svg width="11" height="11" viewBox="0 0 16 16" aria-hidden="true">
                     <path
                       d="M2 2l12 12M14 2L2 14"
                       stroke="currentColor"
@@ -180,7 +180,39 @@ export default function ContentPanel({
                 </button>
               </div>
 
-              <div className="mt-7 h-px w-full bg-gradient-to-r from-cosmic-400/50 to-transparent" />
+              <h2 className="mt-3 font-display text-4xl font-bold leading-[0.95] text-bone-50 md:text-5xl">
+                {section.title}
+              </h2>
+              <p className="mt-2 font-display text-base italic text-bone-300">
+                {section.subtitle}
+              </p>
+
+              <div className="rule mt-6" />
+
+              {/* Opening photograph — each section gets its own */}
+              {section.image && (
+                <figure className="mt-6">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden border border-bone-100/10">
+                    <Image
+                      src={section.image.src}
+                      alt={section.image.alt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 480px"
+                      className="photo-treatment object-cover"
+                      style={{ objectPosition: section.image.position ?? "50% 50%" }}
+                    />
+                    <div className="grain absolute inset-0 opacity-[0.08] mix-blend-overlay" />
+                  </div>
+                  <figcaption className="mt-2 flex items-baseline justify-between">
+                    <span className="font-sans text-[10px] uppercase tracking-wide2 text-bone-400">
+                      {section.image.meta ?? section.image.alt}
+                    </span>
+                    <span className="font-display text-xs italic text-bone-500">
+                      fig. {section.numeral.toLowerCase()}
+                    </span>
+                  </figcaption>
+                </figure>
+              )}
 
               {/* Body */}
               <div className="mt-7">
