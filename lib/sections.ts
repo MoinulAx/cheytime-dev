@@ -32,15 +32,21 @@ export const angleForHour = (hourIndex: number): number =>
   hourIndex * DEGREES_PER_HOUR;
 
 /**
- * The photo library. Three photographs exist today; galleries and panel
- * banners re-crop them via object-position until the full shoot is delivered
- * (see MIGRATION_REPORT.md — "clean artist photo set" is still missing).
+ * Imagery comes straight from Chey's own videos: YouTube serves four distinct
+ * frames per upload (hq1/hq2/hq3 + hqdefault), so every gallery and banner is
+ * a real still of her — no stock, no generated photos. Replace with a proper
+ * photo shoot when one is delivered (see MIGRATION_REPORT.md).
  */
-export const PHOTOS = {
-  figure: "/assets/chey-figure.jpg",
-  motion: "/assets/chey-motion.jpg",
-  hands: "/assets/chey-hands.jpg",
+const VIDEO_IDS = {
+  poppin: "29vWUXMTkME",
+  longKiss: "OamCSPuswjg",
+  sessionIII: "4T6mFd2Sz_Y",
+  sessionIV: "l62mMBXck70",
 } as const;
+
+/** URL of a YouTube frame: n = 1..3 for distinct stills, omit for default. */
+const still = (videoId: string, n?: 1 | 2 | 3): string =>
+  `https://i.ytimg.com/vi/${videoId}/${n ? `hq${n}` : "hqdefault"}.jpg`;
 
 /** Build a gallery frame with the shared caption format. */
 const frame = (
@@ -75,29 +81,19 @@ export const SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-portrait",
+    id: "gallery-poppin",
     numeral: "I",
     hourIndex: 1,
     angle: angleForHour(1),
-    title: "The Portrait",
+    title: "Poppin'",
     subtitle: "Gallery · One",
     data: {
       kind: "gallery",
-      description: "Full-length studies. Coat, shadow, and stance.",
+      description: "Stills from the Poppin' video — her latest, frame by frame.",
       images: [
-        frame(
-          PHOTOS.figure,
-          "Chey — full-length portrait in a dark coat",
-          "Figure Study No. 1",
-          "Staten Island · 2026",
-        ),
-        frame(
-          PHOTOS.figure,
-          "Chey — portrait detail, upper frame",
-          "Figure Study No. 2",
-          "Staten Island · 2026",
-          "50% 12%",
-        ),
+        frame(still(VIDEO_IDS.poppin, 1), "Chey — Poppin' video still", "Poppin' — Frame I", "Music Video · 2026"),
+        frame(still(VIDEO_IDS.poppin, 2), "Chey — Poppin' video still", "Poppin' — Frame II", "Music Video · 2026"),
+        frame(still(VIDEO_IDS.poppin, 3), "Chey — Poppin' video still", "Poppin' — Frame III", "Music Video · 2026"),
       ],
     },
   },
@@ -109,10 +105,9 @@ export const SECTIONS: Section[] = [
     title: "About",
     subtitle: "The Manifesto",
     image: {
-      src: PHOTOS.figure,
-      alt: "Chey — full-length portrait in a dark coat",
-      position: "50% 18%",
-      meta: "Portrait · Staten Island",
+      src: still(VIDEO_IDS.poppin),
+      alt: "Chey — still from the Poppin' music video",
+      meta: "Still · Poppin' · 2026",
     },
     data: {
       kind: "about",
@@ -132,29 +127,19 @@ export const SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-motion",
+    id: "gallery-longkiss",
     numeral: "III",
     hourIndex: 3,
     angle: angleForHour(3),
-    title: "In Motion",
+    title: "Long Kiss Goodnight",
     subtitle: "Gallery · Two",
     data: {
       kind: "gallery",
-      description: "Movement frames. Fabric mid-air, nothing posed twice.",
+      description: "On location for Long Kiss Goodnight.",
       images: [
-        frame(
-          PHOTOS.motion,
-          "Chey — motion portrait, dress in movement",
-          "Motion Frame No. 1",
-          "On Location · 2025",
-        ),
-        frame(
-          PHOTOS.motion,
-          "Chey — motion portrait, detail crop",
-          "Motion Frame No. 2",
-          "On Location · 2025",
-          "50% 80%",
-        ),
+        frame(still(VIDEO_IDS.longKiss, 1), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame I", "Music Video · 2025"),
+        frame(still(VIDEO_IDS.longKiss, 2), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame II", "Music Video · 2025"),
+        frame(still(VIDEO_IDS.longKiss, 3), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame III", "Music Video · 2025"),
       ],
     },
   },
@@ -166,10 +151,9 @@ export const SECTIONS: Section[] = [
     title: "Music",
     subtitle: "The Sound",
     image: {
-      src: PHOTOS.motion,
-      alt: "Chey — motion portrait, dress in movement",
-      position: "50% 30%",
-      meta: "Session Still · 2025",
+      src: still(VIDEO_IDS.longKiss),
+      alt: "Chey — still from Long Kiss Goodnight",
+      meta: "Still · Long Kiss Goodnight · 2025",
     },
     data: {
       kind: "music",
@@ -190,29 +174,19 @@ export const SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-details",
+    id: "gallery-session3",
     numeral: "V",
     hourIndex: 5,
     angle: angleForHour(5),
-    title: "The Details",
+    title: "Session III",
     subtitle: "Gallery · Three",
     data: {
       kind: "gallery",
-      description: "Close work. Hands, rings, the small signatures.",
+      description: "Inside the Session III recording.",
       images: [
-        frame(
-          PHOTOS.hands,
-          "Chey — hands with rings, close frame",
-          "Detail No. 1 — Rings",
-          "Studio · 2026",
-        ),
-        frame(
-          PHOTOS.hands,
-          "Chey — hands with rings, alternate crop",
-          "Detail No. 2 — Gesture",
-          "Studio · 2026",
-          "20% 50%",
-        ),
+        frame(still(VIDEO_IDS.sessionIII, 1), "Chey — Session III still", "Session III — Frame I", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIII, 2), "Chey — Session III still", "Session III — Frame II", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIII, 3), "Chey — Session III still", "Session III — Frame III", "Session · YouTube"),
       ],
     },
   },
@@ -223,12 +197,6 @@ export const SECTIONS: Section[] = [
     angle: angleForHour(6),
     title: "Store",
     subtitle: "The Objects",
-    image: {
-      src: PHOTOS.hands,
-      alt: "Chey — hands with rings, close frame",
-      position: "70% 50%",
-      meta: "Object Study · 2026",
-    },
     data: {
       kind: "store",
       products: [
@@ -243,30 +211,19 @@ export const SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-onset",
+    id: "gallery-session4",
     numeral: "VII",
     hourIndex: 7,
     angle: angleForHour(7),
-    title: "On Set",
+    title: "Session IV",
     subtitle: "Gallery · Four",
     data: {
       kind: "gallery",
-      description: "Between takes — the video shoots, unguarded.",
+      description: "Inside the Session IV recording.",
       images: [
-        frame(
-          PHOTOS.figure,
-          "Chey — on set, full figure",
-          "Set Still No. 1 — Poppin'",
-          "Music Video · 2026",
-          "50% 60%",
-        ),
-        frame(
-          PHOTOS.motion,
-          "Chey — on set, in movement",
-          "Set Still No. 2 — Long Kiss Goodnight",
-          "Music Video · 2025",
-          "50% 45%",
-        ),
+        frame(still(VIDEO_IDS.sessionIV, 1), "Chey — Session IV still", "Session IV — Frame I", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIV, 2), "Chey — Session IV still", "Session IV — Frame II", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIV, 3), "Chey — Session IV still", "Session IV — Frame III", "Session · YouTube"),
       ],
     },
   },
@@ -279,9 +236,8 @@ export const SECTIONS: Section[] = [
     subtitle: "Upcoming",
     placeholder: true,
     image: {
-      src: PHOTOS.motion,
-      alt: "Chey — motion portrait, dress in movement",
-      position: "50% 65%",
+      src: still(VIDEO_IDS.sessionIV),
+      alt: "Chey — performance still",
       meta: "Live · Coming Soon",
     },
     data: {
@@ -292,30 +248,20 @@ export const SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-afterhours",
+    id: "gallery-reel",
     numeral: "IX",
     hourIndex: 9,
     angle: angleForHour(9),
-    title: "After Hours",
+    title: "The Reel",
     subtitle: "Gallery · Five",
     data: {
       kind: "gallery",
-      description: "When the session ends and the city doesn't.",
+      description: "One frame from every release — the run so far.",
       images: [
-        frame(
-          PHOTOS.motion,
-          "Chey — late portrait in movement",
-          "After Hours No. 1",
-          "New York · 2025",
-          "50% 20%",
-        ),
-        frame(
-          PHOTOS.hands,
-          "Chey — hands at rest, rings catching light",
-          "After Hours No. 2",
-          "New York · 2025",
-          "45% 50%",
-        ),
+        frame(still(VIDEO_IDS.poppin, 2), "Chey — Poppin' video still", "Poppin'", "2026"),
+        frame(still(VIDEO_IDS.longKiss, 1), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight", "2025"),
+        frame(still(VIDEO_IDS.sessionIII, 2), "Chey — Session III still", "Session III", "YouTube"),
+        frame(still(VIDEO_IDS.sessionIV, 3), "Chey — Session IV still", "Session IV", "YouTube"),
       ],
     },
   },
@@ -327,9 +273,8 @@ export const SECTIONS: Section[] = [
     title: "Contact",
     subtitle: "Transmission & Archive",
     image: {
-      src: PHOTOS.hands,
-      alt: "Chey — hands with rings, close frame",
-      position: "30% 40%",
+      src: still(VIDEO_IDS.longKiss, 3),
+      alt: "Chey — still from Long Kiss Goodnight",
       meta: "Open Line · 48hr Reply",
     },
     data: {
@@ -345,12 +290,10 @@ export const SECTIONS: Section[] = [
         { label: "Apple Music", url: null },
       ],
       archive: [
-        { alt: "Music Video Shoot — Poppin'", meta: "Studio · 2026", src: PHOTOS.figure, position: "50% 20%" },
-        { alt: "Live Performance — Raw Set", meta: "Berlin · 2026", src: PHOTOS.motion, position: "50% 35%" },
-        { alt: "Long Kiss Goodnight", meta: "On Location · 2025", src: PHOTOS.motion, position: "50% 70%" },
-        { alt: "Studio Session — Vocal Take", meta: "Studio · 2026", src: PHOTOS.hands, position: "30% 50%" },
-        { alt: "Freestyle Set", meta: "London · 2025", src: PHOTOS.figure, position: "50% 55%" },
-        { alt: "Behind the Scenes", meta: "Tokyo · 2026", src: PHOTOS.hands, position: "70% 50%" },
+        { alt: "Music Video Shoot — Poppin'", meta: "Studio · 2026", src: still(VIDEO_IDS.poppin, 3) },
+        { alt: "Long Kiss Goodnight", meta: "On Location · 2025", src: still(VIDEO_IDS.longKiss, 2) },
+        { alt: "Studio Session — Vocal Take", meta: "Session III", src: still(VIDEO_IDS.sessionIII, 1) },
+        { alt: "Behind the Scenes", meta: "Session IV", src: still(VIDEO_IDS.sessionIV, 1) },
       ],
     },
   },
@@ -363,26 +306,12 @@ export const SECTIONS: Section[] = [
     subtitle: "Gallery · Six",
     data: {
       kind: "gallery",
-      description: "Everything kept. The full contact sheet, one hour before midnight.",
+      description: "Everything kept — the full contact sheet, one hour before midnight.",
       images: [
-        frame(
-          PHOTOS.figure,
-          "Chey — full-length portrait in a dark coat",
-          "Vault No. 1 — Figure",
-          "Staten Island · 2026",
-        ),
-        frame(
-          PHOTOS.motion,
-          "Chey — motion portrait, dress in movement",
-          "Vault No. 2 — Motion",
-          "On Location · 2025",
-        ),
-        frame(
-          PHOTOS.hands,
-          "Chey — hands with rings, close frame",
-          "Vault No. 3 — Hands",
-          "Studio · 2026",
-        ),
+        frame(still(VIDEO_IDS.poppin), "Chey — Poppin' video still", "Vault No. 1 — Poppin'", "2026"),
+        frame(still(VIDEO_IDS.longKiss), "Chey — Long Kiss Goodnight video still", "Vault No. 2 — Long Kiss Goodnight", "2025"),
+        frame(still(VIDEO_IDS.sessionIII), "Chey — Session III still", "Vault No. 3 — Session III", "YouTube"),
+        frame(still(VIDEO_IDS.sessionIV), "Chey — Session IV still", "Vault No. 4 — Session IV", "YouTube"),
       ],
     },
   },

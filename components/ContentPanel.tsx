@@ -192,16 +192,15 @@ export default function ContentPanel({
               {/* Opening photograph — each section gets its own */}
               {section.image && (
                 <figure className="mt-6">
-                  <div className="relative aspect-[16/10] w-full overflow-hidden border border-bone-100/10">
+                  <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
                     <Image
                       src={section.image.src}
                       alt={section.image.alt}
                       fill
                       sizes="(max-width: 1024px) 100vw, 480px"
-                      className="photo-treatment object-cover"
+                      className="object-cover"
                       style={{ objectPosition: section.image.position ?? "50% 50%" }}
                     />
-                    <div className="grain absolute inset-0 opacity-[0.08] mix-blend-overlay" />
                   </div>
                   <figcaption className="mt-2 flex items-baseline justify-between">
                     <span className="font-sans text-[10px] uppercase tracking-wide2 text-bone-400">

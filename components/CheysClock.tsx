@@ -134,7 +134,7 @@ export default function CheysClock() {
 
             {/* z-20 — clock hand (rotates only, around the central pivot) */}
             <motion.div
-              className="absolute inset-0 z-20 will-change-transform"
+              className="absolute inset-0 z-20 drop-glow will-change-transform"
               style={{ transformOrigin: HAND_TRANSFORM_ORIGIN }}
               initial={false}
               animate={{ rotate: handAngle }}
@@ -143,12 +143,25 @@ export default function CheysClock() {
               <ClockHand className="h-full w-full" />
             </motion.div>
 
-            {/* z-[21] — plain centre hub (static, sits over the hand base) */}
+            {/* z-[21] — jewelled centre hub (static, sits over the hand base) */}
             <div
               aria-hidden="true"
-              className="absolute left-1/2 top-1/2 z-[21] -translate-x-1/2 -translate-y-1/2 rounded-full border border-bone-100 bg-void"
-              style={{ width: stageSize * 0.028, height: stageSize * 0.028 }}
-            />
+              className="absolute left-1/2 top-1/2 z-[21] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                width: stageSize * 0.05,
+                height: stageSize * 0.05,
+                background:
+                  "radial-gradient(circle at 38% 32%, #ffffff 0%, #cdd2da 38%, #5b626e 100%)",
+                boxShadow:
+                  "0 0 18px rgba(168,85,247,0.7), inset 0 0 6px rgba(0,0,0,0.4)",
+                border: "1px solid rgba(255,255,255,0.5)",
+              }}
+            >
+              <span
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cosmic-500"
+                style={{ width: "34%", height: "34%" }}
+              />
+            </div>
 
             {/* z-30 — numerals */}
             <RomanNumerals

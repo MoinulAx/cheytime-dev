@@ -77,16 +77,15 @@ function GalleryBlock({
                   {img.meta}
                 </span>
               </div>
-              <div className="relative aspect-[4/5] w-full overflow-hidden border border-bone-100/10">
+              <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
                 <Image
                   src={img.src}
                   alt={img.alt}
                   fill
                   sizes="(max-width: 1024px) 100vw, 480px"
-                  className="photo-treatment object-cover"
+                  className="object-cover"
                   style={{ objectPosition: img.position ?? "50% 50%" }}
                 />
-                <div className="grain absolute inset-0 opacity-[0.08] mix-blend-overlay" />
               </div>
               {img.caption && (
                 <figcaption className="mt-2 border-l border-bone-100/20 pl-3 font-sans text-[11px] leading-snug text-bone-300">
@@ -173,7 +172,7 @@ function LiteYouTube({ video }: { video: MusicVideo }) {
             alt=""
             fill
             sizes="(max-width: 1024px) 100vw, 440px"
-            className="object-cover opacity-60 grayscale-[0.4] transition-opacity duration-300 group-hover:opacity-90"
+            className="object-cover opacity-75 transition-opacity duration-300 group-hover:opacity-100"
           />
           {/* play affordance echoes the clock: a thin ring, nothing frosted */}
           <span className="absolute inset-0 grid place-items-center">
@@ -522,7 +521,7 @@ function ContactBlock({
                       alt={a.alt}
                       fill
                       sizes="(max-width: 1024px) 50vw, 220px"
-                      className="photo-treatment object-cover"
+                      className="object-cover"
                       style={{ objectPosition: a.position ?? "50% 50%" }}
                     />
                   )}

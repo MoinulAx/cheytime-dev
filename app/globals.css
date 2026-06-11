@@ -98,9 +98,8 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
     background-size: 160px 160px;
   }
-  /* Editorial photo treatment — desaturated, slightly lifted blacks. */
-  .photo-treatment {
-    filter: grayscale(0.85) contrast(1.06) brightness(0.92);
+  .drop-glow {
+    filter: drop-shadow(0 0 22px rgba(124, 58, 237, 0.45));
   }
 }
 
