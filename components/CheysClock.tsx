@@ -20,9 +20,10 @@ function useStageSize() {
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
-      // Reserve vertical room (≈28%) below the clock for the home copy so the
-      // numerals and their labels never collide with it.
-      setSize(Math.min(width * 0.92, height * 0.72, 720));
+      // Reserve vertical room below the clock for the home copy so the
+      // numerals and their labels never collide with it. Bumped larger so the
+      // dial is the clear centrepiece over the portrait backdrop.
+      setSize(Math.min(width * 0.96, height * 0.78, 820));
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -186,10 +187,7 @@ export default function CheysClock() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="rule mb-4" />
-            <div className="flex items-end justify-between gap-8">
-              <p className="hidden max-w-sm text-left font-sans text-[13px] leading-relaxed text-bone-200/85 md:block">
-                {homeData?.intro}
-              </p>
+            <div className="flex items-baseline justify-end">
               <div className="flex w-full items-baseline justify-between md:w-auto md:flex-col md:items-end md:gap-1.5">
                 <p className="eyebrow text-bone-100">{homeData?.cue}</p>
                 <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
