@@ -9,3 +9,4 @@ export { loadMusic } from "./music";
 export { loadStore } from "./store";
 export { loadEvents } from "./events";
 export { loadArchive } from "./archive";
+export { loadPress } from "./press";

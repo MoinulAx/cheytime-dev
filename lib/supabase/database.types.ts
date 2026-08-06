@@ -368,6 +368,39 @@ export type Database = {
           },
         ]
       }
+      press_features: {
+        Row: {
+          created_at: string | null
+          headline: string
+          id: string
+          outlet: string
+          published: boolean | null
+          published_at: string | null
+          sort_order: number | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          headline: string
+          id?: string
+          outlet: string
+          published?: boolean | null
+          published_at?: string | null
+          sort_order?: number | null
+          url?: string
+        }
+        Update: {
+          created_at?: string | null
+          headline?: string
+          id?: string
+          outlet?: string
+          published?: boolean | null
+          published_at?: string | null
+          sort_order?: number | null
+          url?: string
+        }
+        Relationships: []
+      }
       outreach_logs: {
         Row: {
           contact_name: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.music_links ADD COLUMN itunes_url text;

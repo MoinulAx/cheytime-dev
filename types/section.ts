@@ -13,12 +13,13 @@ export type SectionKind =
   | "store"
   | "events"
   | "contact"
+  | "press"
   | "gallery";
 
 /**
- * Stable section ids. The six named sections sit on the even hours; the six
- * gallery chapters sit on the odd hours so every numeral on the dial opens
- * something.
+ * Stable section ids. The six named sections sit on the even hours; the odd
+ * hours carry five gallery chapters plus Press at XI, so every numeral on the
+ * dial opens something.
  */
 export type SectionId =
   | "home"
@@ -27,6 +28,7 @@ export type SectionId =
   | "store"
   | "events"
   | "contact"
+  | "press"
   | `gallery-${string}`;
 
 /** A single editorial photograph (used by galleries and panel banners). */
@@ -90,6 +92,17 @@ export interface ArchiveItem {
   position?: string;
 }
 
+/** A press feature — one piece of editorial coverage. */
+export interface PressItem {
+  id: string;
+  /** Publication name, e.g. "BET". */
+  outlet: string;
+  headline: string;
+  url: string;
+  /** Pre-formatted on the server so the client never re-formats a date. */
+  dateLabel?: string;
+}
+
 /** A social or platform link. `url: null` => known channel, URL still missing. */
 export interface SocialLink {
   label: string;
@@ -138,6 +151,14 @@ export type SectionData =
       sla: string;
       socials: SocialLink[];
       archive: ArchiveItem[];
+    }
+  | {
+      kind: "press";
+      description?: string;
+      features: PressItem[];
+      /** Affiliations shown as plain text (no article to link to). */
+      affiliations: string[];
+      emptyMessage: string;
     }
   | {
       kind: "gallery";
