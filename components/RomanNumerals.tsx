@@ -1,12 +1,15 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ROMAN_NUMERALS, sectionByHour } from "@/lib/sections";
+import { ROMAN_NUMERALS, sectionByHour } from "@/lib/sections.static";
 import { getNumeralPositions } from "@/lib/clock";
+import type { Section } from "@/types/section";
 
 const POSITIONS = getNumeralPositions(); // constant unit fractions — compute once
 
 interface RomanNumeralsProps {
+  /** The resolved twelve-hour config (see `CheysClock`). */
+  sections: Section[];
   /** Pixel edge length of the square clock stage. */
   stageSize: number;
   /** Hour index currently selected (the hand points here). */
@@ -22,6 +25,7 @@ interface RomanNumeralsProps {
  * The active hour is inked in violet.
  */
 export default function RomanNumerals({
+  sections,
   stageSize,
   activeHour,
   onSelect,
@@ -35,7 +39,7 @@ export default function RomanNumerals({
     <div className="pointer-events-none absolute inset-0 z-30">
       {POSITIONS.map(({ hourIndex, x, y }) => {
         const numeral = ROMAN_NUMERALS[hourIndex];
-        const section = sectionByHour(hourIndex);
+        const section = sectionByHour(sections, hourIndex);
         const isInteractive = Boolean(section);
         const isCurrent = activeHour === hourIndex;
         const isGallery = section?.data.kind === "gallery";

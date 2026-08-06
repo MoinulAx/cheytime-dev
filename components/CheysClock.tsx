@@ -6,9 +6,9 @@ import ClockFace from "./ClockFace";
 import ClockHand from "./ClockHand";
 import RomanNumerals from "./RomanNumerals";
 import ContentPanel from "./ContentPanel";
-import { HOME_SECTION, sectionById, sectionByHour } from "@/lib/sections";
+import { homeSection, sectionById, sectionByHour } from "@/lib/sections.static";
 import { HAND_SPRING, HAND_TRANSFORM_ORIGIN } from "@/lib/clock";
-import type { SectionId } from "@/types/section";
+import type { Section, SectionId } from "@/types/section";
 
 /** Measure a square clock stage that always fits the viewport. */
 function useStageSize() {
@@ -45,6 +45,15 @@ function useMediaQuery(query: string) {
   return matches;
 }
 
+interface CheysClockProps {
+  /**
+   * The resolved twelve-hour config, built on the server by `getSections()`.
+   * Passed in rather than imported so the DB-backed sections carry live
+   * content; the geometry is identical either way.
+   */
+  sections: Section[];
+}
+
 /**
  * CheysClock — the full interactive experience, set like a magazine spread:
  * masthead rule across the top, the quiet dial centre-stage over Chey's
@@ -56,7 +65,7 @@ function useMediaQuery(query: string) {
  * selected section's angle on a soft spring; selecting XII / closing the
  * panel returns it home to 0°.
  */
-export default function CheysClock() {
+export default function CheysClock({ sections }: CheysClockProps) {
   const reduce = useReducedMotion();
   const { ref, size: stageSize } = useStageSize();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -64,22 +73,25 @@ export default function CheysClock() {
   // null === Home / base immersive state (hand at 0°, no panel).
   const [selectedId, setSelectedId] = useState<SectionId | null>(null);
 
-  const selected = (selectedId ? sectionById(selectedId) : null) ?? null;
-  const activeHour = selected ? selected.hourIndex : HOME_SECTION.hourIndex;
-  const handAngle = selected ? selected.angle : HOME_SECTION.angle;
+  const home = homeSection(sections);
+  const selected = (selectedId ? sectionById(sections, selectedId) : null) ?? null;
+  const activeHour = selected ? selected.hourIndex : home.hourIndex;
+  const handAngle = selected ? selected.angle : home.angle;
   const isOpen = selected !== null;
 
-  const handleSelect = useCallback((hourIndex: number) => {
-    const section = sectionByHour(hourIndex);
-    if (!section) return;
-    // XII (Home) acts as the reset — close any open panel.
-    setSelectedId(section.id === "home" ? null : section.id);
-  }, []);
+  const handleSelect = useCallback(
+    (hourIndex: number) => {
+      const section = sectionByHour(sections, hourIndex);
+      if (!section) return;
+      // XII (Home) acts as the reset — close any open panel.
+      setSelectedId(section.id === "home" ? null : section.id);
+    },
+    [sections],
+  );
 
   const handleClose = useCallback(() => setSelectedId(null), []);
 
-  const homeData =
-    HOME_SECTION.data.kind === "home" ? HOME_SECTION.data : null;
+  const homeData = home.data.kind === "home" ? home.data : null;
 
   // Shift/scale the clock so it stays visible while the panel is open.
   const stageMotion = !isOpen
@@ -166,6 +178,7 @@ export default function CheysClock() {
 
             {/* z-30 — numerals */}
             <RomanNumerals
+              sections={sections}
               stageSize={stageSize}
               activeHour={activeHour}
               onSelect={handleSelect}
