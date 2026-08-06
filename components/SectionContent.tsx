@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
 import type {
   Credit,
   EventItem,
@@ -388,6 +389,8 @@ function ContactBlock({
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const update =
     (key: keyof FormState) =>
@@ -396,7 +399,7 @@ function ContactBlock({
       if (errors[key]) setErrors((er) => ({ ...er, [key]: undefined }));
     };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next: Partial<FormState> = {};
     if (!form.name.trim()) next.name = "Required";
@@ -404,10 +407,27 @@ function ContactBlock({
     if (!form.subject.trim()) next.subject = "Required";
     if (!form.message.trim()) next.message = "Required";
     setErrors(next);
-    if (Object.keys(next).length === 0) {
-      // Supabase/EmailJS wiring is deferred — show confirmation only.
-      setSent(true);
+    if (Object.keys(next).length > 0) return;
+
+    // Lands in `contact_submissions`, which the legacy Admin panel reads.
+    // RLS grants anon INSERT only — nothing is readable back from the browser.
+    setSending(true);
+    setFailed(false);
+    const { error } = await createSupabaseClient()
+      .from("contact_submissions")
+      .insert({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        subject: form.subject.trim(),
+        message: form.message.trim(),
+      });
+    setSending(false);
+    if (error) {
+      console.error("[contact] submission failed", error);
+      setFailed(true);
+      return;
     }
+    setSent(true);
   };
 
   // text-base below lg keeps iOS Safari from auto-zooming on focus (<16px inputs).
@@ -472,8 +492,17 @@ function ContactBlock({
                 <p className="mt-1 font-sans text-[11px] text-cosmic-400">{errors.message}</p>
               )}
             </div>
-            <button type="submit" className="btn-editorial mt-2">
-              Send Transmission →
+            {failed && (
+              <p className="font-sans text-[11px] text-cosmic-400">
+                Transmission failed — please try again, or email {email} directly.
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={sending}
+              className="btn-editorial mt-2 disabled:opacity-50"
+            >
+              {sending ? "Sending…" : "Send Transmission →"}
             </button>
           </form>
         )}
