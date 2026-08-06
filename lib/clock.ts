@@ -54,10 +54,36 @@ export function getNumeralPositions(radius = 0.86): NumeralPosition[] {
   });
 }
 
-/** Spring used for the hand sweep — overshoots slightly, settles naturally. */
+/**
+ * Spring used for the hand sweep.
+ *
+ * ── TUNING ──────────────────────────────────────────────────────────────
+ * Tuned to read as an escapement releasing rather than a UI easing curve: it
+ * leaves quickly, overshoots the target by a hair and settles in one visible
+ * recoil. Softening `stiffness` or raising `damping` drifts it back toward
+ * generic-web-animation feel, which is exactly what we're avoiding.
+ */
 export const HAND_SPRING = {
   type: "spring" as const,
-  stiffness: 45,
-  damping: 14,
-  mass: 1.1,
+  stiffness: 92,
+  damping: 11,
+  mass: 0.85,
 };
+
+/**
+ * Spring for a single deadbeat-seconds step. Stiff and light so each 6° tick
+ * lands crisply with a faint recoil — the mechanical "tick" you feel more than
+ * you see. Must settle well inside one second or ticks pile up.
+ */
+export const TICK_SPRING = {
+  type: "spring" as const,
+  stiffness: 780,
+  damping: 21,
+  mass: 0.45,
+};
+
+/** Radius (viewBox units) of the outer minute track. */
+export const MINUTE_TRACK_R = 404;
+
+/** How far the seconds hand reaches — just past the minute track. */
+export const SECONDS_HAND_TIP = 108;

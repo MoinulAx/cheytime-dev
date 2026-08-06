@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import ClockFace from "./ClockFace";
 import ClockHand from "./ClockHand";
+import SecondsHand from "./SecondsHand";
 import RomanNumerals from "./RomanNumerals";
 import ContentPanel from "./ContentPanel";
 import { homeSection, sectionById, sectionByHour } from "@/lib/sections.static";
@@ -60,10 +61,10 @@ interface CheysClockProps {
  * portrait, and the home copy anchored to the bottom corners (never centred
  * under the dial, so nothing overlaps the numerals).
  *
- * Layers (z): 0 background (page) · 1 face ring · 2 dial marks · 20 hand ·
- * 21 hub · 30 numerals · 40 content panel. The hand rotates (only) to the
- * selected section's angle on a soft spring; selecting XII / closing the
- * panel returns it home to 0°.
+ * Layers (z): 0 background (page) · 1 face ring · 2 dial marks · 19 live
+ * seconds · 20 hand · 21 hub · 30 numerals · 40 content panel. The hand
+ * rotates (only) to the selected section's angle on an escapement spring;
+ * selecting XII / closing the panel returns it home to 0°.
  */
 export default function CheysClock({ sections }: CheysClockProps) {
   const reduce = useReducedMotion();
@@ -144,6 +145,9 @@ export default function CheysClock({ sections }: CheysClockProps) {
             <div className="absolute inset-0 z-[2]">
               <ClockFace className="h-full w-full" />
             </div>
+
+            {/* z-[19] — live seconds, ticking real time beneath the hand */}
+            <SecondsHand className="absolute inset-0 z-[19] h-full w-full" />
 
             {/* z-20 — clock hand (rotates only, around the central pivot) */}
             <motion.div
