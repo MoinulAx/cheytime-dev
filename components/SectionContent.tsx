@@ -9,6 +9,7 @@ import type {
   EventItem,
   GalleryImage,
   MusicVideo,
+  PressItem,
   Product,
   Section,
   SectionData,
@@ -363,6 +364,86 @@ function EventsBlock({
   );
 }
 
+/* ── PRESS ────────────────────────────────────────────────────────────── */
+
+function PressBlock({
+  description,
+  features,
+  affiliations,
+  emptyMessage,
+}: {
+  description?: string;
+  features: PressItem[];
+  affiliations: string[];
+  emptyMessage: string;
+}) {
+  if (features.length === 0) {
+    return (
+      <div className="border-y border-bone-100/10 py-12 text-center">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+          {emptyMessage}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <Stagger>
+      {description && (
+        <Item>
+          <p className="font-display text-lg italic leading-snug text-bone-200">
+            {description}
+          </p>
+        </Item>
+      )}
+      <div className="mt-6 divide-y divide-bone-100/10 border-y border-bone-100/10">
+        {features.map((f) => (
+          <Item key={f.id}>
+            <a
+              href={f.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block py-5"
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
+                  {f.outlet}
+                </span>
+                {f.dateLabel && (
+                  <span className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
+                    {f.dateLabel}
+                  </span>
+                )}
+              </div>
+              <h3 className="mt-1 font-display text-lg leading-snug text-bone-50 underline decoration-bone-100/20 underline-offset-4 transition-colors group-hover:decoration-bone-100">
+                {f.headline}
+              </h3>
+            </a>
+          </Item>
+        ))}
+      </div>
+      {affiliations.length > 0 && (
+        <Item>
+          <div className="mt-8">
+            <p className="eyebrow mb-3">Also featured on</p>
+            <div className="flex flex-wrap gap-2">
+              {affiliations.map((a) => (
+                <span
+                  key={a}
+                  className="border border-bone-100/10 px-3 py-1.5 font-sans text-[11px] uppercase tracking-wide2 text-bone-500"
+                >
+                  {a}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Item>
+      )}
+    </Stagger>
+  );
+}
+
 /* ── CONTACT / ARCHIVE ────────────────────────────────────────────────── */
 
 interface FormState {
@@ -600,6 +681,15 @@ export default function SectionContent({ section }: { section: Section }) {
           sla={data.sla}
           socials={data.socials}
           archive={data.archive}
+        />
+      );
+    case "press":
+      return (
+        <PressBlock
+          description={data.description}
+          features={data.features}
+          affiliations={data.affiliations}
+          emptyMessage={data.emptyMessage}
         />
       );
     case "gallery":

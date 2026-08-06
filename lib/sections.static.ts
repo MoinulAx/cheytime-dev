@@ -2,8 +2,8 @@ import type { GalleryImage, Section } from "@/types/section";
 
 /**
  * Roman numerals for all twelve dial positions, indexed by hour (0 = XII).
- * Every hour is interactive: the six named sections sit on the even hours,
- * six photographic gallery chapters sit on the odd hours.
+ * Every hour is interactive: the six named sections sit on the even hours; the
+ * odd hours carry five photographic gallery chapters plus Press at XI.
  */
 export const ROMAN_NUMERALS = [
   "XII",
@@ -71,7 +71,8 @@ const frame = (
  * Home (XII) and About (II) are editorial in full: the hero copy and the
  * manifesto have no rows in the legacy schema and stay hard-coded until the
  * client asks otherwise. The gallery chapters on the odd hours are built from
- * YouTube stills and are likewise static.
+ * YouTube stills and are likewise static. Press (XI) is DB-backed too, but its
+ * affiliation list stays here — those are logos with no article to link to.
  */
 export const STATIC_SECTIONS: Section[] = [
   {
@@ -167,8 +168,8 @@ export const STATIC_SECTIONS: Section[] = [
     },
     data: {
       kind: "music",
-      channelLabel: "@cheymusic127",
-      channelUrl: "https://www.youtube.com/@cheymusic127",
+      channelLabel: "@CheyMusic127",
+      channelUrl: "https://www.youtube.com/@CheyMusic127",
       videos: [
         { id: "v1", title: "Poppin'", youtubeId: "29vWUXMTkME", year: "2026" },
         {
@@ -289,13 +290,14 @@ export const STATIC_SECTIONS: Section[] = [
     },
     data: {
       kind: "contact",
-      // TODO(client): confirm whether email should move to the cheytime.com domain.
-      email: "contact@cheymusic.com",
+      // Management address as published in the 2026 press kit.
+      email: "Smgproductions2024@gmail.com",
       blurb: "For bookings, press, and collaboration.",
       sla: "Responses within 48 hours.",
       socials: [
-        { label: "YouTube", url: "https://www.youtube.com/@cheymusic127" },
-        { label: "Instagram", url: null },
+        { label: "YouTube", url: "https://www.youtube.com/@CheyMusic127" },
+        { label: "Instagram", url: "https://www.instagram.com/imchey__/" },
+        { label: "TikTok", url: "https://www.tiktok.com/@cheymusic" },
         { label: "Spotify", url: null },
         { label: "Apple Music", url: null },
       ],
@@ -308,21 +310,53 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-vault",
+    id: "press",
     numeral: "XI",
     hourIndex: 11,
     angle: angleForHour(11),
-    title: "The Vault",
-    subtitle: "Gallery · Six",
+    title: "Press",
+    subtitle: "The Record",
+    image: {
+      src: still(VIDEO_IDS.poppin, 2),
+      alt: "Chey — press portrait",
+      meta: "Press · 2026",
+    },
     data: {
-      kind: "gallery",
-      description: "Everything kept — the full contact sheet, one hour before midnight.",
-      images: [
-        frame(still(VIDEO_IDS.poppin), "Chey — Poppin' video still", "Vault No. 1 — Poppin'", "2026"),
-        frame(still(VIDEO_IDS.longKiss), "Chey — Long Kiss Goodnight video still", "Vault No. 2 — Long Kiss Goodnight", "2025"),
-        frame(still(VIDEO_IDS.sessionIII), "Chey — Session III still", "Vault No. 3 — Session III", "YouTube"),
-        frame(still(VIDEO_IDS.sessionIV), "Chey — Session IV still", "Vault No. 4 — Session IV", "YouTube"),
+      kind: "press",
+      description: "Where the work has been written about.",
+      // Live from `press_features`; this is the last-known-good copy, seeded
+      // from the 2026 press kit.
+      features: [
+        {
+          id: "pr-iheart",
+          outlet: "iHeartRadio",
+          headline: "Way Up With Angela Yee: Chey Smith Tells Us A Secret",
+          url: "https://wjlbdetroit.iheart.com/featured/angela-yee/content/2024-05-31-1119-way-up-with-angela-yee-way-up-with-chey-smith-tell-us-a-secret/",
+          dateLabel: "May 2024",
+        },
+        {
+          id: "pr-bet",
+          outlet: "BET",
+          headline: "Method Man’s Daughter Releases Her New Music",
+          url: "https://www.bet.com/article/t1pii7/method-mans-daughter-releases-her-new-music",
+        },
+        {
+          id: "pr-vibe",
+          outlet: "VIBE",
+          headline: "Method Man’s Daughter Chey Performs With Trina In Detroit",
+          url: "https://www.vibe.com/music/music-news/method-man-daughter-chey-perform-trina-detroit-1234862254/",
+        },
+        {
+          id: "pr-interview",
+          outlet: "YouTube",
+          headline: "Interview",
+          url: "https://www.youtube.com/watch?v=buAynLjO8ok",
+        },
       ],
+      // Logos on the press kit with no article behind them.
+      affiliations: ["SiriusXM — Hip-Hop & R&B", "Live Nation"],
+      emptyMessage:
+        "Coverage is being gathered. Press enquiries are welcome — the line is open on X.",
     },
   },
 ];

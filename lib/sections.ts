@@ -1,6 +1,12 @@
 import type { Section } from "@/types/section";
 import { STATIC_SECTIONS } from "./sections.static";
-import { loadArchive, loadEvents, loadMusic, loadStore } from "./loaders";
+import {
+  loadArchive,
+  loadEvents,
+  loadMusic,
+  loadPress,
+  loadStore,
+} from "./loaders";
 
 /**
  * Server-side section builder.
@@ -21,19 +27,23 @@ export async function getSections(): Promise<Section[]> {
   const store = bySection.get("store");
   const events = bySection.get("events");
   const contact = bySection.get("contact");
+  const press = bySection.get("press");
 
-  const [musicData, storeData, eventsData, contactData] = await Promise.all([
-    music?.data.kind === "music" ? loadMusic(music.data) : null,
-    store?.data.kind === "store" ? loadStore(store.data) : null,
-    events?.data.kind === "events" ? loadEvents(events.data) : null,
-    contact?.data.kind === "contact" ? loadArchive(contact.data) : null,
-  ]);
+  const [musicData, storeData, eventsData, contactData, pressData] =
+    await Promise.all([
+      music?.data.kind === "music" ? loadMusic(music.data) : null,
+      store?.data.kind === "store" ? loadStore(store.data) : null,
+      events?.data.kind === "events" ? loadEvents(events.data) : null,
+      contact?.data.kind === "contact" ? loadArchive(contact.data) : null,
+      press?.data.kind === "press" ? loadPress(press.data) : null,
+    ]);
 
   const resolved: Partial<Record<string, Section["data"]>> = {
     music: musicData ?? undefined,
     store: storeData ?? undefined,
     events: eventsData ?? undefined,
     contact: contactData ?? undefined,
+    press: pressData ?? undefined,
   };
 
   return STATIC_SECTIONS.map((section) => {
