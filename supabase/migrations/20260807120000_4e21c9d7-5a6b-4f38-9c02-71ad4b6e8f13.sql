@@ -12,7 +12,7 @@
 -- Key/value rather than a column per string: these are a handful of unrelated
 -- sentences spread across four sections, and a wide one-row table would need a
 -- migration every time the client wants to say something new.
-CREATE TABLE public.site_settings (
+CREATE TABLE IF NOT EXISTS public.site_settings (
   key text PRIMARY KEY,
   value text NOT NULL DEFAULT '',
   label text NOT NULL DEFAULT '',
@@ -23,9 +23,13 @@ CREATE TABLE public.site_settings (
 
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read settings" ON public.site_settings;
 CREATE POLICY "Public can read settings" ON public.site_settings FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Admins can insert settings" ON public.site_settings;
 CREATE POLICY "Admins can insert settings" ON public.site_settings FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins can update settings" ON public.site_settings;
 CREATE POLICY "Admins can update settings" ON public.site_settings FOR UPDATE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins can delete settings" ON public.site_settings;
 CREATE POLICY "Admins can delete settings" ON public.site_settings FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
 
 INSERT INTO public.site_settings (key, value, label, section_id, sort_order) VALUES
@@ -47,7 +51,7 @@ Every release is a document of a specific tension — silence against static, re
 ON CONFLICT (key) DO NOTHING;
 
 -- ── 2. About credits ───────────────────────────────────────────────────────
-CREATE TABLE public.about_credits (
+CREATE TABLE IF NOT EXISTS public.about_credits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   role text NOT NULL DEFAULT '',
   name text NOT NULL DEFAULT '',
@@ -57,9 +61,13 @@ CREATE TABLE public.about_credits (
 
 ALTER TABLE public.about_credits ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read credits" ON public.about_credits;
 CREATE POLICY "Public can read credits" ON public.about_credits FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Admins can insert credits" ON public.about_credits;
 CREATE POLICY "Admins can insert credits" ON public.about_credits FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins can update credits" ON public.about_credits;
 CREATE POLICY "Admins can update credits" ON public.about_credits FOR UPDATE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins can delete credits" ON public.about_credits;
 CREATE POLICY "Admins can delete credits" ON public.about_credits FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
 
 INSERT INTO public.about_credits (role, name, sort_order) VALUES
@@ -73,7 +81,7 @@ ON CONFLICT DO NOTHING;
 -- ── 3. Contact channel links ───────────────────────────────────────────────
 -- `social_embeds` holds embeddable post URLs; these are plain profile links,
 -- and a null url is meaningful — it renders as a "· soon" chip.
-CREATE TABLE public.social_links (
+CREATE TABLE IF NOT EXISTS public.social_links (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   label text NOT NULL DEFAULT '',
   url text,
@@ -83,9 +91,13 @@ CREATE TABLE public.social_links (
 
 ALTER TABLE public.social_links ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read social links" ON public.social_links;
 CREATE POLICY "Public can read social links" ON public.social_links FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Admins can insert social links" ON public.social_links;
 CREATE POLICY "Admins can insert social links" ON public.social_links FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins can update social links" ON public.social_links;
 CREATE POLICY "Admins can update social links" ON public.social_links FOR UPDATE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
+DROP POLICY IF EXISTS "Admins can delete social links" ON public.social_links;
 CREATE POLICY "Admins can delete social links" ON public.social_links FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
 
 INSERT INTO public.social_links (label, url, sort_order) VALUES
@@ -106,21 +118,32 @@ CREATE INDEX IF NOT EXISTS gallery_items_collection_idx
   ON public.gallery_items (collection, sort_order);
 
 -- The three gallery chapters, built from YouTube stills of Chey's own videos.
-INSERT INTO public.gallery_items (alt, meta, image_url, media_type, collection, sort_order) VALUES
-  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq1.jpg', 'image', 'videos', 1),
-  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'image', 'videos', 2),
-  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq3.jpg', 'image', 'videos', 3),
-  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'image', 'videos', 4),
-  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq2.jpg', 'image', 'videos', 5),
-  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq3.jpg', 'image', 'videos', 6),
-  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq1.jpg', 'image', 'sessions', 1),
-  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'image', 'sessions', 2),
-  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq3.jpg', 'image', 'sessions', 3),
-  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq1.jpg', 'image', 'sessions', 4),
-  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq2.jpg', 'image', 'sessions', 5),
-  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'image', 'sessions', 6),
-  ('Chey — Poppin'' video still', '2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'image', 'reel', 1),
-  ('Chey — Long Kiss Goodnight video still', '2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'image', 'reel', 2),
-  ('Chey — Session III still', 'YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'image', 'reel', 3),
-  ('Chey — Session IV still', 'YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'image', 'reel', 4)
-ON CONFLICT DO NOTHING;
+--
+-- Guarded per collection rather than with ON CONFLICT: gallery_items has no
+-- unique constraint for ON CONFLICT to key off, so a plain re-run would insert
+-- all sixteen rows a second time. Seeding only when a chapter is empty makes
+-- this safe to apply repeatedly, and means it will never overwrite chapters the
+-- client has since curated in the admin.
+INSERT INTO public.gallery_items (alt, meta, image_url, media_type, collection, sort_order)
+SELECT v.alt, v.meta, v.image_url, 'image', v.collection, v.sort_order
+FROM (VALUES
+  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq1.jpg', 'videos', 1),
+  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'videos', 2),
+  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq3.jpg', 'videos', 3),
+  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'videos', 4),
+  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq2.jpg', 'videos', 5),
+  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq3.jpg', 'videos', 6),
+  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq1.jpg', 'sessions', 1),
+  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'sessions', 2),
+  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq3.jpg', 'sessions', 3),
+  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq1.jpg', 'sessions', 4),
+  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq2.jpg', 'sessions', 5),
+  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'sessions', 6),
+  ('Chey — Poppin'' video still', '2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'reel', 1),
+  ('Chey — Long Kiss Goodnight video still', '2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'reel', 2),
+  ('Chey — Session III still', 'YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'reel', 3),
+  ('Chey — Session IV still', 'YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'reel', 4)
+) AS v(alt, meta, image_url, collection, sort_order)
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.gallery_items g WHERE g.collection = v.collection
+);

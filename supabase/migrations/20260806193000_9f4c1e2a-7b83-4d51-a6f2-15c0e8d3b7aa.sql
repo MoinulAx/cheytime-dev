@@ -1,7 +1,7 @@
 
 -- Create press_features table for editorial coverage (BET, VIBE, iHeart, ...)
 -- Seeded from the CHEY2026 press kit.
-CREATE TABLE public.press_features (
+CREATE TABLE IF NOT EXISTS public.press_features (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   outlet text NOT NULL,
   headline text NOT NULL,
@@ -14,10 +14,15 @@ CREATE TABLE public.press_features (
 
 ALTER TABLE public.press_features ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public can read published press" ON public.press_features;
 CREATE POLICY "Public can read published press" ON public.press_features FOR SELECT TO anon, authenticated USING (published = true);
+DROP POLICY IF EXISTS "Admins can read all press" ON public.press_features;
 CREATE POLICY "Admins can read all press" ON public.press_features FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins can insert press" ON public.press_features;
 CREATE POLICY "Admins can insert press" ON public.press_features FOR INSERT TO authenticated WITH CHECK (has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins can update press" ON public.press_features;
 CREATE POLICY "Admins can update press" ON public.press_features FOR UPDATE TO authenticated USING (has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admins can delete press" ON public.press_features;
 CREATE POLICY "Admins can delete press" ON public.press_features FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'));
 
 -- Seed: the four press hits linked from the 2026 kit. Headlines are derived
