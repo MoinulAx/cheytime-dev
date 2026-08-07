@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteRecord, saveRecord } from "@/app/admin/actions";
-import type { FieldDef, TableDef } from "@/lib/admin/schema";
+import type { FieldDef, StorageBucket, TableDef } from "@/lib/admin/schema";
 import { fromInputValue, toInputValue } from "@/lib/admin/datetime";
 import { createClient } from "@/lib/supabase/browser";
 
@@ -16,15 +16,68 @@ const INPUT =
 const str = (v: unknown): string =>
   v === null || v === undefined ? "" : String(v);
 
-/** Upload into the public bucket the site already reads and renders. */
-async function uploadImage(file: File): Promise<string> {
+/**
+ * Upload to a storage bucket and return the public URL.
+ *
+ * Images go to `site-assets`; audio to `music-files`, matching where the
+ * legacy admin and the `secure-download` function expect to find things.
+ * The timestamped path keeps two files of the same name from colliding.
+ */
+async function uploadTo(file: File, bucket: StorageBucket): Promise<string> {
   const db = createClient();
-  const path = `admin/${Date.now()}-${file.name.replace(/[^\w.-]+/g, "-")}`;
+  const safeName = file.name.replace(/[^\w.-]+/g, "-");
+  const prefix = bucket === "music-files" ? "audio" : "admin";
+  const path = `${prefix}/${Date.now()}-${safeName}`;
   const { data, error } = await db.storage
-    .from("site-assets")
+    .from(bucket)
     .upload(path, file, { upsert: true });
   if (error) throw error;
-  return db.storage.from("site-assets").getPublicUrl(data.path).data.publicUrl;
+  return db.storage.from(bucket).getPublicUrl(data.path).data.publicUrl;
+}
+
+/** Shared file-picker button used by the image and audio fields. */
+function UploadButton({
+  accept,
+  bucket,
+  onUploaded,
+}: {
+  accept: string;
+  bucket: StorageBucket;
+  onUploaded: (url: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+
+  return (
+    <>
+      <label className="btn-editorial cursor-pointer text-[10px]">
+        {busy ? "Uploading…" : "Upload"}
+        <input
+          type="file"
+          accept={accept}
+          className="hidden"
+          disabled={busy}
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setBusy(true);
+            setFailed(null);
+            try {
+              onUploaded(await uploadTo(file, bucket));
+            } catch (err) {
+              setFailed(err instanceof Error ? err.message : "Upload failed.");
+            } finally {
+              setBusy(false);
+              e.target.value = "";
+            }
+          }}
+        />
+      </label>
+      {failed && (
+        <p className="mt-1 font-sans text-[11px] text-cosmic-400">{failed}</p>
+      )}
+    </>
+  );
 }
 
 function Field({
@@ -36,9 +89,6 @@ function Field({
   value: unknown;
   onChange: (v: unknown) => void;
 }) {
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
   const control = () => {
     switch (def.type) {
       case "textarea":
@@ -127,31 +177,11 @@ function Field({
               placeholder="https://… or upload below"
             />
             <div className="flex items-center gap-3">
-              <label className="btn-editorial cursor-pointer text-[10px]">
-                {uploading ? "Uploading…" : "Upload"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  disabled={uploading}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setUploading(true);
-                    setUploadError(null);
-                    try {
-                      onChange(await uploadImage(file));
-                    } catch (err) {
-                      setUploadError(
-                        err instanceof Error ? err.message : "Upload failed.",
-                      );
-                    } finally {
-                      setUploading(false);
-                      e.target.value = "";
-                    }
-                  }}
-                />
-              </label>
+              <UploadButton
+                accept="image/*"
+                bucket={def.bucket ?? "site-assets"}
+                onUploaded={onChange}
+              />
               {str(value) && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -161,10 +191,42 @@ function Field({
                 />
               )}
             </div>
-            {uploadError && (
-              <p className="font-sans text-[11px] text-cosmic-400">
-                {uploadError}
-              </p>
+          </div>
+        );
+      case "audio":
+        return (
+          <div className="space-y-2">
+            <input
+              id={def.key}
+              type="url"
+              value={str(value)}
+              onChange={(e) => onChange(e.target.value)}
+              className={INPUT}
+              placeholder="https://… or upload below"
+            />
+            <div className="flex flex-wrap items-center gap-3">
+              <UploadButton
+                accept="audio/*"
+                bucket={def.bucket ?? "music-files"}
+                onUploaded={onChange}
+              />
+              {str(value) && (
+                <button
+                  type="button"
+                  onClick={() => onChange(null)}
+                  className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500 hover:text-cosmic-400"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            {str(value) && (
+              <audio
+                controls
+                preload="none"
+                src={str(value)}
+                className="w-full"
+              />
             )}
           </div>
         );

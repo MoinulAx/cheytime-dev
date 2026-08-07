@@ -19,7 +19,16 @@ export type FieldType =
   | "date"
   | "boolean"
   | "select"
-  | "image";
+  | "image"
+  | "audio";
+
+/**
+ * Storage buckets. Both are `public = true` on this project, so neither one
+ * withholds a file from someone holding its URL — `music-files` is separated
+ * for organisation and because `secure-download` issues tokens against it, not
+ * because the bucket itself restricts reads.
+ */
+export type StorageBucket = "site-assets" | "music-files";
 
 export interface FieldDef {
   key: string;
@@ -29,6 +38,8 @@ export interface FieldDef {
   placeholder?: string;
   /** Rendered under the input — use for anything non-obvious. */
   hint?: string;
+  /** Upload target for `image` / `audio` fields. Defaults to `site-assets`. */
+  bucket?: StorageBucket;
 }
 
 export interface TableDef {
@@ -124,6 +135,13 @@ export const ADMIN_TABLES: TableDef[] = [
         hint: "Leave blank for a standalone release. Paste an album's ID to nest this track under it.",
       },
       { key: "artwork_url", label: "Artwork", type: "image" },
+      {
+        key: "audio_url",
+        label: "Audio",
+        type: "audio",
+        bucket: "music-files",
+        hint: "Optional. The clock embeds the YouTube link above, so this is for reference and future use.",
+      },
       { key: "description", label: "Description", type: "textarea" },
       { key: "sort_order", label: "Sort order", type: "number" },
     ],
@@ -325,11 +343,18 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "cover_url", label: "Cover", type: "image" },
       {
         key: "audio_url",
-        label: "Audio URL",
-        type: "url",
-        hint: "Full track, delivered after purchase. Lives in the private music-files bucket.",
+        label: "Full track",
+        type: "audio",
+        bucket: "music-files",
+        hint: "The file being sold. Never sent to the site — released by secure-download after purchase. Note the bucket is public, so treat the URL itself as the secret.",
       },
-      { key: "preview_audio_url", label: "Preview URL", type: "url" },
+      {
+        key: "preview_audio_url",
+        label: "Preview clip",
+        type: "audio",
+        bucket: "music-files",
+        hint: "Plays publicly on the Digital hour (VII). Upload a short excerpt, not the full track.",
+      },
       { key: "active", label: "Active", type: "boolean" },
     ],
     defaults: {

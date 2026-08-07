@@ -159,8 +159,12 @@ Supabase webhook hitting a `/api/revalidate` route handler closes the gap.
 - **Music album nesting is by ID, not by picker.** Nesting a track under an
   album means pasting the album's `parent_album_id`. It works, but it is the
   one place the port is clumsier than it should be.
-- **`music_files` uploads are not wired.** Only the public `site-assets`
-  bucket is. Digital audio still has to be uploaded from the legacy admin.
+- **`merch_product_images` is not managed here.** The legacy admin has a
+  multi-image strip per product; this panel only has the single `image_url`.
+  Extra images already in that table stay put but cannot be added or removed
+  from here. This is the last real gap before the legacy admin can be retired.
+- **No bulk upload.** The legacy admin takes a folder of gallery images or
+  audio at once; this one is a file at a time.
 - **No optimistic UI.** Every save round-trips and then refreshes the route.
   Correct, but it feels slower than the old client-side admin on a slow link.
 
@@ -264,8 +268,16 @@ injects it. Never put it in `.env.local`, and never in a `NEXT_PUBLIC_*` var.
 
 | Bucket | Public | Use |
 | --- | --- | --- |
-| `site-assets` | Yes | Artwork, gallery and product images. Admin uploads land here. |
-| `music-files` | Yes (read) | Audio. Full tracks are gated by the `secure-download` function, not by the bucket. |
+| `site-assets` | Yes | Artwork, gallery and product images. |
+| `music-files` | Yes | Audio — full tracks and preview clips. |
+
+⚠️ **Both buckets are `public = true`.** `music-files` does not withhold a paid
+track from anyone holding its URL; `secure-download` issues tokens, but the
+bucket itself does not check them. The site never renders `audio_url` (see
+`lib/loaders/digital.ts`), so the URLs are not discoverable from the page —
+but that is obscurity, not access control. Making the bucket private is a
+migration that would also affect the legacy repo's download flow, so it is
+flagged rather than changed.
 
 `next.config.ts` allows `*.supabase.co/storage/v1/object/public/**`, so anything
 uploaded renders through `next/image` with no further config.
