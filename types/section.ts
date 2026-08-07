@@ -14,12 +14,14 @@ export type SectionKind =
   | "events"
   | "contact"
   | "press"
+  | "blog"
+  | "digital"
   | "gallery";
 
 /**
- * Stable section ids. The six named sections sit on the even hours; the odd
- * hours carry five gallery chapters plus Press at XI, so every numeral on the
- * dial opens something.
+ * Stable section ids. The six pillar sections sit on the even hours; the odd
+ * hours carry Journal, Digital, Press and three gallery chapters, so every
+ * numeral on the dial opens something.
  */
 export type SectionId =
   | "home"
@@ -29,6 +31,8 @@ export type SectionId =
   | "events"
   | "contact"
   | "press"
+  | "blog"
+  | "digital"
   | `gallery-${string}`;
 
 /** A single editorial photograph (used by galleries and panel banners). */
@@ -103,6 +107,30 @@ export interface PressItem {
   dateLabel?: string;
 }
 
+/** A written dispatch. `url` is set only when the post links out. */
+export interface BlogPost {
+  id: string;
+  title: string;
+  /** Pre-formatted on the server so the client never re-formats a date. */
+  dateLabel: string;
+  excerpt: string;
+  /** External article, when the post points somewhere. */
+  url?: string;
+  thumbnail?: string;
+}
+
+/** A paid digital release (music_products). */
+export interface DigitalRelease {
+  id: string;
+  title: string;
+  artist: string;
+  price: number;
+  description?: string;
+  cover?: string;
+  /** Short preview clip — the only audio playable without buying. */
+  previewUrl?: string;
+}
+
 /** A social or platform link. `url: null` => known channel, URL still missing. */
 export interface SocialLink {
   label: string;
@@ -158,6 +186,19 @@ export type SectionData =
       features: PressItem[];
       /** Affiliations shown as plain text (no article to link to). */
       affiliations: string[];
+      emptyMessage: string;
+    }
+  | {
+      kind: "blog";
+      description?: string;
+      posts: BlogPost[];
+      emptyMessage: string;
+    }
+  | {
+      kind: "digital";
+      description?: string;
+      releases: DigitalRelease[];
+      note?: string;
       emptyMessage: string;
     }
   | {

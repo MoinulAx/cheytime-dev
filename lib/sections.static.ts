@@ -3,7 +3,8 @@ import type { GalleryImage, Section } from "@/types/section";
 /**
  * Roman numerals for all twelve dial positions, indexed by hour (0 = XII).
  * Every hour is interactive: the six named sections sit on the even hours; the
- * odd hours carry five photographic gallery chapters plus Press at XI.
+ * odd hours carry Journal (I), two photographic gallery chapters (III, V),
+ * Digital (VII), The Reel (IX) and Press (XI).
  */
 export const ROMAN_NUMERALS = [
   "XII",
@@ -92,20 +93,25 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-poppin",
+    id: "blog",
     numeral: "I",
     hourIndex: 1,
     angle: angleForHour(1),
-    title: "Poppin'",
-    subtitle: "Gallery · One",
+    title: "Journal",
+    subtitle: "Dispatches",
+    image: {
+      src: still(VIDEO_IDS.poppin, 1),
+      alt: "Chey — still from the Poppin' music video",
+      meta: "Journal · Written",
+    },
     data: {
-      kind: "gallery",
-      description: "Stills from the Poppin' video — her latest, frame by frame.",
-      images: [
-        frame(still(VIDEO_IDS.poppin, 1), "Chey — Poppin' video still", "Poppin' — Frame I", "Music Video · 2026"),
-        frame(still(VIDEO_IDS.poppin, 2), "Chey — Poppin' video still", "Poppin' — Frame II", "Music Video · 2026"),
-        frame(still(VIDEO_IDS.poppin, 3), "Chey — Poppin' video still", "Poppin' — Frame III", "Music Video · 2026"),
-      ],
+      kind: "blog",
+      description: "Notes, announcements and long-form from Chey and the team.",
+      // Live from `blog_posts`. Nothing is seeded — the legacy site's posts
+      // are the source, and this renders whatever is in the table.
+      posts: [],
+      emptyMessage:
+        "No entries yet. Announcements and long-form land here first.",
     },
   },
   {
@@ -138,16 +144,19 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-longkiss",
+    id: "gallery-videos",
     numeral: "III",
     hourIndex: 3,
     angle: angleForHour(3),
-    title: "Long Kiss Goodnight",
-    subtitle: "Gallery · Two",
+    title: "The Videos",
+    subtitle: "Gallery · One",
     data: {
       kind: "gallery",
-      description: "On location for Long Kiss Goodnight.",
+      description: "Frame by frame through the music videos.",
       images: [
+        frame(still(VIDEO_IDS.poppin, 1), "Chey — Poppin' video still", "Poppin' — Frame I", "Music Video · 2026"),
+        frame(still(VIDEO_IDS.poppin, 2), "Chey — Poppin' video still", "Poppin' — Frame II", "Music Video · 2026"),
+        frame(still(VIDEO_IDS.poppin, 3), "Chey — Poppin' video still", "Poppin' — Frame III", "Music Video · 2026"),
         frame(still(VIDEO_IDS.longKiss, 1), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame I", "Music Video · 2025"),
         frame(still(VIDEO_IDS.longKiss, 2), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame II", "Music Video · 2025"),
         frame(still(VIDEO_IDS.longKiss, 3), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame III", "Music Video · 2025"),
@@ -185,19 +194,22 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-session3",
+    id: "gallery-sessions",
     numeral: "V",
     hourIndex: 5,
     angle: angleForHour(5),
-    title: "Session III",
-    subtitle: "Gallery · Three",
+    title: "The Sessions",
+    subtitle: "Gallery · Two",
     data: {
       kind: "gallery",
-      description: "Inside the Session III recording.",
+      description: "Inside the recording sessions.",
       images: [
         frame(still(VIDEO_IDS.sessionIII, 1), "Chey — Session III still", "Session III — Frame I", "Session · YouTube"),
         frame(still(VIDEO_IDS.sessionIII, 2), "Chey — Session III still", "Session III — Frame II", "Session · YouTube"),
         frame(still(VIDEO_IDS.sessionIII, 3), "Chey — Session III still", "Session III — Frame III", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIV, 1), "Chey — Session IV still", "Session IV — Frame I", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIV, 2), "Chey — Session IV still", "Session IV — Frame II", "Session · YouTube"),
+        frame(still(VIDEO_IDS.sessionIV, 3), "Chey — Session IV still", "Session IV — Frame III", "Session · YouTube"),
       ],
     },
   },
@@ -222,20 +234,26 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-session4",
+    id: "digital",
     numeral: "VII",
     hourIndex: 7,
     angle: angleForHour(7),
-    title: "Session IV",
-    subtitle: "Gallery · Four",
+    title: "Digital",
+    subtitle: "Downloads",
+    image: {
+      src: still(VIDEO_IDS.sessionIV, 2),
+      alt: "Chey — studio session still",
+      meta: "Digital · Downloads",
+    },
     data: {
-      kind: "gallery",
-      description: "Inside the Session IV recording.",
-      images: [
-        frame(still(VIDEO_IDS.sessionIV, 1), "Chey — Session IV still", "Session IV — Frame I", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIV, 2), "Chey — Session IV still", "Session IV — Frame II", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIV, 3), "Chey — Session IV still", "Session IV — Frame III", "Session · YouTube"),
-      ],
+      kind: "digital",
+      description: "Buy the record outright — yours to keep, no stream needed.",
+      // Live from `music_products`. Only previews are exposed here; the full
+      // file is released by the secure-download function after purchase.
+      releases: [],
+      note: "Checkout runs from the legacy store while payments are being moved across.",
+      emptyMessage:
+        "Nothing on sale right now. New drops are announced here and on the Journal.",
     },
   },
   {

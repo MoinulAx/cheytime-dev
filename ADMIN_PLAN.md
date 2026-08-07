@@ -216,7 +216,79 @@ Notes:
 
 ---
 
-## 4. Content to confirm with the client
+## 4. Supabase reference
+
+One project serves both codebases. An edit in either admin hits the same rows.
+
+| | |
+| --- | --- |
+| Project ID | `enhduflezmiugpjaovhz` |
+| URL | `https://enhduflezmiugpjaovhz.supabase.co` |
+| Dashboard | `https://supabase.com/dashboard/project/enhduflezmiugpjaovhz` |
+| Config | `supabase/config.toml` (this repo) |
+| Migrations | `supabase/migrations/` — mirrored from the legacy repo, schema of record |
+
+### Keys
+
+Set in `.env.local` (gitignored); template in `.env.local.example`.
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://enhduflezmiugpjaovhz.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon / publishable key>
+```
+
+Both are public by design — the anon key is shipped to the browser and every
+table is guarded by RLS. Find them under Project Settings → API.
+
+**The service role key belongs to neither codebase.** It bypasses RLS
+entirely. It lives only in the edge functions' own environment, where Supabase
+injects it. Never put it in `.env.local`, and never in a `NEXT_PUBLIC_*` var.
+
+### Tables
+
+| Table | Feeds | Notes |
+| --- | --- | --- |
+| `music_releases` | Music (IV) | Albums + tracks; `parent_album_id` nests tracks. Only YouTube links embed. |
+| `merch_products` | Store (VI) | `active = true` only. |
+| `events` | Events (VIII) | Published + future only; RLS enforces published. |
+| `gallery_items` | Contact archive (X) | `media_type = 'image'` only. |
+| `press_features` | Press (XI) | Added in this migration; published + linked only. |
+| `blog_posts` | Blog (I) | |
+| `music_products` | Digital (VII) | Paid downloads; checkout not wired here. |
+| `contact_submissions` | — | Contact form writes; anon INSERT, admin SELECT. |
+| `outreach_logs` | — | Internal PR pipeline, admin-only. |
+| `purchases` | — | Stripe webhook writes. No admin UPDATE/DELETE policy. |
+| `user_roles` | — | Admin grants. See §3.7. |
+
+### Storage
+
+| Bucket | Public | Use |
+| --- | --- | --- |
+| `site-assets` | Yes | Artwork, gallery and product images. Admin uploads land here. |
+| `music-files` | Yes (read) | Audio. Full tracks are gated by the `secure-download` function, not by the bucket. |
+
+`next.config.ts` allows `*.supabase.co/storage/v1/object/public/**`, so anything
+uploaded renders through `next/image` with no further config.
+
+### Edge functions
+
+Deployed from the **legacy repo** (`supabase/functions/`), not from here:
+
+- `admin-auth` — verifies the JWT and checks the admin role with the service
+  role. This site's guard calls its `login-check` action.
+- `create-checkout-session`, `stripe-webhook` — Stripe. Not wired to this site.
+- `secure-download` — issues download tokens for purchased audio.
+
+### RLS shape
+
+Consistent across content tables: **public SELECT** (sometimes narrowed to
+`published = true`), **all writes gated** behind
+`has_role(auth.uid(), 'admin')`. That is why the admin needs no new policies,
+and why a leaked anon key does not expose writes.
+
+---
+
+## 5. Content to confirm with the client
 
 - **Press headlines were derived from URL slugs**, not from the articles. Worth
   checking against the live pages.

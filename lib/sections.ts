@@ -2,6 +2,8 @@ import type { Section } from "@/types/section";
 import { STATIC_SECTIONS } from "./sections.static";
 import {
   loadArchive,
+  loadBlog,
+  loadDigital,
   loadEvents,
   loadMusic,
   loadPress,
@@ -28,15 +30,26 @@ export async function getSections(): Promise<Section[]> {
   const events = bySection.get("events");
   const contact = bySection.get("contact");
   const press = bySection.get("press");
+  const blog = bySection.get("blog");
+  const digital = bySection.get("digital");
 
-  const [musicData, storeData, eventsData, contactData, pressData] =
-    await Promise.all([
-      music?.data.kind === "music" ? loadMusic(music.data) : null,
-      store?.data.kind === "store" ? loadStore(store.data) : null,
-      events?.data.kind === "events" ? loadEvents(events.data) : null,
-      contact?.data.kind === "contact" ? loadArchive(contact.data) : null,
-      press?.data.kind === "press" ? loadPress(press.data) : null,
-    ]);
+  const [
+    musicData,
+    storeData,
+    eventsData,
+    contactData,
+    pressData,
+    blogData,
+    digitalData,
+  ] = await Promise.all([
+    music?.data.kind === "music" ? loadMusic(music.data) : null,
+    store?.data.kind === "store" ? loadStore(store.data) : null,
+    events?.data.kind === "events" ? loadEvents(events.data) : null,
+    contact?.data.kind === "contact" ? loadArchive(contact.data) : null,
+    press?.data.kind === "press" ? loadPress(press.data) : null,
+    blog?.data.kind === "blog" ? loadBlog(blog.data) : null,
+    digital?.data.kind === "digital" ? loadDigital(digital.data) : null,
+  ]);
 
   const resolved: Partial<Record<string, Section["data"]>> = {
     music: musicData ?? undefined,
@@ -44,6 +57,8 @@ export async function getSections(): Promise<Section[]> {
     events: eventsData ?? undefined,
     contact: contactData ?? undefined,
     press: pressData ?? undefined,
+    blog: blogData ?? undefined,
+    digital: digitalData ?? undefined,
   };
 
   return STATIC_SECTIONS.map((section) => {

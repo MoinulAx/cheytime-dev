@@ -10,3 +10,5 @@ export { loadStore } from "./store";
 export { loadEvents } from "./events";
 export { loadArchive } from "./archive";
 export { loadPress } from "./press";
+export { loadBlog } from "./blog";
+export { loadDigital } from "./digital";

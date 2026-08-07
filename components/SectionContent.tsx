@@ -5,7 +5,9 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
 import type {
+  BlogPost,
   Credit,
+  DigitalRelease,
   EventItem,
   GalleryImage,
   MusicVideo,
@@ -364,6 +366,176 @@ function EventsBlock({
   );
 }
 
+/* ── BLOG ─────────────────────────────────────────────────────────────── */
+
+function BlogBlock({
+  description,
+  posts,
+  emptyMessage,
+}: {
+  description?: string;
+  posts: BlogPost[];
+  emptyMessage: string;
+}) {
+  if (posts.length === 0) {
+    return (
+      <div className="border-y border-bone-100/10 py-12 text-center">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+          {emptyMessage}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <Stagger>
+      {description && (
+        <Item>
+          <p className="font-display text-lg italic leading-snug text-bone-200">
+            {description}
+          </p>
+        </Item>
+      )}
+      <div className="mt-6 divide-y divide-bone-100/10 border-y border-bone-100/10">
+        {posts.map((post) => {
+          // Only a link when the post actually points somewhere — this site
+          // has no per-post route, so a bare title must not look clickable.
+          const Title = post.url ? "a" : "h3";
+          return (
+            <Item key={post.id}>
+              <article className="py-5">
+                {post.dateLabel && (
+                  <p className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
+                    {post.dateLabel}
+                  </p>
+                )}
+                <Title
+                  {...(post.url
+                    ? {
+                        href: post.url,
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                        className:
+                          "mt-1 block font-display text-lg leading-snug text-bone-50 underline decoration-bone-100/20 underline-offset-4 transition-colors hover:decoration-bone-100",
+                      }
+                    : {
+                        className:
+                          "mt-1 font-display text-lg leading-snug text-bone-50",
+                      })}
+                >
+                  {post.title}
+                </Title>
+                {post.excerpt && (
+                  <p className="mt-2 font-sans text-sm leading-relaxed text-bone-200/80">
+                    {post.excerpt}
+                  </p>
+                )}
+              </article>
+            </Item>
+          );
+        })}
+      </div>
+    </Stagger>
+  );
+}
+
+/* ── DIGITAL ──────────────────────────────────────────────────────────── */
+
+function DigitalBlock({
+  description,
+  releases,
+  note,
+  emptyMessage,
+}: {
+  description?: string;
+  releases: DigitalRelease[];
+  note?: string;
+  emptyMessage: string;
+}) {
+  if (releases.length === 0) {
+    return (
+      <div className="border-y border-bone-100/10 py-12 text-center">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+          {emptyMessage}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <Stagger>
+      {description && (
+        <Item>
+          <p className="font-display text-lg italic leading-snug text-bone-200">
+            {description}
+          </p>
+        </Item>
+      )}
+      <div className="mt-6 space-y-6">
+        {releases.map((r) => (
+          <Item key={r.id}>
+            <article className="border border-bone-100/10">
+              <div className="flex gap-4 p-4">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
+                  {r.cover ? (
+                    <Image
+                      src={r.cover}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="absolute inset-0 grid place-items-center font-display text-2xl italic text-bone-100/15">
+                      ♪
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-sans text-[13px] leading-tight text-bone-100">
+                    {r.title}
+                  </p>
+                  <p className="mt-0.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                    {r.artist}
+                  </p>
+                  {r.description && (
+                    <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
+                      {r.description}
+                    </p>
+                  )}
+                </div>
+                <span className="font-display text-lg italic text-bone-50">
+                  ${r.price}
+                </span>
+              </div>
+              {r.previewUrl && (
+                <div className="border-t border-bone-100/10 px-4 py-3">
+                  <p className="eyebrow mb-2">Preview</p>
+                  {/* Preview clip only — the full file is never sent to the
+                      browser; it is released after purchase. */}
+                  <audio
+                    controls
+                    preload="none"
+                    src={r.previewUrl}
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </article>
+          </Item>
+        ))}
+      </div>
+      {note && (
+        <Item>
+          <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
+        </Item>
+      )}
+    </Stagger>
+  );
+}
+
 /* ── PRESS ────────────────────────────────────────────────────────────── */
 
 function PressBlock({
@@ -681,6 +853,23 @@ export default function SectionContent({ section }: { section: Section }) {
           sla={data.sla}
           socials={data.socials}
           archive={data.archive}
+        />
+      );
+    case "blog":
+      return (
+        <BlogBlock
+          description={data.description}
+          posts={data.posts}
+          emptyMessage={data.emptyMessage}
+        />
+      );
+    case "digital":
+      return (
+        <DigitalBlock
+          description={data.description}
+          releases={data.releases}
+          note={data.note}
+          emptyMessage={data.emptyMessage}
         />
       );
     case "press":

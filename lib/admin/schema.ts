@@ -277,18 +277,12 @@ export const ADMIN_TABLES: TableDef[] = [
     defaults: {},
   },
 
-  /*
-   * ── Not on the clock ───────────────────────────────────────────────────
-   * These carry over from the legacy site, which had a page per section. The
-   * new site has no blog or checkout surface yet, so editing them here changes
-   * the database but nothing visible on cheytime.com. They are kept so this
-   * panel is a complete replacement for the old one rather than a subset.
-   */
   {
     table: "blog_posts",
-    title: "Blog",
+    title: "Journal",
+    numeral: "I",
     blurb:
-      "Carried over from the legacy site. Not rendered on the clock — there is no blog section yet.",
+      "Entries on the clock's Journal hour. A post only becomes a link if it has an external URL — there is no per-post page on the new site.",
     labelKey: "title",
     orderBy: [{ column: "date", ascending: false }],
     fields: [
@@ -318,8 +312,9 @@ export const ADMIN_TABLES: TableDef[] = [
   {
     table: "music_products",
     title: "Digital",
+    numeral: "VII",
     blurb:
-      "Paid downloads behind Stripe checkout. The checkout functions still run from the legacy repo, so these are not purchasable from the new site yet.",
+      "Paid downloads. Active products show on the clock with their preview clip; the full audio is only released after purchase. Checkout still runs from the legacy repo.",
     labelKey: "title",
     orderBy: [{ column: "created_at", ascending: false }],
     fields: [
