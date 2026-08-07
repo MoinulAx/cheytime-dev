@@ -370,6 +370,8 @@ export default function TableEditor({
 
   const isCreating = editingId === "__new__";
   const canCreate = def.canCreate !== false && !def.readOnly;
+  // `site_settings` is keyed on `key`, not `id`.
+  const pk = def.primaryKey ?? "id";
 
   const openNew = () => {
     setEditingId("__new__");
@@ -378,7 +380,7 @@ export default function TableEditor({
   };
 
   const openEdit = (row: Row) => {
-    setEditingId(String(row.id));
+    setEditingId(String(row[pk]));
     setDraft(Object.fromEntries(def.fields.map((f) => [f.key, row[f.key]])));
     setError(null);
   };
@@ -499,7 +501,7 @@ export default function TableEditor({
           </p>
         )}
         {rows.map((row) => {
-          const id = String(row.id);
+          const id = String(row[pk]);
           const label = str(row[def.labelKey]) || "Untitled";
           const isUnread =
             def.table === "contact_submissions" && !row.read ? true : false;

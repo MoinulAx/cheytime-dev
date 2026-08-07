@@ -161,6 +161,7 @@ export type Database = {
         Row: {
           alt: string
           aspect_ratio: string | null
+          collection: string
           created_at: string | null
           id: string
           image_url: string | null
@@ -171,6 +172,7 @@ export type Database = {
         Insert: {
           alt: string
           aspect_ratio?: string | null
+          collection?: string
           created_at?: string | null
           id?: string
           image_url?: string | null
@@ -181,6 +183,7 @@ export type Database = {
         Update: {
           alt?: string
           aspect_ratio?: string | null
+          collection?: string
           created_at?: string | null
           id?: string
           image_url?: string | null
@@ -367,6 +370,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_settings: {
+        Row: {
+          key: string
+          label: string
+          section_id: string
+          sort_order: number | null
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          key: string
+          label?: string
+          section_id?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          value?: string
+        }
+        Update: {
+          key?: string
+          label?: string
+          section_id?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      about_credits: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          role: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          role?: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          role?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      social_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          sort_order: number | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          sort_order?: number | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          sort_order?: number | null
+          url?: string | null
+        }
+        Relationships: []
       }
       press_features: {
         Row: {

@@ -93,6 +93,11 @@ export interface TableDef {
   readOnly?: boolean;
   /** Extra images (or similar) managed inline against each row. */
   child?: ChildTableDef;
+  /**
+   * Primary key column. Defaults to `id`; `site_settings` is keyed on `key`,
+   * and updating it with an `id` filter would silently match nothing.
+   */
+  primaryKey?: string;
 }
 
 /**
@@ -113,6 +118,9 @@ export const WRITABLE_TABLES = [
   "outreach_logs",
   "purchases",
   "merch_product_images",
+  "site_settings",
+  "about_credits",
+  "social_links",
 ] as const;
 
 export type WritableTable = (typeof WRITABLE_TABLES)[number];
@@ -121,6 +129,78 @@ export const isWritableTable = (name: string): name is WritableTable =>
   (WRITABLE_TABLES as readonly string[]).includes(name);
 
 export const ADMIN_TABLES: TableDef[] = [
+  {
+    table: "site_settings",
+    title: "Copy",
+    blurb:
+      "The written copy across the clock — the Home lines, the About biography and quote, the contact details. Editing a value here changes the site; the key is what the code looks up, so leave it alone.",
+    labelKey: "label",
+    canCreate: false,
+    primaryKey: "key",
+    orderBy: [
+      { column: "section_id", ascending: true },
+      { column: "sort_order", ascending: true },
+    ],
+    fields: [
+      {
+        key: "key",
+        label: "Key",
+        type: "text",
+        hint: "Identifier used by the code. Changing it detaches the copy from where it renders.",
+      },
+      { key: "label", label: "Label", type: "text" },
+      {
+        key: "value",
+        label: "Value",
+        type: "textarea",
+        hint: "For the biography, separate paragraphs with a blank line.",
+      },
+      { key: "section_id", label: "Section", type: "text" },
+      { key: "sort_order", label: "Sort order", type: "number" },
+    ],
+    defaults: {},
+  },
+  {
+    table: "about_credits",
+    title: "Credits",
+    numeral: "II",
+    blurb: "The role/name list at the bottom of the About panel.",
+    labelKey: "role",
+    orderBy: [
+      { column: "sort_order", ascending: true },
+      { column: "created_at", ascending: true },
+    ],
+    fields: [
+      { key: "role", label: "Role", type: "text", placeholder: "Production" },
+      { key: "name", label: "Name", type: "text", placeholder: "Chey" },
+      { key: "sort_order", label: "Sort order", type: "number" },
+    ],
+    defaults: { role: "", name: "", sort_order: 0 },
+  },
+  {
+    table: "social_links",
+    title: "Channels",
+    numeral: "X",
+    blurb:
+      "The channel chips on Contact. Leave the URL blank to show the label greyed out as “· soon”.",
+    labelKey: "label",
+    orderBy: [
+      { column: "sort_order", ascending: true },
+      { column: "created_at", ascending: true },
+    ],
+    fields: [
+      { key: "label", label: "Label", type: "text", placeholder: "Spotify" },
+      {
+        key: "url",
+        label: "URL",
+        type: "url",
+        nullable: true,
+        hint: "Blank renders the “· soon” chip rather than a dead link.",
+      },
+      { key: "sort_order", label: "Sort order", type: "number" },
+    ],
+    defaults: { label: "", url: "", sort_order: 0 },
+  },
   {
     table: "music_releases",
     title: "Music",
@@ -253,9 +333,10 @@ export const ADMIN_TABLES: TableDef[] = [
   },
   {
     table: "gallery_items",
-    title: "Archive",
-    numeral: "X",
-    blurb: "The archive grid inside Contact. Images only.",
+    title: "Gallery",
+    numeral: "III · V · IX · X",
+    blurb:
+      "Every photograph on the clock. The collection decides which hour it appears on. Images only.",
     labelKey: "alt",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -271,6 +352,13 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "meta", label: "Meta", type: "text", placeholder: "Studio · 2026" },
       { key: "image_url", label: "Image", type: "image" },
       {
+        key: "collection",
+        label: "Collection",
+        type: "select",
+        options: ["archive", "videos", "sessions", "reel"],
+        hint: "archive → Contact (X) · videos → The Videos (III) · sessions → The Sessions (V) · reel → The Reel (IX)",
+      },
+      {
         key: "media_type",
         label: "Media type",
         type: "select",
@@ -283,6 +371,7 @@ export const ADMIN_TABLES: TableDef[] = [
       alt: "",
       meta: "",
       image_url: "",
+      collection: "archive",
       media_type: "image",
       sort_order: 0,
     },

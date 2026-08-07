@@ -37,6 +37,15 @@ function revalidateSite() {
  * Numbers fall back to 0: `price` and `sort_order` are both
  * `NOT NULL DEFAULT 0`, and a cleared number means zero here, not unknown.
  */
+/**
+ * Which column identifies a row. Almost always `id`, but `site_settings` is
+ * keyed on `key` — filtering that by `id` matches nothing and the update
+ * silently succeeds against zero rows.
+ */
+function primaryKeyOf(table: WritableTable): string {
+  return ADMIN_TABLES.find((d) => d.table === table)?.primaryKey ?? "id";
+}
+
 function clean(
   table: WritableTable,
   values: Record<string, unknown>,
@@ -83,9 +92,10 @@ export async function saveRecord(
   // type here, so the generated per-table Insert/Update types cannot be applied.
   // RLS plus the column constraints are what actually validate the payload.
   const payload = clean(table, values) as never;
+  const pk = primaryKeyOf(table);
 
   const { error } = id
-    ? await db.from(table).update(payload).eq("id", id)
+    ? await db.from(table).update(payload).eq(pk, id)
     : await db.from(table).insert(payload);
 
   if (error) return { ok: false, error: error.message };
@@ -103,7 +113,7 @@ export async function deleteRecord(
     return { ok: false, error: "Not signed in as an admin." };
 
   const db = await createClient();
-  const { error } = await db.from(table).delete().eq("id", id);
+  const { error } = await db.from(table).delete().eq(primaryKeyOf(table), id);
   if (error) return { ok: false, error: error.message };
 
   revalidateSite();

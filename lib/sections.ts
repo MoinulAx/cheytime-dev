@@ -1,14 +1,32 @@
-import type { Section } from "@/types/section";
+import type { Section, SectionId } from "@/types/section";
 import { STATIC_SECTIONS } from "./sections.static";
 import {
+  applyContact,
+  applyHome,
+  applyMusicChannel,
+  loadAbout,
   loadArchive,
   loadBlog,
   loadDigital,
   loadEvents,
+  loadGallery,
   loadMusic,
   loadPress,
+  loadSettings,
   loadStore,
 } from "./loaders";
+
+/**
+ * Maps a gallery section id to its `gallery_items.collection` value. The
+ * archive grid inside Contact uses `archive` and is loaded separately.
+ */
+const GALLERY_COLLECTIONS = {
+  "gallery-videos": "videos",
+  "gallery-sessions": "sessions",
+  "gallery-reel": "reel",
+} satisfies Partial<Record<SectionId, string>>;
+
+type GallerySectionId = keyof typeof GALLERY_COLLECTIONS;
 
 /**
  * Server-side section builder.
@@ -16,43 +34,73 @@ import {
  * ⚠️ This module reaches the server-only Supabase client. Client components
  * must import geometry and lookups from `lib/sections.static.ts` instead.
  *
- * The clock's shape — twelve hours, their numerals, angles, titles and
- * photographs — is fixed and comes from the static config. All this does is
- * swap the `data` payload of the four DB-backed sections for live rows. Every
- * loader falls back to its static content, so a Supabase outage costs freshness
- * and nothing else.
+ * The clock's shape — twelve hours, their numerals and angles — is fixed and
+ * comes from the static config. Everything inside a panel is now live: copy
+ * from `site_settings`, lists from their own tables. Every loader falls back
+ * to its static content, so a Supabase outage costs freshness and nothing
+ * else, and the site still renders exactly as it does today.
  */
 export async function getSections(): Promise<Section[]> {
+  const settings = await loadSettings();
   const bySection = new Map(STATIC_SECTIONS.map((s) => [s.id, s]));
 
-  const music = bySection.get("music");
-  const store = bySection.get("store");
-  const events = bySection.get("events");
-  const contact = bySection.get("contact");
-  const press = bySection.get("press");
-  const blog = bySection.get("blog");
-  const digital = bySection.get("digital");
+  const dataOf = <K extends Section["data"]["kind"]>(
+    id: SectionId,
+    kind: K,
+  ): Extract<Section["data"], { kind: K }> | null => {
+    const data = bySection.get(id)?.data;
+    return data?.kind === kind
+      ? (data as Extract<Section["data"], { kind: K }>)
+      : null;
+  };
+
+  const music = dataOf("music", "music");
+  const store = dataOf("store", "store");
+  const events = dataOf("events", "events");
+  const contact = dataOf("contact", "contact");
+  const press = dataOf("press", "press");
+  const blog = dataOf("blog", "blog");
+  const digital = dataOf("digital", "digital");
+  const about = dataOf("about", "about");
+  const home = dataOf("home", "home");
+
+  const galleryIds = Object.keys(GALLERY_COLLECTIONS) as GallerySectionId[];
 
   const [
     musicData,
     storeData,
     eventsData,
-    contactData,
+    archiveData,
     pressData,
     blogData,
     digitalData,
+    aboutData,
+    ...galleryData
   ] = await Promise.all([
-    music?.data.kind === "music" ? loadMusic(music.data) : null,
-    store?.data.kind === "store" ? loadStore(store.data) : null,
-    events?.data.kind === "events" ? loadEvents(events.data) : null,
-    contact?.data.kind === "contact" ? loadArchive(contact.data) : null,
-    press?.data.kind === "press" ? loadPress(press.data) : null,
-    blog?.data.kind === "blog" ? loadBlog(blog.data) : null,
-    digital?.data.kind === "digital" ? loadDigital(digital.data) : null,
+    music ? loadMusic(music) : null,
+    store ? loadStore(store) : null,
+    events ? loadEvents(events) : null,
+    contact ? loadArchive(contact) : null,
+    press ? loadPress(press) : null,
+    blog ? loadBlog(blog) : null,
+    digital ? loadDigital(digital) : null,
+    about ? loadAbout(about, settings) : null,
+    ...galleryIds.map((id) => {
+      const fallback = dataOf(id, "gallery");
+      return fallback
+        ? loadGallery(GALLERY_COLLECTIONS[id], fallback)
+        : Promise.resolve(null);
+    }),
   ]);
 
+  // `loadArchive` returns the whole contact payload; layer the editorial
+  // strings and channel list over it before it goes out.
+  const contactData = archiveData ? await applyContact(archiveData, settings) : null;
+
   const resolved: Partial<Record<string, Section["data"]>> = {
-    music: musicData ?? undefined,
+    home: home ? applyHome(home, settings) : undefined,
+    about: aboutData ?? undefined,
+    music: musicData ? applyMusicChannel(musicData, settings) : undefined,
     store: storeData ?? undefined,
     events: eventsData ?? undefined,
     contact: contactData ?? undefined,
@@ -60,6 +108,11 @@ export async function getSections(): Promise<Section[]> {
     blog: blogData ?? undefined,
     digital: digitalData ?? undefined,
   };
+
+  galleryIds.forEach((id, i) => {
+    const data = galleryData[i];
+    if (data) resolved[id] = data;
+  });
 
   return STATIC_SECTIONS.map((section) => {
     const data = resolved[section.id];
