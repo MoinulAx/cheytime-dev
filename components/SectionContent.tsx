@@ -16,7 +16,6 @@ import type {
   Section,
   SectionData,
   SocialLink,
-  ArchiveItem,
 } from "@/types/section";
 
 /* ── shared bits ──────────────────────────────────────────────────────── */
@@ -631,13 +630,11 @@ function ContactBlock({
   blurb,
   sla,
   socials,
-  archive,
 }: {
   email: string;
   blurb: string;
   sla: string;
   socials: SocialLink[];
-  archive: ArchiveItem[];
 }) {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Partial<FormState>>({});
@@ -790,37 +787,6 @@ function ContactBlock({
         </div>
       </Item>
 
-      <Item>
-        <div className="mt-8">
-          <p className="eyebrow mb-3">The Archive</p>
-          <div className="grid grid-cols-2 gap-3">
-            {archive.map((a, i) => (
-              <figure key={i} className="border border-bone-100/10">
-                <div className="relative aspect-[4/3] overflow-hidden bg-void-800">
-                  {a.src && (
-                    <Image
-                      src={a.src}
-                      alt={a.alt}
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 220px"
-                      className="object-cover"
-                      style={{ objectPosition: a.position ?? "50% 50%" }}
-                    />
-                  )}
-                </div>
-                <figcaption className="border-t border-bone-100/10 p-2">
-                  <p className="font-sans text-[11px] leading-tight text-bone-200">
-                    {a.alt}
-                  </p>
-                  <p className="mt-0.5 font-sans text-[9px] uppercase tracking-wide2 text-bone-500">
-                    {a.meta}
-                  </p>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </Item>
     </Stagger>
   );
 }
@@ -852,7 +818,6 @@ export default function SectionContent({ section }: { section: Section }) {
           blurb={data.blurb}
           sla={data.sla}
           socials={data.socials}
-          archive={data.archive}
         />
       );
     case "blog":

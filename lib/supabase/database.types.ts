@@ -371,6 +371,48 @@ export type Database = {
           },
         ]
       }
+      site_sections: {
+        Row: {
+          description: string
+          empty_message: string
+          image_alt: string
+          image_meta: string
+          image_url: string
+          note: string
+          section_id: string
+          sort_order: number | null
+          subtitle: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          description?: string
+          empty_message?: string
+          image_alt?: string
+          image_meta?: string
+          image_url?: string
+          note?: string
+          section_id: string
+          sort_order?: number | null
+          subtitle?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Update: {
+          description?: string
+          empty_message?: string
+          image_alt?: string
+          image_meta?: string
+          image_url?: string
+          note?: string
+          section_id?: string
+          sort_order?: number | null
+          subtitle?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string

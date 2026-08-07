@@ -5,22 +5,22 @@ import { renderableImage } from "./images";
 type GalleryData = Extract<SectionData, { kind: "gallery" }>;
 
 /**
- * A gallery chapter — live from `gallery_items` filtered to one `collection`.
+ * Gallery (IX) — every photograph, from `gallery_items`.
  *
- * The same table backs the Contact archive (`collection = 'archive'`), so the
- * filter is what keeps the chapters and the archive from bleeding into each
- * other. Non-image media is dropped: this grid only knows how to draw a
- * photograph.
+ * There used to be four views of this one table: chapters on III, V and IX,
+ * plus a grid inside Contact. They were the same photographs sliced up, so
+ * they are now a single section and there is no `collection` filter — the
+ * column still exists but nothing reads it.
+ *
+ * Non-image media and unusable URLs are dropped here rather than in the
+ * renderer: the grid only knows how to draw a photograph, and an
+ * off-allowlist src would throw during render.
  */
-export async function loadGallery(
-  collection: string,
-  fallback: GalleryData,
-): Promise<GalleryData> {
-  const images = await withSupabase(`loadGallery(${collection})`, async (db) => {
+export async function loadGallery(fallback: GalleryData): Promise<GalleryData> {
+  const images = await withSupabase("loadGallery", async (db) => {
     const { data, error } = await db
       .from("gallery_items")
       .select("*")
-      .eq("collection", collection)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) throw error;

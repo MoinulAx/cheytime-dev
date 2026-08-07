@@ -84,18 +84,19 @@ confirming these are real merch.
 
 ---
 
-## `/gallery` Gallery → III · V · IX + X archive
+## `/gallery` Gallery → IX
 
 | Content | Status |
 |---|---|
-| 9 archive rows (alt + meta) | LIVE in admin, **invisible on site** — every row has an empty `image_url`, so all are filtered and the archive falls back |
-| Gallery chapters III / V / IX | LIVE — YouTube stills, seeded by the migration |
-| 7 real photographs in the legacy repo | **MISSING** — now copied to `public/assets/`, not yet used |
+| Every photograph | LIVE — one Gallery section reading all of `gallery_items` |
+| 9 original archive rows | LIVE in admin, invisible until given an `image_url` |
+| 7 real photographs | LIVE — seeded into the archive |
 
-Available photography: `chey-braids`, `chey-earring`, `chey-furhat`,
-`chey-mediakit`, `editorial-1`, `editorial-2`, `editorial-3`.
-
----
+There used to be four photo surfaces: chapters on III, V and IX plus a grid
+inside Contact. All four read the same table, sliced up. They are now one
+section at IX; `gallery_items.collection` still records the old grouping but
+nothing reads it, and III and V render inactive rather than being padded with
+duplicates.
 
 ## `/blog` Blog → I Journal
 

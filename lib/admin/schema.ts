@@ -74,6 +74,12 @@ export interface TableDef {
   title: string;
   /** The clock hour this content drives, if any. */
   numeral?: string;
+  /**
+   * Where these rows appear for a visitor, in plain words. Shown at the top of
+   * every tab so nobody has to guess whether an edit is visible — the tables
+   * that surface nowhere say so outright.
+   */
+  showsOn: string;
   /** One-line description of where it surfaces. */
   blurb: string;
   fields: FieldDef[];
@@ -121,6 +127,7 @@ export const WRITABLE_TABLES = [
   "site_settings",
   "about_credits",
   "social_links",
+  "site_sections",
 ] as const;
 
 export type WritableTable = (typeof WRITABLE_TABLES)[number];
@@ -130,8 +137,35 @@ export const isWritableTable = (name: string): name is WritableTable =>
 
 export const ADMIN_TABLES: TableDef[] = [
   {
+    table: "site_sections",
+    title: "Sections",
+    numeral: "all",
+    showsOn: "Every panel — the heading, the sub-heading, the photograph at the top, and the supporting lines under it.",
+    blurb:
+      "The shell of each section rather than its content. Leave a field blank to keep the built-in wording. section_id is what the code looks up — do not change it.",
+    labelKey: "section_id",
+    canCreate: false,
+    primaryKey: "section_id",
+    orderBy: [{ column: "sort_order", ascending: true }],
+    fields: [
+      { key: "section_id", label: "Section ID", type: "text", hint: "Identifier used by the code. Changing it detaches the row from its section." },
+      { key: "title", label: "Title", type: "text" },
+      { key: "subtitle", label: "Subtitle", type: "text" },
+      { key: "description", label: "Description", type: "textarea", hint: "Intro line inside the panel. Used by Journal, Digital, Gallery and Press." },
+      { key: "note", label: "Note", type: "textarea", hint: "Small italic line at the foot of the panel. Used by Music, Store and Digital." },
+      { key: "empty_message", label: "Empty message", type: "textarea", hint: "Shown when the section has no rows yet." },
+      { key: "image_url", label: "Panel image", type: "image" },
+      { key: "image_alt", label: "Image alt text", type: "text" },
+      { key: "image_meta", label: "Image caption", type: "text" },
+      { key: "sort_order", label: "Sort order", type: "number" },
+    ],
+    defaults: {},
+  },
+  {
     table: "site_settings",
     title: "Copy",
+    showsOn:
+      "Home (XII) and About (II) mostly — plus the YouTube handle on Music (IV) and the address on Contact (X). Each row says which section it belongs to.",
     blurb:
       "The written copy across the clock — the Home lines, the About biography and quote, the contact details. Editing a value here changes the site; the key is what the code looks up, so leave it alone.",
     labelKey: "label",
@@ -164,6 +198,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "about_credits",
     title: "Credits",
     numeral: "II",
+    showsOn:
+      "About (II) — the credits list at the foot of the panel.",
     blurb: "The role/name list at the bottom of the About panel.",
     labelKey: "role",
     orderBy: [
@@ -181,6 +217,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "social_links",
     title: "Channels",
     numeral: "X",
+    showsOn:
+      "Contact (X) — the row of channel chips. A blank URL renders a greyed-out “· soon” chip instead of a dead link.",
     blurb:
       "The channel chips on Contact. Leave the URL blank to show the label greyed out as “· soon”.",
     labelKey: "label",
@@ -205,6 +243,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "music_releases",
     title: "Music",
     numeral: "IV",
+    showsOn:
+      "Music (IV). Only rows with a YouTube link appear — Spotify and Apple links are stored but cannot be embedded.",
     blurb:
       "Albums and tracks. Only rows with a YouTube link appear on the site — Spotify and Apple links are stored but cannot be embedded.",
     labelKey: "title",
@@ -265,6 +305,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "merch_products",
     title: "Store",
     numeral: "VI",
+    showsOn:
+      "Store (VI). Only products marked active appear.",
     blurb:
       "Merch. Only products marked active are shown. The clock renders the main image; extra images are stored for the legacy store's carousel.",
     labelKey: "title",
@@ -302,6 +344,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "events",
     title: "Events",
     numeral: "VIII",
+    showsOn:
+      "Events (VIII). Only published events dated in the future appear; past dates drop off on their own.",
     blurb:
       "Shows. Only published events in the future appear — past dates drop off on their own.",
     labelKey: "title",
@@ -335,6 +379,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "gallery_items",
     title: "Gallery",
     numeral: "III · V · IX · X",
+    showsOn:
+      "Gallery (IX) — every image row, in sort order. This is the only place photographs appear on the clock.",
     blurb:
       "Every photograph on the clock. The collection decides which hour it appears on. Images only.",
     labelKey: "alt",
@@ -380,6 +426,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "press_features",
     title: "Press",
     numeral: "XI",
+    showsOn:
+      "Press (XI). Only published rows that have a link appear.",
     blurb: "Editorial coverage. Only published rows with a link are shown.",
     labelKey: "headline",
     orderBy: [
@@ -406,6 +454,8 @@ export const ADMIN_TABLES: TableDef[] = [
   {
     table: "contact_submissions",
     title: "Submissions",
+    showsOn:
+      "Nowhere public. This is the inbox for the Contact (X) form.",
     blurb: "Messages from the Contact form. Read-only, apart from marking read.",
     labelKey: "subject",
     canCreate: false,
@@ -424,6 +474,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "blog_posts",
     title: "Journal",
     numeral: "I",
+    showsOn:
+      "Journal (I). A post only becomes a link if it has an external URL — there is no per-post page on the clock.",
     blurb:
       "Entries on the clock's Journal hour. A post only becomes a link if it has an external URL — there is no per-post page on the new site.",
     labelKey: "title",
@@ -456,6 +508,8 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "music_products",
     title: "Digital",
     numeral: "VII",
+    showsOn:
+      "Digital (VII). Active products appear with their preview clip; the full audio is only released after purchase.",
     blurb:
       "Paid downloads. Active products show on the clock with their preview clip; the full audio is only released after purchase. Checkout still runs from the legacy repo.",
     labelKey: "title",
@@ -496,6 +550,8 @@ export const ADMIN_TABLES: TableDef[] = [
   {
     table: "outreach_logs",
     title: "Outreach",
+    showsOn:
+      "Nowhere public. Internal PR pipeline, admin-only.",
     blurb: "Internal PR pipeline. Admin-only — never shown publicly.",
     labelKey: "contact_name",
     orderBy: [{ column: "created_at", ascending: false }],
@@ -522,6 +578,8 @@ export const ADMIN_TABLES: TableDef[] = [
   {
     table: "purchases",
     title: "Purchases",
+    showsOn:
+      "Nowhere public. Stripe orders, written by the webhook.",
     blurb:
       "Stripe orders, written by the webhook. Read-only: there is no admin update or delete policy on this table.",
     labelKey: "email",

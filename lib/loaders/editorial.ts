@@ -81,8 +81,10 @@ export function applyMusicChannel(
 }
 
 /**
- * Contact (X) — address and channel list. The archive grid is already handled
- * by `loadArchive`, so this only layers the editorial strings on top.
+ * Contact (X) — address and channel list.
+ *
+ * No photographs here any more: the grid that used to sit in this panel was a
+ * fourth view of `gallery_items`, and the Gallery section owns them now.
  */
 export async function applyContact(
   data: ContactData,
@@ -109,6 +111,5 @@ export async function applyContact(
     blurb: setting(s, "contact.blurb", data.blurb),
     sla: setting(s, "contact.sla", data.sla),
     socials: socials && socials.length > 0 ? socials : data.socials,
-    archive: data.archive,
   };
 }

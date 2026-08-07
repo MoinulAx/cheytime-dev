@@ -33,7 +33,7 @@ export type SectionId =
   | "press"
   | "blog"
   | "digital"
-  | `gallery-${string}`;
+  | "gallery";
 
 /** A single editorial photograph (used by galleries and panel banners). */
 export interface GalleryImage {
@@ -186,7 +186,12 @@ export type SectionData =
       blurb: string;
       sla: string;
       socials: SocialLink[];
-      archive: ArchiveItem[];
+      /**
+       * Kept as an optional escape hatch, but the panel no longer renders a
+       * grid here — photographs live in the Gallery section, which is the one
+       * place they come from. See CONTENT_MAP.md.
+       */
+      archive?: ArchiveItem[];
     }
   | {
       kind: "press";

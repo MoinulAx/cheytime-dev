@@ -1,10 +1,13 @@
-import type { GalleryImage, Section } from "@/types/section";
+import type { Section } from "@/types/section";
 
 /**
  * Roman numerals for all twelve dial positions, indexed by hour (0 = XII).
- * Every hour is interactive: the six named sections sit on the even hours; the
- * odd hours carry Journal (I), two photographic gallery chapters (III, V),
- * Digital (VII), The Reel (IX) and Press (XI).
+ *
+ * Ten hours open a section: Home XII, Journal I, About II, Music IV, Store VI,
+ * Digital VII, Events VIII, Gallery IX, Contact X, Press XI. III and V carry
+ * no section and render inactive — the photographs that used to fill them were
+ * the same rows Gallery already shows, so padding the dial with them was
+ * redundant rather than generous.
  */
 export const ROMAN_NUMERALS = [
   "XII",
@@ -33,53 +36,19 @@ export const angleForHour = (hourIndex: number): number =>
   hourIndex * DEGREES_PER_HOUR;
 
 /**
- * Panel imagery now uses the real photographs in `public/assets/`, carried
- * over from the legacy repo where they were sitting unused.
- *
- * The YouTube stills below still back the gallery chapters — four distinct
- * frames per upload (hq1/hq2/hq3 + hqdefault) — so those remain real frames of
- * her rather than stock. Swap them for shoot photography when more arrives.
- */
-const VIDEO_IDS = {
-  poppin: "29vWUXMTkME",
-  longKiss: "OamCSPuswjg",
-  sessionIII: "4T6mFd2Sz_Y",
-  sessionIV: "l62mMBXck70",
-} as const;
-
-/** URL of a YouTube frame: n = 1..3 for distinct stills, omit for default. */
-const still = (videoId: string, n?: 1 | 2 | 3): string =>
-  `https://i.ytimg.com/vi/${videoId}/${n ? `hq${n}` : "hqdefault"}.jpg`;
-
-/** Build a gallery frame with the shared caption format. */
-const frame = (
-  src: string,
-  alt: string,
-  caption: string,
-  meta: string,
-  position?: string,
-): GalleryImage => ({ src, alt, caption, meta, position });
-
-/**
  * ── CONTENT ──────────────────────────────────────────────────────────────
- * The static baseline for every section.
+ * The fallback baseline. Nothing here is what a visitor normally sees.
  *
- * Four sections are DB-backed and get overlaid at request time by
- * `getSections()` in `lib/sections.ts`: Music (IV), Store (VI), Events (VIII)
- * and the archive grid on Contact (X). What remains here for those is the
- * editorial furniture with no DB column — channel URL, notes, the empty-state
- * message, the contact address and channel list — plus the last-known content,
- * which is what renders if Supabase is unreachable.
+ * Every section is DB-backed: lists come from their own tables, copy from
+ * `site_settings`, and each section's title, subtitle, panel image and
+ * supporting lines from `site_sections`. This file is what renders when
+ * Supabase is unreachable, so it is kept in step with the seeds rather than
+ * left to rot.
  *
- * Every section is now DB-backed. What lives here is the last-known-good copy
- * each loader falls back to when Supabase is unreachable, plus the handful of
- * fields with no column behind them — Press's affiliation list, for instance,
- * which is logos with no article to link to.
- *
- * The About biography and the Home data strip are Chey's own words, taken
- * verbatim from the legacy /about and / pages. Earlier copy in this file
- * ("Architect of sound…", "Studio Null") was invented and appears nowhere on
- * the legacy site — see CONTENT_MAP.md before trusting MIGRATION_REPORT.md §3.
+ * The About biography and the Home data strip are Chey's own words, verbatim
+ * from the legacy /about and / pages. Earlier copy here ("Architect of
+ * sound…", "Studio Null") was invented and appears nowhere on the legacy site
+ * — read CONTENT_MAP.md before trusting MIGRATION_REPORT.md §3.
  */
 export const STATIC_SECTIONS: Section[] = [
   {
@@ -163,26 +132,6 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-videos",
-    numeral: "III",
-    hourIndex: 3,
-    angle: angleForHour(3),
-    title: "The Videos",
-    subtitle: "Gallery · One",
-    data: {
-      kind: "gallery",
-      description: "Frame by frame through the music videos.",
-      images: [
-        frame(still(VIDEO_IDS.poppin, 1), "Chey — Poppin' video still", "Poppin' — Frame I", "Music Video · 2026"),
-        frame(still(VIDEO_IDS.poppin, 2), "Chey — Poppin' video still", "Poppin' — Frame II", "Music Video · 2026"),
-        frame(still(VIDEO_IDS.poppin, 3), "Chey — Poppin' video still", "Poppin' — Frame III", "Music Video · 2026"),
-        frame(still(VIDEO_IDS.longKiss, 1), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame I", "Music Video · 2025"),
-        frame(still(VIDEO_IDS.longKiss, 2), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame II", "Music Video · 2025"),
-        frame(still(VIDEO_IDS.longKiss, 3), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight — Frame III", "Music Video · 2025"),
-      ],
-    },
-  },
-  {
     id: "music",
     numeral: "IV",
     hourIndex: 4,
@@ -210,26 +159,6 @@ export const STATIC_SECTIONS: Section[] = [
         { id: "v4", title: "Session IV", youtubeId: "l62mMBXck70" },
       ],
       note: "Spotify & Apple Music links coming soon.",
-    },
-  },
-  {
-    id: "gallery-sessions",
-    numeral: "V",
-    hourIndex: 5,
-    angle: angleForHour(5),
-    title: "The Sessions",
-    subtitle: "Gallery · Two",
-    data: {
-      kind: "gallery",
-      description: "Inside the recording sessions.",
-      images: [
-        frame(still(VIDEO_IDS.sessionIII, 1), "Chey — Session III still", "Session III — Frame I", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIII, 2), "Chey — Session III still", "Session III — Frame II", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIII, 3), "Chey — Session III still", "Session III — Frame III", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIV, 1), "Chey — Session IV still", "Session IV — Frame I", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIV, 2), "Chey — Session IV still", "Session IV — Frame II", "Session · YouTube"),
-        frame(still(VIDEO_IDS.sessionIV, 3), "Chey — Session IV still", "Session IV — Frame III", "Session · YouTube"),
-      ],
     },
   },
   {
@@ -296,21 +225,24 @@ export const STATIC_SECTIONS: Section[] = [
     },
   },
   {
-    id: "gallery-reel",
+    id: "gallery",
     numeral: "IX",
     hourIndex: 9,
     angle: angleForHour(9),
-    title: "The Reel",
-    subtitle: "Gallery · Five",
+    title: "Gallery",
+    subtitle: "The Archive",
+    image: {
+      src: "/assets/chey-furhat.jpg",
+      alt: "Chey — portrait",
+      meta: "Archive · Photography",
+    },
     data: {
       kind: "gallery",
-      description: "One frame from every release — the run so far.",
-      images: [
-        frame(still(VIDEO_IDS.poppin, 2), "Chey — Poppin' video still", "Poppin'", "2026"),
-        frame(still(VIDEO_IDS.longKiss, 1), "Chey — Long Kiss Goodnight video still", "Long Kiss Goodnight", "2025"),
-        frame(still(VIDEO_IDS.sessionIII, 2), "Chey — Session III still", "Session III", "YouTube"),
-        frame(still(VIDEO_IDS.sessionIV, 3), "Chey — Session IV still", "Session IV", "YouTube"),
-      ],
+      description: "Every frame, in one place.",
+      // Live from `gallery_items` — all of it. This is the only photo surface
+      // on the clock; the chapters that used to sit on III, V and IX, and the
+      // grid that used to sit inside Contact, were four views of one table.
+      images: [],
     },
   },
   {
@@ -337,12 +269,6 @@ export const STATIC_SECTIONS: Section[] = [
         { label: "TikTok", url: "https://www.tiktok.com/@cheymusic" },
         { label: "Spotify", url: null },
         { label: "Apple Music", url: null },
-      ],
-      archive: [
-        { alt: "Music Video Shoot — Poppin'", meta: "Studio · 2026", src: still(VIDEO_IDS.poppin, 3) },
-        { alt: "Long Kiss Goodnight", meta: "On Location · 2025", src: still(VIDEO_IDS.longKiss, 2) },
-        { alt: "Studio Session — Vocal Take", meta: "Session III", src: still(VIDEO_IDS.sessionIII, 1) },
-        { alt: "Behind the Scenes", meta: "Session IV", src: still(VIDEO_IDS.sessionIV, 1) },
       ],
     },
   },

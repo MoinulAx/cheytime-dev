@@ -431,7 +431,16 @@ export default function TableEditor({
             )}
             {def.title}
           </h2>
-          <p className="mt-1 font-sans text-[13px] leading-relaxed text-bone-400">
+          {/* Where an edit here actually lands. Stated first, and stated for
+              the internal tables too, so "does this show anywhere?" is never
+              a guess. */}
+          <p className="mt-2 border-l-2 border-cosmic-600/50 pl-3 font-sans text-[13px] leading-relaxed text-bone-200">
+            <span className="mr-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+              Appears on
+            </span>
+            {def.showsOn}
+          </p>
+          <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-400">
             {def.blurb}
           </p>
         </div>
