@@ -81,11 +81,6 @@ export const STATIC_SECTIONS: Section[] = [
     angle: angleForHour(1),
     title: "Journal",
     subtitle: "Dispatches",
-    image: {
-      src: "/assets/editorial-2.jpg",
-      alt: "Chey — editorial portrait",
-      meta: "Journal · Written",
-    },
     data: {
       kind: "blog",
       description: "Notes, announcements and long-form from Chey and the team.",
@@ -212,11 +207,6 @@ export const STATIC_SECTIONS: Section[] = [
     title: "Events",
     subtitle: "Upcoming",
     placeholder: true,
-    image: {
-      src: "/assets/editorial-3.jpg",
-      alt: "Chey — editorial portrait",
-      meta: "Live · Coming Soon",
-    },
     data: {
       kind: "events",
       events: [],
@@ -231,11 +221,6 @@ export const STATIC_SECTIONS: Section[] = [
     angle: angleForHour(9),
     title: "Gallery",
     subtitle: "The Archive",
-    image: {
-      src: "/assets/chey-furhat.jpg",
-      alt: "Chey — portrait",
-      meta: "Archive · Photography",
-    },
     data: {
       kind: "gallery",
       description: "Every frame, in one place.",
@@ -252,11 +237,6 @@ export const STATIC_SECTIONS: Section[] = [
     angle: angleForHour(10),
     title: "Contact",
     subtitle: "Transmission & Archive",
-    image: {
-      src: "/assets/editorial-1.jpg",
-      alt: "Chey — editorial portrait",
-      meta: "Open Line · 48hr Reply",
-    },
     data: {
       kind: "contact",
       // Management address as published in the 2026 press kit.

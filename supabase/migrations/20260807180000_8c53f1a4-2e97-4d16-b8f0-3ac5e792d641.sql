@@ -66,10 +66,7 @@ FROM (VALUES
   ('Chey — portrait, braids and chain', 'Portrait', '/assets/chey-braids.jpg', 101),
   ('Chey — 2024 media kit cover',       'Media Kit · 2024', '/assets/chey-mediakit.jpg', 102),
   ('Chey — portrait with earring',      'Portrait', '/assets/chey-earring.jpg', 103),
-  ('Chey — portrait, fur hat',          'Portrait', '/assets/chey-furhat.jpg', 104),
-  ('Chey — editorial',                  'Editorial', '/assets/editorial-1.jpg', 105),
-  ('Chey — editorial',                  'Editorial', '/assets/editorial-2.jpg', 106),
-  ('Chey — editorial',                  'Editorial', '/assets/editorial-3.jpg', 107)
+  ('Chey — portrait, fur hat',          'Portrait', '/assets/chey-furhat.jpg', 104)
 ) AS v(alt, meta, image_url, sort_order)
 WHERE NOT EXISTS (
   SELECT 1 FROM public.gallery_items g WHERE g.image_url = v.image_url

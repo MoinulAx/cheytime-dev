@@ -48,7 +48,7 @@ INSERT INTO public.site_sections
   ('blog',    'Journal', 'Dispatches',
               'Notes, announcements and long-form from Chey and the team.', '',
               'No entries yet. Announcements and long-form land here first.',
-              '/assets/editorial-2.jpg', 'Chey — editorial portrait', 'Journal · Written', 1),
+              '', '', '', 1),
   ('about',   'About', 'The Manifesto', '', '', '',
               '/assets/chey-braids.jpg', 'Chey — portrait', 'Portrait · Staten Island', 2),
   ('music',   'Music', 'The Sound', '',
@@ -64,16 +64,14 @@ INSERT INTO public.site_sections
               '/assets/chey-earring.jpg', 'Chey — portrait', 'Digital · Downloads', 7),
   ('events',  'Events', 'Upcoming', '', '',
               'No dates on the calendar right now. New shows are announced here first — check back soon.',
-              '/assets/editorial-3.jpg', 'Chey — editorial portrait', 'Live · Coming Soon', 8),
+              '', '', '', 8),
   ('gallery', 'Gallery', 'The Archive', 'Every frame, in one place.', '',
-              '', '/assets/chey-furhat.jpg', 'Chey — portrait', 'Archive · Photography', 9),
+              '', '', '', '', 9),
   ('contact', 'Contact', 'Transmission', '', '', '',
-              '/assets/editorial-1.jpg', 'Chey — editorial portrait', 'Open Line · 48hr Reply', 10),
+              '', '', '', 10),
   ('press',   'Press', 'The Record', 'Where the work has been written about.', '',
               'Coverage is being gathered. Press enquiries are welcome — the line is open on X.',
               '/assets/chey-mediakit.jpg', 'Chey — 2024 media kit cover', 'Press · Media Kit', 11)
 ON CONFLICT (section_id) DO NOTHING;
 
-COMMENT ON COLUMN public.gallery_items.collection IS
-  'Historical grouping only. The Gallery section renders every row regardless '
-  'of this value — kept so the original chaptering is not lost.';
+COMMENT ON COLUMN public.gallery_items.collection IS 'Historical grouping only. The Gallery section renders every row regardless of this value, kept so the original chaptering is not lost.';
