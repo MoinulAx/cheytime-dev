@@ -19,13 +19,14 @@ into this codebase.
 | Press section (XI) + `press_features` table and migration | Done |
 | Full migration history mirrored into `supabase/migrations/` | Done |
 | ISR at 60s, route builds `○ Static` | Done |
+| **Admin panel at `/admin`** | Built — see §3. Ten tabs, one per table the legacy admin managed. |
 
 ### Not done
 
 | Piece | State |
 | --- | --- |
-| **Admin panel in this repo** | **Not started** — see §3 |
 | Verification against the live database | **Blocked** — see §2 |
+| Signing into the admin end to end | **Blocked** — same reason. The guard and login render; no CRUD action has been run against a real row. |
 | Product imagery in the Store panel | Not started — `merch_products.image_url` is read but discarded, because `Product` has no image field and the renderer draws a numbered placeholder tile. Adding it means touching `StoreBlock`. |
 | The three EPK videos (`SIcEPXmavDk`, `lXucfyLDE7M`, `xAkX2h97qeE`) | Not added — Music is DB-driven now, so these belong in `music_releases` via the admin, not in a static list. |
 | Page 1 of `CHEY2026.pdf` | Not migrated — it is a single full-bleed image and could not be extracted in this environment. If it carries copy, that copy is not on the site. |
@@ -68,11 +69,23 @@ intended tradeoff for a marketing site. When the admin moves into this repo,
 
 ---
 
-## 3. Admin panel plan
+## 3. Admin panel — as built
 
-The legacy admin is a single 1380-line `src/pages/Admin.tsx` in the old repo —
-a tabbed CRUD surface over the same tables this site now reads. The goal is to
-port it to the App Router, not to redesign it.
+Ported from the legacy `src/pages/Admin.tsx` (a single 1380-line tabbed CRUD
+surface) to the App Router at `/admin`. Same database, same tables, same job.
+
+Two things changed in the port:
+
+**Tabs are named by clock hour, not by page.** The old admin mirrored the old
+site's pages; the new site renders hours, so each tab names the numeral it
+feeds — Music IV, Store VI, Events VIII, Archive X, Press XI. Tabs with no
+numeral (Submissions, Blog, Digital, Outreach, Purchases) say in the tab
+itself where they do and don't surface, so it is clear that editing Blog
+changes the database but nothing visible.
+
+**One schema-driven editor instead of a component per table.** Adding a field
+to `lib/admin/schema.ts` adds it to the form, the create defaults and the save
+payload. There is no per-table component to keep in step.
 
 ### 3.1 Auth
 
@@ -141,24 +154,65 @@ admin appear immediately. Edits made in the **legacy** admin still take up to
 60s, since that app cannot call into this one. If that becomes a problem, a
 Supabase webhook hitting a `/api/revalidate` route handler closes the gap.
 
-### 3.6 Sequencing
+### 3.6 Known rough edges
 
-1. `middleware.ts` + login + `/admin` guard — nothing else works without it.
-2. Press and Events. Smallest schemas, and Press has no legacy admin to port,
-   so it is the cleanest place to establish the CRUD pattern.
-3. Store and Gallery. Adds the upload path.
-4. Music. Hardest — the album/track parent-child relationship needs real UI.
-5. Messages. Read-only plus a `read` toggle.
-6. Retire the legacy admin once every tab has an equivalent here.
+- **Music album nesting is by ID, not by picker.** Nesting a track under an
+  album means pasting the album's `parent_album_id`. It works, but it is the
+  one place the port is clumsier than it should be.
+- **`music_files` uploads are not wired.** Only the public `site-assets`
+  bucket is. Digital audio still has to be uploaded from the legacy admin.
+- **No optimistic UI.** Every save round-trips and then refreshes the route.
+  Correct, but it feels slower than the old client-side admin on a slow link.
 
-### 3.7 Decisions still needed
+### 3.7 Granting admin access
+
+Deliberately locked down: **there is no invite flow and no self-serve signup
+path into the admin.** Access is granted in two manual steps, both in the
+Supabase dashboard.
+
+1. **Create the user** under Authentication → Users → Add user. Set a password
+   and confirm the email; an unconfirmed user cannot sign in.
+2. **Grant the role** in the SQL editor. Looking the user up by email avoids
+   copying UUIDs around, and `user_roles` has a `UNIQUE (user_id, role)`
+   constraint, so re-running this is harmless:
+
+```sql
+insert into public.user_roles (user_id, role)
+select id, 'admin'::public.app_role
+from auth.users
+where email = 'person@example.com'
+on conflict (user_id, role) do nothing;
+```
+
+To revoke, delete the row — the session dies at its next refresh, within the
+hour:
+
+```sql
+delete from public.user_roles
+using auth.users
+where user_roles.user_id = auth.users.id
+  and auth.users.email = 'person@example.com'
+  and user_roles.role = 'admin';
+```
+
+Notes:
+
+- `app_role` is an enum of `admin | moderator | user`. Only `admin` grants
+  anything — the other two are unused by both apps.
+- Creating an account without the role is safe. They can sign in, get bounced
+  straight back to the login form, and every write they attempt fails RLS.
+- If public signups are enabled on the project, that remains true — an account
+  alone grants nothing. Worth disabling anyway if nothing else needs it.
+
+### 3.8 Decisions still needed
 
 - **Does the legacy admin get retired, or do both run?** Both writing to one
-  database is fine, but two UIs drift. Recommend retiring the old one after §3.6.
-- **Who gets an admin account?** Rows must be added to `user_roles` by hand;
-  there is no invite flow.
+  database is fine, but two UIs drift. Recommend retiring the old one now that
+  this panel covers every table it managed.
 - **Store checkout.** The Stripe edge functions live in the legacy repo and are
   not wired here. The Store panel's Reserve button is still local-only state.
+- **Blog and Digital have no home on the clock.** They are editable here but
+  nothing renders them. Either give them an hour or accept they are dormant.
 
 ---
 
