@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminUser } from "@/lib/admin/auth";
-import { isWritableTable } from "@/lib/admin/schema";
+import {
+  ADMIN_TABLES,
+  isWritableTable,
+  type WritableTable,
+} from "@/lib/admin/schema";
 
 export interface ActionResult {
   ok: boolean;
@@ -21,11 +25,43 @@ function revalidateSite() {
   revalidatePath("/admin");
 }
 
-/** Strip empty strings to null so blank optional fields don't fail a cast. */
-function clean(values: Record<string, unknown>): Record<string, unknown> {
+/**
+ * Normalise a blank field to whatever its column actually accepts.
+ *
+ * Most text columns in this schema are `NOT NULL DEFAULT ''`, so blanking one
+ * has to write `''` — writing `null` trips the not-null constraint and
+ * surfaces to the admin as a raw database error. Only columns marked
+ * `nullable` (uuid, date, timestamp) get `null`, because an empty string
+ * cannot be cast to those types at all.
+ *
+ * Numbers fall back to 0: `price` and `sort_order` are both
+ * `NOT NULL DEFAULT 0`, and a cleared number means zero here, not unknown.
+ */
+function clean(
+  table: WritableTable,
+  values: Record<string, unknown>,
+): Record<string, unknown> {
+  const fields = ADMIN_TABLES.find((d) => d.table === table)?.fields ?? [];
+  const byKey = new Map(fields.map((f) => [f.key, f]));
+
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(values)) {
-    out[key] = typeof value === "string" && value.trim() === "" ? null : value;
+    const field = byKey.get(key);
+    const isBlank =
+      value === null ||
+      value === undefined ||
+      (typeof value === "string" && value.trim() === "");
+
+    if (!isBlank) {
+      out[key] = value;
+      continue;
+    }
+    if (field?.nullable) out[key] = null;
+    else if (field?.type === "number") out[key] = 0;
+    else if (field?.type === "boolean") out[key] = false;
+    else if (field) out[key] = "";
+    // Unknown keys (child-table columns) pass through untouched.
+    else out[key] = value;
   }
   return out;
 }
@@ -46,7 +82,7 @@ export async function saveRecord(
   // The row shape is defined by lib/admin/schema.ts rather than by a literal
   // type here, so the generated per-table Insert/Update types cannot be applied.
   // RLS plus the column constraints are what actually validate the payload.
-  const payload = clean(values) as never;
+  const payload = clean(table, values) as never;
 
   const { error } = id
     ? await db.from(table).update(payload).eq("id", id)

@@ -3,7 +3,12 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteRecord, saveRecord } from "@/app/admin/actions";
-import type { FieldDef, StorageBucket, TableDef } from "@/lib/admin/schema";
+import type {
+  ChildTableDef,
+  FieldDef,
+  StorageBucket,
+  TableDef,
+} from "@/lib/admin/schema";
 import { fromInputValue, toInputValue } from "@/lib/admin/datetime";
 import { createClient } from "@/lib/supabase/browser";
 
@@ -259,13 +264,101 @@ function Field({
   );
 }
 
+/**
+ * Extra images for one parent row (merch product → merch_product_images).
+ *
+ * Adding uploads first, then writes the row, so a failed upload never leaves a
+ * record pointing at nothing. Deleting only removes the row — the file stays
+ * in the bucket, matching the legacy admin and keeping a mis-click recoverable.
+ */
+function ChildImages({
+  child,
+  parentId,
+  images,
+  onChanged,
+}: {
+  child: ChildTableDef;
+  parentId: string;
+  images: Row[];
+  onChanged: () => void;
+}) {
+  const [error, setError] = useState<string | null>(null);
+
+  const add = async (url: string) => {
+    setError(null);
+    const result = await saveRecord(child.table, null, {
+      [child.foreignKey]: parentId,
+      [child.imageKey]: url,
+      ...(child.sortKey ? { [child.sortKey]: images.length } : {}),
+    });
+    if (!result.ok) setError(result.error ?? "Could not add the image.");
+    else onChanged();
+  };
+
+  const remove = async (id: string) => {
+    setError(null);
+    const result = await deleteRecord(child.table, id);
+    if (!result.ok) setError(result.error ?? "Could not remove the image.");
+    else onChanged();
+  };
+
+  return (
+    // order-3 keeps the full-width strip below the row's own controls rather
+    // than wrapping between the title and the buttons.
+    <div className="order-3 mt-3 w-full border-t border-bone-100/10 pt-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="eyebrow">
+          {child.title}
+          {images.length > 0 && (
+            <span className="ml-2 text-bone-500">{images.length}</span>
+          )}
+        </p>
+        <UploadButton
+          accept="image/*"
+          bucket={child.bucket ?? "site-assets"}
+          onUploaded={add}
+        />
+      </div>
+
+      {images.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {images.map((img) => (
+            <div key={String(img.id)} className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={str(img[child.imageKey])}
+                alt=""
+                className="h-14 w-14 border border-bone-100/15 object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => remove(String(img.id))}
+                aria-label="Remove image"
+                className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center border border-bone-100/30 bg-void text-[10px] text-bone-300 hover:border-cosmic-400 hover:text-cosmic-400"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-2 font-sans text-[11px] text-cosmic-400">{error}</p>
+      )}
+    </div>
+  );
+}
+
 export default function TableEditor({
   def,
   rows,
+  childRows,
   loadError,
 }: {
   def: TableDef;
   rows: Row[];
+  childRows: Row[];
   loadError: string | null;
 }) {
   const router = useRouter();
@@ -441,7 +534,7 @@ export default function TableEditor({
                 </p>
               </div>
               {!def.readOnly && (
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="order-2 flex shrink-0 items-center gap-3">
                   <button
                     type="button"
                     onClick={() => openEdit(row)}
@@ -457,6 +550,17 @@ export default function TableEditor({
                     Delete
                   </button>
                 </div>
+              )}
+
+              {def.child && (
+                <ChildImages
+                  child={def.child}
+                  parentId={id}
+                  images={childRows.filter(
+                    (c) => String(c[def.child!.foreignKey]) === id,
+                  )}
+                  onChanged={() => startTransition(() => router.refresh())}
+                />
               )}
             </div>
           );

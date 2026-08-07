@@ -10,6 +10,8 @@ import TableEditor from "./TableEditor";
 export interface TableRows {
   table: string;
   rows: Record<string, unknown>[];
+  /** Rows of the table's `child`, if it has one. Empty otherwise. */
+  childRows: Record<string, unknown>[];
   error: string | null;
 }
 
@@ -101,6 +103,7 @@ export default function AdminTabs({
           key={activeDef.table}
           def={activeDef}
           rows={activeData?.rows ?? []}
+          childRows={activeData?.childRows ?? []}
           loadError={activeData?.error ?? null}
         />
       </div>

@@ -26,9 +26,26 @@ export default async function AdminPage() {
         query = query.order(order.column, { ascending: order.ascending });
       }
       const { data, error } = await query;
+
+      // Child rows (extra merch images) come back in the same pass, so the
+      // strip under each product renders with the list instead of firing a
+      // request per row after mount.
+      let childRows: Record<string, unknown>[] = [];
+      if (def.child) {
+        let childQuery = db.from(def.child.table).select("*");
+        if (def.child.sortKey) {
+          childQuery = childQuery.order(def.child.sortKey, {
+            ascending: true,
+          });
+        }
+        const { data: children } = await childQuery;
+        childRows = (children ?? []) as Record<string, unknown>[];
+      }
+
       return {
         table: def.table,
         rows: (data ?? []) as Record<string, unknown>[],
+        childRows,
         error: error?.message ?? null,
       };
     }),

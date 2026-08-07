@@ -40,6 +40,28 @@ export interface FieldDef {
   hint?: string;
   /** Upload target for `image` / `audio` fields. Defaults to `site-assets`. */
   bucket?: StorageBucket;
+  /**
+   * Send `null` when the field is left blank.
+   *
+   * Only for columns where an empty string cannot be cast — uuid, date,
+   * timestamp. Most text columns here are `NOT NULL DEFAULT ''`, so blanking
+   * them must write `''`; writing `null` instead trips the not-null
+   * constraint and surfaces as a confusing database error.
+   */
+  nullable?: boolean;
+}
+
+/** A one-to-many child table edited inline from its parent's row. */
+export interface ChildTableDef {
+  table: WritableTable;
+  /** Column on the child holding the parent's id. */
+  foreignKey: string;
+  title: string;
+  /** Column holding the image URL. */
+  imageKey: string;
+  /** Column used to order the strip, if any. */
+  sortKey?: string;
+  bucket?: StorageBucket;
 }
 
 export interface TableDef {
@@ -69,6 +91,8 @@ export interface TableDef {
    * failures.
    */
   readOnly?: boolean;
+  /** Extra images (or similar) managed inline against each row. */
+  child?: ChildTableDef;
 }
 
 /**
@@ -88,6 +112,7 @@ export const WRITABLE_TABLES = [
   "music_products",
   "outreach_logs",
   "purchases",
+  "merch_product_images",
 ] as const;
 
 export type WritableTable = (typeof WRITABLE_TABLES)[number];
@@ -132,6 +157,7 @@ export const ADMIN_TABLES: TableDef[] = [
         key: "parent_album_id",
         label: "Parent album ID",
         type: "text",
+        nullable: true,
         hint: "Leave blank for a standalone release. Paste an album's ID to nest this track under it.",
       },
       { key: "artwork_url", label: "Artwork", type: "image" },
@@ -159,9 +185,18 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "merch_products",
     title: "Store",
     numeral: "VI",
-    blurb: "Merch. Only products marked active are shown.",
+    blurb:
+      "Merch. Only products marked active are shown. The clock renders the main image; extra images are stored for the legacy store's carousel.",
     labelKey: "title",
     orderBy: [{ column: "created_at", ascending: false }],
+    child: {
+      table: "merch_product_images",
+      foreignKey: "merch_product_id",
+      title: "Extra images",
+      imageKey: "image_url",
+      sortKey: "sort_order",
+      bucket: "site-assets",
+    },
     fields: [
       { key: "title", label: "Title", type: "text" },
       { key: "price", label: "Price", type: "number" },
@@ -197,7 +232,8 @@ export const ADMIN_TABLES: TableDef[] = [
         key: "date_time",
         label: "Date & time",
         type: "datetime",
-        hint: "Entered and displayed in New York time.",
+        nullable: true,
+        hint: "Entered and displayed in New York time. Required — an event with no date cannot be saved.",
       },
       { key: "location", label: "Location", type: "text" },
       { key: "description", label: "Description", type: "textarea" },
@@ -265,7 +301,7 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "outlet", label: "Outlet", type: "text", placeholder: "BET" },
       { key: "headline", label: "Headline", type: "text" },
       { key: "url", label: "Article URL", type: "url" },
-      { key: "published_at", label: "Published", type: "date" },
+      { key: "published_at", label: "Published", type: "date", nullable: true },
       { key: "sort_order", label: "Sort order", type: "number" },
       { key: "published", label: "Published", type: "boolean" },
     ],

@@ -159,12 +159,9 @@ Supabase webhook hitting a `/api/revalidate` route handler closes the gap.
 - **Music album nesting is by ID, not by picker.** Nesting a track under an
   album means pasting the album's `parent_album_id`. It works, but it is the
   one place the port is clumsier than it should be.
-- **`merch_product_images` is not managed here.** The legacy admin has a
-  multi-image strip per product; this panel only has the single `image_url`.
-  Extra images already in that table stay put but cannot be added or removed
-  from here. This is the last real gap before the legacy admin can be retired.
 - **No bulk upload.** The legacy admin takes a folder of gallery images or
-  audio at once; this one is a file at a time.
+  audio at once; this one is a file at a time. Last remaining difference, and
+  the only thing the legacy admin still does better.
 - **No optimistic UI.** Every save round-trips and then refreshes the route.
   Correct, but it feels slower than the old client-side admin on a slow link.
 
