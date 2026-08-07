@@ -1,17 +1,8 @@
 import { createStaticClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { isFrameworkSignal } from "@/lib/next-signals";
 
 type ServerClient = ReturnType<typeof createStaticClient>;
-
-/**
- * Next signals rendering decisions (bailing out of static, redirects, 404s) by
- * throwing. Those must reach the framework untouched — swallowing one turns a
- * routing instruction into a silent content fallback.
- */
-function isFrameworkSignal(error: unknown): boolean {
-  const digest = (error as { digest?: unknown })?.digest;
-  return typeof digest === "string" && /^(NEXT_|DYNAMIC_SERVER_USAGE)/.test(digest);
-}
 
 /**
  * Run a Supabase read, degrading to `null` instead of throwing.

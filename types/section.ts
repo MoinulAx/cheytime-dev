@@ -96,6 +96,12 @@ export interface ArchiveItem {
   position?: string;
 }
 
+/** One label/value pair from the home data strip. */
+export interface Fact {
+  label: string;
+  value: string;
+}
+
 /** A press feature — one piece of editorial coverage. */
 export interface PressItem {
   id: string;
@@ -148,6 +154,8 @@ export type SectionData =
       location: string;
       intro: string;
       cue: string;
+      /** The legacy home data strip: Based · Genre · Latest · Direction. */
+      facts: Fact[];
     }
   | {
       kind: "about";

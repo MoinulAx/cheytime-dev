@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isFrameworkSignal } from "@/lib/next-signals";
 import {
   SUPABASE_ANON_KEY,
   SUPABASE_URL,
@@ -100,8 +101,11 @@ export async function getAdminUser(): Promise<AdminUser | null> {
     if (error || !roles || roles.length === 0) return null;
     return { id: user.id, email: user.email ?? null };
   } catch (error) {
-    // Treated as "not an admin" rather than allowed to escape: a failure here
-    // should land on the sign-in page, never on a 500.
+    // Next's own control flow must not be caught here — swallowing the
+    // bail-out signal lets it believe an authenticated route is cacheable.
+    if (isFrameworkSignal(error)) throw error;
+    // Anything else is treated as "not an admin" rather than allowed to
+    // escape: a failure here should land on the sign-in page, never a 500.
     console.error("[admin] admin check failed", error);
     return null;
   }

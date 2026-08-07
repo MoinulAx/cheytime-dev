@@ -33,10 +33,12 @@ export const angleForHour = (hourIndex: number): number =>
   hourIndex * DEGREES_PER_HOUR;
 
 /**
- * Imagery comes straight from Chey's own videos: YouTube serves four distinct
- * frames per upload (hq1/hq2/hq3 + hqdefault), so every gallery and banner is
- * a real still of her — no stock, no generated photos. Replace with a proper
- * photo shoot when one is delivered (see MIGRATION_REPORT.md).
+ * Panel imagery now uses the real photographs in `public/assets/`, carried
+ * over from the legacy repo where they were sitting unused.
+ *
+ * The YouTube stills below still back the gallery chapters — four distinct
+ * frames per upload (hq1/hq2/hq3 + hqdefault) — so those remain real frames of
+ * her rather than stock. Swap them for shoot photography when more arrives.
  */
 const VIDEO_IDS = {
   poppin: "29vWUXMTkME",
@@ -69,11 +71,15 @@ const frame = (
  * message, the contact address and channel list — plus the last-known content,
  * which is what renders if Supabase is unreachable.
  *
- * Home (XII) and About (II) are editorial in full: the hero copy and the
- * manifesto have no rows in the legacy schema and stay hard-coded until the
- * client asks otherwise. The gallery chapters on the odd hours are built from
- * YouTube stills and are likewise static. Press (XI) is DB-backed too, but its
- * affiliation list stays here — those are logos with no article to link to.
+ * Every section is now DB-backed. What lives here is the last-known-good copy
+ * each loader falls back to when Supabase is unreachable, plus the handful of
+ * fields with no column behind them — Press's affiliation list, for instance,
+ * which is logos with no article to link to.
+ *
+ * The About biography and the Home data strip are Chey's own words, taken
+ * verbatim from the legacy /about and / pages. Earlier copy in this file
+ * ("Architect of sound…", "Studio Null") was invented and appears nowhere on
+ * the legacy site — see CONTENT_MAP.md before trusting MIGRATION_REPORT.md §3.
  */
 export const STATIC_SECTIONS: Section[] = [
   {
@@ -90,6 +96,13 @@ export const STATIC_SECTIONS: Section[] = [
       intro:
         "Relatable lyricism over upbeat, captivating production. Stream the sound, step into the archive, and catch what comes next — on Chey's time.",
       cue: "Choose an hour to begin",
+      // The legacy home data strip, carried over verbatim.
+      facts: [
+        { label: "Based", value: "Staten Island, NY" },
+        { label: "Genre", value: "Hip-Hop" },
+        { label: "Latest", value: "Whips & Chains Freestyle" },
+        { label: "Direction", value: "Borleone Films" },
+      ],
     },
   },
   {
@@ -100,8 +113,8 @@ export const STATIC_SECTIONS: Section[] = [
     title: "Journal",
     subtitle: "Dispatches",
     image: {
-      src: still(VIDEO_IDS.poppin, 1),
-      alt: "Chey — still from the Poppin' music video",
+      src: "/assets/editorial-2.jpg",
+      alt: "Chey — editorial portrait",
       meta: "Journal · Written",
     },
     data: {
@@ -122,19 +135,24 @@ export const STATIC_SECTIONS: Section[] = [
     title: "About",
     subtitle: "The Manifesto",
     image: {
-      src: still(VIDEO_IDS.poppin),
-      alt: "Chey — still from the Poppin' music video",
-      meta: "Still · Poppin' · 2026",
+      src: "/assets/chey-braids.jpg",
+      alt: "Chey — portrait",
+      meta: "Portrait · Staten Island",
     },
     data: {
       kind: "about",
+      // Chey's own biography, verbatim from the legacy /about and / pages.
+      // The copy that used to sit here ("Architect of sound…", "Studio Null")
+      // appears nowhere on the legacy site — see CONTENT_MAP.md.
       bio: [
-        "Chey. Architect of sound — blending raw, relatable lyricism with heavy, captivating production.",
-        "Born from a rejection of the polished and predictable. In a landscape saturated with overproduced noise, the choice was rawness. In a world addicted to trends, the choice was substance.",
-        "Every release is a document of a specific tension — silence against static, restraint against aggression. The work lives at the intersection of sound and vision.",
+        "Cheyenne, professionally known as “Chey”, is a multifaceted rap artist and musician originally from Staten Island, NY. Her deep-rooted passion for music led her to pursue a career in the industry after initially working in the field of psychology, specifically with children with special needs. Transitioning from her previous profession, Chey fully committed herself to her music and acting aspirations, drawing inspiration from her family's strong musical background.",
+        "Chey's introduction to rap music came from her father, who exposed her to the art of free-styling and rhymes. Having grown up in a musically inclined environment, she developed a love for both singing and performing from an early age. Her exposure to rap music, including iconic tracks like “Mama Said Knock You Out” by LL Cool J, played a pivotal role in shaping her artistic journey within the rap genre.",
+        "Chey's musical style is a harmonious blend of relatable, upbeat, and lyrically captivating elements, aiming to resonate with a diverse audience. Her approach to her songs encompasses a wide range of themes, ensuring that her music reflects the experiences and emotions that people from different walks of life can relate to.",
+        "She hopes to convey messages of originality and self-confidence through her artistry, encouraging her listeners to embrace their individuality. She is motivated by the positive reactions and support she receives from her fans, which serve as a driving force in her artistic endeavors.",
+        "To aspiring artists seeking to establish themselves in the industry, Chey advocates for perseverance, self-authenticity, and steady dedication to their craft. She emphasizes the importance of staying true to one's vision and maintaining a positive outlook, even in the face of challenges.",
+        "While staying true to her musical roots, she also envisions exploring opportunities in acting, allowing her to expand her creative horizons. Hip Hop's Princess artistic journey is characterized by a steadfast commitment to her profession, an unwavering desire to connect with her audience, and an aspiration to make a meaningful impact through her music.",
       ],
-      quote:
-        "The mic captures the exact frequency of the room. The imperfections are intentional.",
+      quote: "I don't follow trends, I'm trending.",
       credits: [
         { role: "Artist", name: "Chey" },
         { role: "Production", name: "Chey" },
@@ -172,9 +190,9 @@ export const STATIC_SECTIONS: Section[] = [
     title: "Music",
     subtitle: "The Sound",
     image: {
-      src: still(VIDEO_IDS.longKiss),
-      alt: "Chey — still from Long Kiss Goodnight",
-      meta: "Still · Long Kiss Goodnight · 2025",
+      src: "/assets/chey-furhat.jpg",
+      alt: "Chey — portrait",
+      meta: "Portrait · The Sound",
     },
     data: {
       kind: "music",
@@ -242,8 +260,8 @@ export const STATIC_SECTIONS: Section[] = [
     title: "Digital",
     subtitle: "Downloads",
     image: {
-      src: still(VIDEO_IDS.sessionIV, 2),
-      alt: "Chey — studio session still",
+      src: "/assets/chey-earring.jpg",
+      alt: "Chey — portrait",
       meta: "Digital · Downloads",
     },
     data: {
@@ -266,8 +284,8 @@ export const STATIC_SECTIONS: Section[] = [
     subtitle: "Upcoming",
     placeholder: true,
     image: {
-      src: still(VIDEO_IDS.sessionIV),
-      alt: "Chey — performance still",
+      src: "/assets/editorial-3.jpg",
+      alt: "Chey — editorial portrait",
       meta: "Live · Coming Soon",
     },
     data: {
@@ -303,8 +321,8 @@ export const STATIC_SECTIONS: Section[] = [
     title: "Contact",
     subtitle: "Transmission & Archive",
     image: {
-      src: still(VIDEO_IDS.longKiss, 3),
-      alt: "Chey — still from Long Kiss Goodnight",
+      src: "/assets/editorial-1.jpg",
+      alt: "Chey — editorial portrait",
       meta: "Open Line · 48hr Reply",
     },
     data: {
@@ -336,9 +354,9 @@ export const STATIC_SECTIONS: Section[] = [
     title: "Press",
     subtitle: "The Record",
     image: {
-      src: still(VIDEO_IDS.poppin, 2),
-      alt: "Chey — press portrait",
-      meta: "Press · 2026",
+      src: "/assets/chey-mediakit.jpg",
+      alt: "Chey — 2024 media kit cover",
+      meta: "Press · Media Kit",
     },
     data: {
       kind: "press",

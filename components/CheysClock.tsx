@@ -219,6 +219,22 @@ export default function CheysClock({ sections }: CheysClockProps) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
+            {/* Data strip — the legacy home facts. Hidden on small screens,
+                where it would collide with the dial rather than sit under it. */}
+            {homeData && homeData.facts.length > 0 && (
+              <div className="mb-3 hidden items-baseline justify-between gap-6 md:flex">
+                {homeData.facts.map((f) => (
+                  <div key={f.label} className="min-w-0">
+                    <p className="font-sans text-[9px] uppercase tracking-luxe text-bone-600">
+                      {f.label}
+                    </p>
+                    <p className="mt-0.5 truncate font-sans text-[11px] text-bone-300">
+                      {f.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="rule mb-4" />
             <div className="flex items-end justify-between gap-4">
               {/* Build credit — quiet, bottom-left, clear of the dial. */}

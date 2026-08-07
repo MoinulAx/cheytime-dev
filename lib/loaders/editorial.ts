@@ -7,14 +7,23 @@ type AboutData = Extract<SectionData, { kind: "about" }>;
 type ContactData = Extract<SectionData, { kind: "contact" }>;
 type MusicData = Extract<SectionData, { kind: "music" }>;
 
-/** Home (XII) — four strings, all from `site_settings`. */
+/** Home (XII) — copy and the data strip, all from `site_settings`. */
 export function applyHome(fallback: HomeData, s: SiteSettings): HomeData {
+  // The strip's labels are fixed; only the values are editable, so each is a
+  // settings key rather than a table. A blank value drops that pair entirely
+  // instead of rendering a label with nothing under it.
+  const facts = fallback.facts.flatMap((fact) => {
+    const value = s[`home.fact.${fact.label.toLowerCase()}`] ?? fact.value;
+    return value ? [{ label: fact.label, value }] : [];
+  });
+
   return {
     kind: "home",
     tagline: setting(s, "home.tagline", fallback.tagline),
     location: setting(s, "home.location", fallback.location),
     intro: setting(s, "home.intro", fallback.intro),
     cue: setting(s, "home.cue", fallback.cue),
+    facts,
   };
 }
 
