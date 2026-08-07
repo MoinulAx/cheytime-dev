@@ -1,5 +1,6 @@
 import type { GalleryImage, SectionData } from "@/types/section";
 import { text, withSupabase } from "./utils";
+import { renderableImage } from "./images";
 
 type GalleryData = Extract<SectionData, { kind: "gallery" }>;
 
@@ -26,7 +27,7 @@ export async function loadGallery(
 
     const out: GalleryImage[] = [];
     for (const row of data ?? []) {
-      const src = text(row.image_url);
+      const src = renderableImage(text(row.image_url));
       if (!src) continue;
       if (row.media_type && row.media_type !== "image") continue;
       out.push({

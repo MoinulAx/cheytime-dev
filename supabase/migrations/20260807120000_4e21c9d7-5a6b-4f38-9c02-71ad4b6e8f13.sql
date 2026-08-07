@@ -66,7 +66,8 @@ INSERT INTO public.about_credits (role, name, sort_order) VALUES
   ('Artist', 'Chey', 1),
   ('Production', 'Chey', 2),
   ('Direction', 'Chey', 3),
-  ('Visuals', 'Studio Null', 4)
+  ('Visuals', 'rummspace', 4),
+  ('Web', 'rummspace', 5)
 ON CONFLICT DO NOTHING;
 
 -- ── 3. Contact channel links ───────────────────────────────────────────────

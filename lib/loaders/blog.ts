@@ -1,5 +1,6 @@
 import type { SectionData } from "@/types/section";
 import { text, withSupabase } from "./utils";
+import { renderableImage } from "./images";
 
 type BlogData = Extract<SectionData, { kind: "blog" }>;
 
@@ -10,11 +11,30 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-/** `blog_posts.date` is a bare date — parse as UTC so it can't roll back a day. */
+/**
+ * `blog_posts.date` is a free-text column, not a date type.
+ *
+ * The seeded rows use `2026.02.27`, the admin's date input produces
+ * `2026-02-27`, and nothing stops someone typing "Spring 2026". So: normalise
+ * the two known numeric shapes, parse as UTC to avoid rolling back a day, and
+ * pass anything else through untouched rather than showing a blank or
+ * "Invalid Date" where a date should be.
+ */
 function formatDateLabel(date: string | null): string {
-  if (!date) return "";
-  const at = new Date(/^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T00:00:00Z` : date);
-  return Number.isNaN(at.getTime()) ? "" : DATE_FORMAT.format(at);
+  const raw = date?.trim();
+  if (!raw) return "";
+
+  const numeric = raw.match(/^(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})$/);
+  if (numeric) {
+    const [, y, m, d] = numeric;
+    const at = new Date(
+      `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}T00:00:00Z`,
+    );
+    if (!Number.isNaN(at.getTime())) return DATE_FORMAT.format(at);
+  }
+
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? raw : DATE_FORMAT.format(parsed);
 }
 
 /**
@@ -39,7 +59,7 @@ export async function loadBlog(fallback: BlogData): Promise<BlogData> {
       dateLabel: formatDateLabel(row.date),
       excerpt: text(row.excerpt) ?? "",
       url: text(row.external_url),
-      thumbnail: text(row.thumbnail_url),
+      thumbnail: renderableImage(text(row.thumbnail_url)),
     }));
   });
 

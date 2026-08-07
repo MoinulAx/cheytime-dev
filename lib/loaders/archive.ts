@@ -1,5 +1,6 @@
 import type { ArchiveItem, SectionData } from "@/types/section";
 import { text, withSupabase } from "./utils";
+import { renderableImage } from "./images";
 
 type ContactData = Extract<SectionData, { kind: "contact" }>;
 
@@ -25,7 +26,9 @@ export async function loadArchive(fallback: ContactData): Promise<ContactData> {
 
     const items: ArchiveItem[] = [];
     for (const row of data ?? []) {
-      const src = text(row.image_url);
+      // Dropped rather than passed through: next/image throws on an
+      // unconfigured host, and that throw would take down the whole page.
+      const src = renderableImage(text(row.image_url));
       if (!src) continue;
       if (row.media_type && row.media_type !== "image") continue;
       items.push({

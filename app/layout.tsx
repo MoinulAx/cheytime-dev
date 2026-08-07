@@ -33,6 +33,10 @@ export const metadata: Metadata = {
     "music",
   ],
   authors: [{ name: "Chey" }],
+  // Site design and build credit — surfaced in the page metadata as well as
+  // in the footer credit on the dial.
+  creator: "rummspace",
+  publisher: "rummspace",
   openGraph: {
     type: "profile",
     title: "Chey Time — Hip Hop's Princess",

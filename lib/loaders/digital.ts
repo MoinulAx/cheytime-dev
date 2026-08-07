@@ -1,5 +1,6 @@
 import type { SectionData } from "@/types/section";
 import { text, withSupabase } from "./utils";
+import { renderableImage } from "./images";
 
 type DigitalData = Extract<SectionData, { kind: "digital" }>;
 
@@ -29,7 +30,7 @@ export async function loadDigital(fallback: DigitalData): Promise<DigitalData> {
       artist: text(row.artist) ?? "Chey",
       price: normalizePrice(row.price),
       description: text(row.description),
-      cover: text(row.cover_url),
+      cover: renderableImage(text(row.cover_url)),
       previewUrl: text(row.preview_audio_url),
     }));
   });

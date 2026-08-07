@@ -220,8 +220,20 @@ export default function CheysClock({ sections }: CheysClockProps) {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="rule mb-4" />
-            <div className="flex items-baseline justify-end">
-              <div className="flex w-full items-baseline justify-between md:w-auto md:flex-col md:items-end md:gap-1.5">
+            <div className="flex items-end justify-between gap-4">
+              {/* Build credit — quiet, bottom-left, clear of the dial. */}
+              <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-600">
+                Site by{" "}
+                <a
+                  href="https://rummspace.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pointer-events-auto transition-colors hover:text-bone-300"
+                >
+                  rummspace
+                </a>
+              </p>
+              <div className="flex items-baseline justify-between gap-4 md:w-auto md:flex-col md:items-end md:gap-1.5">
                 <p className="eyebrow text-bone-100">{homeData?.cue}</p>
                 <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
                   {homeData?.location}
