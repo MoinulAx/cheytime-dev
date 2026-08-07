@@ -9,6 +9,7 @@ import RomanNumerals from "./RomanNumerals";
 import ContentPanel from "./ContentPanel";
 import { homeSection, sectionById, sectionByHour } from "@/lib/sections.static";
 import { HAND_SPRING, HAND_TRANSFORM_ORIGIN } from "@/lib/clock";
+import { clockStageMotion } from "@/lib/panel";
 import type { Section, SectionId } from "@/types/section";
 
 /** Measure a square clock stage that always fits the viewport. */
@@ -31,6 +32,18 @@ function useStageSize() {
   }, []);
 
   return { ref, size };
+}
+
+/** Viewport width, so the open-panel layout can size against the real screen. */
+function useViewportWidth() {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
 }
 
 /** Simple media-query hook (post-mount, SSR-safe). */
@@ -70,6 +83,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
   const reduce = useReducedMotion();
   const { ref, size: stageSize } = useStageSize();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const viewportWidth = useViewportWidth();
 
   // null === Home / base immersive state (hand at 0°, no panel).
   const [selectedId, setSelectedId] = useState<SectionId | null>(null);
@@ -94,11 +108,13 @@ export default function CheysClock({ sections }: CheysClockProps) {
 
   const homeData = home.data.kind === "home" ? home.data : null;
 
-  // Shift/scale the clock so it stays visible while the panel is open.
+  // Shift/scale the clock so it stays visible while the panel is open. On
+  // desktop the dial re-centres into the strip left of the panel, so widening
+  // the panel can never crowd it.
   const stageMotion = !isOpen
     ? { x: 0, y: 0, scale: 1 }
     : isDesktop
-      ? { x: -stageSize * 0.2, y: 0, scale: 0.9 }
+      ? clockStageMotion(viewportWidth, stageSize)
       : { x: 0, y: -stageSize * 0.16, scale: 0.82 };
 
   const ringDiameter = stageSize * 0.86;

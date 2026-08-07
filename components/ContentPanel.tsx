@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import SectionContent from "./SectionContent";
+import { PANEL_WIDTH_CLASSES } from "@/lib/panel";
 import type { Section } from "@/types/section";
 
 interface ContentPanelProps {
@@ -138,7 +139,7 @@ export default function ContentPanel({
             className={[
               "panel panel-scroll fixed z-50 overflow-y-auto outline-none",
               isDesktop
-                ? "right-0 top-0 h-dvh w-full max-w-[480px] border-l"
+                ? `right-0 top-0 h-dvh w-full border-l ${PANEL_WIDTH_CLASSES}`
                 : "inset-x-0 bottom-0 max-h-[88dvh] border-t",
             ].join(" ")}
             variants={panelVariants}
@@ -154,7 +155,7 @@ export default function ContentPanel({
               </div>
             )}
 
-            <div className="px-6 pb-16 pt-6 md:px-8 md:pt-8">
+            <div className="px-6 pb-16 pt-6 md:px-8 md:pt-8 xl:px-10 2xl:px-12">
               {/* Header — index row, then the title like a chapter opener */}
               <div className="flex items-baseline justify-between gap-4">
                 <p className="eyebrow">
