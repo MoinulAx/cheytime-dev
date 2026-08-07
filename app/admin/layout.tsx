@@ -1,15 +1,14 @@
 import type { ReactNode } from "react";
 
 /**
- * Admin shell.
+ * Admin shell — chrome only, no auth.
  *
- * `body` sets `overflow: hidden` for the clock, which would trap the admin's
- * content — this fixed, scrollable wrapper opts back out without touching the
- * global stylesheet.
+ * The gate lives in `(dashboard)/layout.tsx` so it wraps every real admin
+ * route while leaving `/admin/login` reachable. Requiring a session to render
+ * the sign-in form would lock everyone out.
  *
- * Every route below here reads cookies and is therefore dynamic by nature.
- * Never add `revalidate` to an admin route: caching an authenticated page
- * risks serving one admin's view to the next visitor.
+ * `body` sets `overflow: hidden` for the clock, which would trap this content —
+ * the fixed, scrollable wrapper opts back out without touching global CSS.
  */
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (

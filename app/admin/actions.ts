@@ -74,6 +74,18 @@ export async function deleteRecord(
   return { ok: true };
 }
 
+/**
+ * Server-side "is the current session an admin?".
+ *
+ * Exposed so the login form can report a non-admin account clearly instead of
+ * bouncing the user back to the form with no explanation. The answer comes
+ * from the same `admin-auth` edge function the guard uses — the browser never
+ * decides this for itself.
+ */
+export async function isAdmin(): Promise<boolean> {
+  return (await getAdminUser()) !== null;
+}
+
 export async function signOut(): Promise<void> {
   const db = await createClient();
   await db.auth.signOut();

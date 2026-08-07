@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
+import { isAdmin } from "@/app/admin/actions";
 
 const FIELD =
   "w-full border-0 border-b border-bone-100/20 bg-transparent px-0 py-2.5 font-sans text-base lg:text-sm text-bone-50 outline-none transition-colors placeholder:text-bone-500 focus:border-bone-100";
@@ -31,23 +32,19 @@ export default function LoginForm() {
       return;
     }
 
-    // Being signed in is not the same as being an admin. Check the role before
-    // sending them on, so a non-admin gets a clear message instead of a blank
-    // panel whose every action fails an RLS policy.
-    const { data: roles } = await db
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id)
-      .eq("role", "admin");
-
-    if (!roles || roles.length === 0) {
+    // This form's only job is to establish the session. Whether the account is
+    // an admin is decided on the server by the `admin-auth` edge function, and
+    // a non-admin simply gets redirected straight back here. Repeating the
+    // role check in the browser would be a second, weaker source of truth.
+    const admin = await isAdmin();
+    if (!admin) {
       await db.auth.signOut();
       setBusy(false);
       setError("That account is not an admin.");
       return;
     }
 
-    // refresh() so the server layout re-runs with the new session cookie.
+    // refresh() so the guarded layout re-runs with the new session cookie.
     router.replace("/admin");
     router.refresh();
   };
