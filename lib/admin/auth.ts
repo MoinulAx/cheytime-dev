@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/env";
+import {
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+  isSupabaseConfigured,
+} from "@/lib/supabase/env";
 
 export interface AdminUser {
   id: string;
@@ -55,31 +59,50 @@ async function askAdminAuth(accessToken: string): Promise<boolean | null> {
  * gates writes behind `has_role(auth.uid(), 'admin')`.
  */
 export async function getAdminUser(): Promise<AdminUser | null> {
-  const db = await createClient();
+  // Without this guard `createServerClient` throws "supabaseUrl is required"
+  // on empty env, and because nothing here catches it the whole /admin route
+  // 500s instead of showing the sign-in page. The public site never hit this:
+  // its loaders all check the same flag before touching Supabase.
+  if (!isSupabaseConfigured) {
+    console.error(
+      "[admin] NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are " +
+        "missing from this environment — nobody can sign in until they are set.",
+    );
+    return null;
+  }
 
-  // getUser() validates the JWT with the auth server; getSession() alone does not.
-  const {
-    data: { user },
-  } = await db.auth.getUser();
-  if (!user) return null;
+  try {
+    const db = await createClient();
 
-  const {
-    data: { session },
-  } = await db.auth.getSession();
+    // getUser() validates the JWT with the auth server; getSession() does not.
+    const {
+      data: { user },
+    } = await db.auth.getUser();
+    if (!user) return null;
 
-  const viaFunction = session?.access_token
-    ? await askAdminAuth(session.access_token)
-    : null;
+    const {
+      data: { session },
+    } = await db.auth.getSession();
 
-  if (viaFunction === true) return { id: user.id, email: user.email ?? null };
-  if (viaFunction === false) return null;
+    const viaFunction = session?.access_token
+      ? await askAdminAuth(session.access_token)
+      : null;
 
-  const { data: roles, error } = await db
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .eq("role", "admin");
+    if (viaFunction === true) return { id: user.id, email: user.email ?? null };
+    if (viaFunction === false) return null;
 
-  if (error || !roles || roles.length === 0) return null;
-  return { id: user.id, email: user.email ?? null };
+    const { data: roles, error } = await db
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin");
+
+    if (error || !roles || roles.length === 0) return null;
+    return { id: user.id, email: user.email ?? null };
+  } catch (error) {
+    // Treated as "not an admin" rather than allowed to escape: a failure here
+    // should land on the sign-in page, never on a 500.
+    console.error("[admin] admin check failed", error);
+    return null;
+  }
 }

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getAdminUser } from "@/lib/admin/auth";
 import {
   ADMIN_TABLES,
@@ -133,7 +134,15 @@ export async function isAdmin(): Promise<boolean> {
 }
 
 export async function signOut(): Promise<void> {
-  const db = await createClient();
-  await db.auth.signOut();
+  // Guarded like every other entry point: an unconfigured environment must
+  // land on the sign-in page, not throw out of a Server Action.
+  if (isSupabaseConfigured) {
+    try {
+      const db = await createClient();
+      await db.auth.signOut();
+    } catch (error) {
+      console.error("[admin] sign out failed", error);
+    }
+  }
   revalidatePath("/admin");
 }
