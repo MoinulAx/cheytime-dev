@@ -54,15 +54,22 @@ function Item({ children }: { children: React.ReactNode }) {
 
 /* ── GALLERY ──────────────────────────────────────────────────────────── */
 
-function GalleryBlock({
+export function GalleryBlock({
   description,
   images,
   links,
+  limit,
 }: {
   description?: string;
   images: GalleryImage[];
   links?: GalleryLink[];
+  /** Panel preview count. Omitted on /gallery, which shows everything. */
+  limit?: number;
 }) {
+  const shownImages = limit ? images.slice(0, limit) : images;
+  const shownLinks = limit ? [] : links;
+  const hiddenCount =
+    images.length - shownImages.length + (limit ? (links?.length ?? 0) : 0);
   return (
     <Stagger>
       {description && (
@@ -73,7 +80,7 @@ function GalleryBlock({
         </Item>
       )}
       <div className="mt-6 space-y-8">
-        {images.map((img, i) => (
+        {shownImages.map((img, i) => (
           <Item key={`${img.src}-${i}`}>
             <figure>
               <div className="flex items-baseline justify-between pb-2">
@@ -108,13 +115,13 @@ function GalleryBlock({
           below the photographs rather than interleaved: they are a different
           kind of object, and threading them through the photo stack breaks
           its rhythm. */}
-      {links && links.length > 0 && (
+      {shownLinks && shownLinks.length > 0 && (
         <div className="mt-12">
           <Item>
             <p className="eyebrow border-b border-bone-100/10 pb-2">Elsewhere</p>
           </Item>
           <ul className="mt-4 space-y-8">
-            {links.map((link) => {
+            {shownLinks.map((link) => {
               const label = [link.platform, link.kind, link.meta]
                 .filter(Boolean)
                 .join(" · ");
@@ -195,6 +202,13 @@ function GalleryBlock({
             })}
           </ul>
         </div>
+      )}
+      {hiddenCount > 0 && (
+        <Item>
+          <Link href="/gallery" className="btn-editorial mt-8">
+            See all {images.length + (links?.length ?? 0)}
+          </Link>
+        </Item>
       )}
     </Stagger>
   );
@@ -288,17 +302,22 @@ function LiteYouTube({ video }: { video: MusicVideo }) {
   );
 }
 
-function MusicBlock({
+export function MusicBlock({
   channelLabel,
   channelUrl,
   videos,
   note,
+  limit,
 }: {
   channelLabel: string;
   channelUrl: string;
   videos: MusicVideo[];
   note?: string;
+  /** Panel preview count. Omitted on /music, which shows everything. */
+  limit?: number;
 }) {
+  const shownVideos = limit ? videos.slice(0, limit) : videos;
+  const hiddenCount = videos.length - shownVideos.length;
   return (
     <Stagger>
       <Item>
@@ -312,7 +331,7 @@ function MusicBlock({
         </a>
       </Item>
       <div className="mt-7 space-y-8">
-        {videos.map((v, i) => (
+        {shownVideos.map((v, i) => (
           <Item key={v.id}>
             <div className="mb-2 flex items-baseline justify-between border-b border-bone-100/10 pb-2">
               <p className="font-sans text-sm text-bone-100">
@@ -334,6 +353,13 @@ function MusicBlock({
       {note && (
         <Item>
           <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
+        </Item>
+      )}
+      {hiddenCount > 0 && (
+        <Item>
+          <Link href="/music" className="btn-editorial mt-8">
+            See all {videos.length}
+          </Link>
         </Item>
       )}
     </Stagger>
@@ -661,17 +687,22 @@ function DigitalBlock({
 
 /* ── PRESS ────────────────────────────────────────────────────────────── */
 
-function PressBlock({
+export function PressBlock({
   description,
   features,
   affiliations,
   emptyMessage,
+  limit,
 }: {
   description?: string;
   features: PressItem[];
   affiliations: string[];
   emptyMessage: string;
+  /** Panel preview count. Omitted on /press, which shows everything. */
+  limit?: number;
 }) {
+  const shownFeatures = limit ? features.slice(0, limit) : features;
+  const hiddenCount = features.length - shownFeatures.length;
   if (features.length === 0) {
     return (
       <div className="border-y border-bone-100/10 py-12 text-center">
@@ -693,7 +724,7 @@ function PressBlock({
         </Item>
       )}
       <div className="mt-6 divide-y divide-bone-100/10 border-y border-bone-100/10">
-        {features.map((f) => (
+        {shownFeatures.map((f) => (
           <Item key={f.id}>
             <a
               href={f.url}
@@ -733,6 +764,13 @@ function PressBlock({
               ))}
             </div>
           </div>
+        </Item>
+      )}
+      {hiddenCount > 0 && (
+        <Item>
+          <Link href="/press" className="btn-editorial mt-8">
+            See all {features.length}
+          </Link>
         </Item>
       )}
     </Stagger>
@@ -925,6 +963,7 @@ export default function SectionContent({ section }: { section: Section }) {
     case "music":
       return (
         <MusicBlock
+          limit={3}
           channelLabel={data.channelLabel}
           channelUrl={data.channelUrl}
           videos={data.videos}
@@ -964,6 +1003,7 @@ export default function SectionContent({ section }: { section: Section }) {
     case "press":
       return (
         <PressBlock
+          limit={3}
           description={data.description}
           features={data.features}
           affiliations={data.affiliations}
@@ -973,6 +1013,7 @@ export default function SectionContent({ section }: { section: Section }) {
     case "gallery":
       return (
         <GalleryBlock
+          limit={4}
           description={data.description}
           images={data.images}
           links={data.links}
