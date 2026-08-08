@@ -69,6 +69,12 @@
     letter-spacing: 0.35em;
   }
 
+  /* Cap long-form text at a comfortable line length. The panel is wide so
+     photographs and grids can breathe; prose should not stretch with it. */
+  .measure {
+    max-width: 62ch;
+  }
+
   /* Hairline rule — the recurring editorial divider. */
   .rule {
     @apply h-px w-full;

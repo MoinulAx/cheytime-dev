@@ -67,7 +67,7 @@ function GalleryBlock({
     <Stagger>
       {description && (
         <Item>
-          <p className="font-display text-lg italic leading-snug text-bone-200">
+          <p className="measure font-display text-lg italic leading-snug text-bone-200">
             {description}
           </p>
         </Item>
@@ -89,7 +89,7 @@ function GalleryBlock({
                   src={img.src}
                   alt={img.alt}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 480px"
+                  sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
                   className="object-cover"
                   style={{ objectPosition: img.position ?? "50% 50%" }}
                 />
@@ -215,13 +215,13 @@ function AboutBlock({
     <Stagger>
       {bio.map((p, i) => (
         <Item key={i}>
-          <p className="mb-4 font-sans text-[15px] leading-relaxed text-bone-200/90">
+          <p className="measure mb-5 font-sans text-[15px] leading-relaxed text-bone-200/90">
             {p}
           </p>
         </Item>
       ))}
       <Item>
-        <blockquote className="my-8 border-l border-bone-100/40 pl-5">
+        <blockquote className="measure my-10 border-l border-bone-100/40 pl-5">
           <p className="font-display text-xl italic leading-snug text-bone-50">
             “{quote}”
           </p>
@@ -271,7 +271,7 @@ function LiteYouTube({ video }: { video: MusicVideo }) {
             src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
             alt=""
             fill
-            sizes="(max-width: 1024px) 100vw, 440px"
+            sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
             className="object-cover opacity-75 transition-opacity duration-300 group-hover:opacity-100"
           />
           {/* play affordance echoes the clock: a thin ring, nothing frosted */}
@@ -506,7 +506,7 @@ function BlogBlock({
     <Stagger>
       {description && (
         <Item>
-          <p className="font-display text-lg italic leading-snug text-bone-200">
+          <p className="measure font-display text-lg italic leading-snug text-bone-200">
             {description}
           </p>
         </Item>
@@ -541,7 +541,7 @@ function BlogBlock({
                   {post.title}
                 </Title>
                 {post.excerpt && (
-                  <p className="mt-2 font-sans text-sm leading-relaxed text-bone-200/80">
+                  <p className="measure mt-2 font-sans text-sm leading-relaxed text-bone-200/80">
                     {post.excerpt}
                   </p>
                 )}
@@ -591,7 +591,7 @@ function DigitalBlock({
     <Stagger>
       {description && (
         <Item>
-          <p className="font-display text-lg italic leading-snug text-bone-200">
+          <p className="measure font-display text-lg italic leading-snug text-bone-200">
             {description}
           </p>
         </Item>
@@ -687,7 +687,7 @@ function PressBlock({
     <Stagger>
       {description && (
         <Item>
-          <p className="font-display text-lg italic leading-snug text-bone-200">
+          <p className="measure font-display text-lg italic leading-snug text-bone-200">
             {description}
           </p>
         </Item>
@@ -811,7 +811,7 @@ function ContactBlock({
   return (
     <Stagger>
       <Item>
-        <p className="font-sans text-sm leading-relaxed text-bone-200/90">{blurb}</p>
+        <p className="measure font-sans text-sm leading-relaxed text-bone-200/90">{blurb}</p>
         <a
           href={`mailto:${email}`}
           className="mt-2 inline-block font-display text-base italic text-bone-50 underline decoration-bone-100/30 underline-offset-4 hover:decoration-bone-100"

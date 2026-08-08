@@ -9,14 +9,14 @@
 
 /** Panel width in px for a given viewport width (desktop only, >= 1024). */
 export function panelWidthFor(viewportWidth: number): number {
-  if (viewportWidth >= 1536) return 780;
-  if (viewportWidth >= 1280) return 680;
-  return 560;
+  if (viewportWidth >= 1536) return 920;
+  if (viewportWidth >= 1280) return 780;
+  return 600;
 }
 
 /** Tailwind classes matching {@link panelWidthFor}. Keep the two in step. */
 export const PANEL_WIDTH_CLASSES =
-  "max-w-[560px] xl:max-w-[680px] 2xl:max-w-[780px]";
+  "max-w-[600px] xl:max-w-[780px] 2xl:max-w-[920px]";
 
 /** Fraction of the free strip the clock is allowed to occupy when open. */
 const CLOCK_FIT = 0.9;
@@ -37,5 +37,5 @@ export function clockStageMotion(
   const free = Math.max(viewportWidth - panel, 0);
   const scale =
     stageSize > 0 ? Math.min(0.9, (free * CLOCK_FIT) / stageSize) : 0.9;
-  return { x: -panel / 2, y: 0, scale: Math.max(scale, 0.42) };
+  return { x: -panel / 2, y: 0, scale: Math.max(scale, 0.5) };
 }

@@ -155,7 +155,7 @@ export default function ContentPanel({
               </div>
             )}
 
-            <div className="px-6 pb-16 pt-6 md:px-8 md:pt-8 xl:px-10 2xl:px-12">
+            <div className="px-6 pb-24 pt-8 md:px-10 md:pt-12 xl:px-14 2xl:px-16">
               {/* Header — index row, then the title like a chapter opener */}
               <div className="flex items-baseline justify-between gap-4">
                 <p className="eyebrow">
@@ -181,24 +181,24 @@ export default function ContentPanel({
                 </button>
               </div>
 
-              <h2 className="mt-3 font-display text-4xl font-bold leading-[0.95] text-bone-50 md:text-5xl">
+              <h2 className="mt-5 font-display text-4xl font-bold leading-[0.95] text-bone-50 md:text-5xl">
                 {section.title}
               </h2>
-              <p className="mt-2 font-display text-base italic text-bone-300">
+              <p className="mt-3 font-display text-base italic text-bone-300">
                 {section.subtitle}
               </p>
 
-              <div className="rule mt-6" />
+              <div className="rule mt-8" />
 
               {/* Opening photograph — each section gets its own */}
               {section.image && (
-                <figure className="mt-6">
+                <figure className="mt-8">
                   <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
                     <Image
                       src={section.image.src}
                       alt={section.image.alt}
                       fill
-                      sizes="(max-width: 1024px) 100vw, 480px"
+                      sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
                       className="object-cover"
                       style={{ objectPosition: section.image.position ?? "50% 50%" }}
                     />
