@@ -438,7 +438,11 @@ function EventsBlock({
         <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
-        <span className="eyebrow mt-5 block">Placeholder — no dates confirmed</span>
+        {/* No "placeholder — no dates confirmed" line here. It was a note to
+            ourselves about the seed data and it was rendering to visitors,
+            telling them the section is unfinished rather than that there is
+            nothing on the calendar yet. `emptyMessage` already says that, and
+            it is editable in the admin. */}
       </div>
     );
   }
