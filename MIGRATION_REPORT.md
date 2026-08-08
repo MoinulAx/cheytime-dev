@@ -1,5 +1,24 @@
 # CheyTime — Migration & Discovery Report
 
+> ## ⚠️ Superseded — do not use this file as a content source
+>
+> This was the first-pass audit, and parts of it are wrong in a way that
+> caused real damage. **§3 presents invented copy as content quoted from the
+> legacy site** — "Architect of sound…", "Studio Null", the "mic captures the
+> exact frequency of the room" quote. None of it is Chey's. It was written
+> here, read back as if sourced, and shipped to the live site.
+>
+> The same pass invented two music titles ("Session III", "Session IV") and
+> mispaired two real ones — see §4, where the video ids are listed without the
+> titles that were later attached to them.
+>
+> For content, read **`CONTENT_MAP.md`**, and check anything naming Chey's
+> work against `music_releases` / `site_settings` before writing it down.
+> What remains reliable here is the structural audit: the legacy route list
+> (§2), the store prices (§5), and the functionality inventory (§10).
+>
+> Kept rather than deleted because the failure is worth being able to trace.
+
 **Date:** 2026-06-06
 **Author:** Discovery audit for the `cheytime-dev` rebuild
 **Sources audited:**

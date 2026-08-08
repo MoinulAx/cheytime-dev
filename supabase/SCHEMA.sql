@@ -122,7 +122,10 @@ CREATE TABLE public.music_releases (
 
 -- ── music_links — Music IV (fallback) ─────────────────────────────────────
 -- The older YouTube-only table. loadMusic() reads it only when
--- music_releases is empty, which is the case today.
+-- music_releases is empty — which is no longer the case. As of 2026-06-10
+-- music_releases holds twelve real tracks and this table holds nothing, so
+-- the fallback path is dead code in practice. (Earlier notes had this the
+-- other way round.)
 CREATE TABLE public.music_links (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
@@ -193,8 +196,15 @@ CREATE TABLE public.events (
 -- admin write. The site additionally filters date_time >= now().
 
 -- ── gallery_items — Gallery IX ────────────────────────────────────────────
--- Every photograph on the clock. `collection` is historical only — Gallery
+-- Every archive entry on the clock. `collection` is historical only — Gallery
 -- renders all rows regardless. Rows with no image_url are invisible.
+--
+-- image_url carries two different things: image URLs, and Instagram post /
+-- reel permalinks for appearances that were only ever posted there.
+-- lib/loaders/gallery.ts sorts them — images to the photo grid, permalinks to
+-- link cards. On the permalink rows `meta` is the marker string 'instagram'
+-- rather than a caption, left over from the legacy gallery keying its embed
+-- off it.
 CREATE TABLE public.gallery_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   alt text NOT NULL,                              -- caption + alt text

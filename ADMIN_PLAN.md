@@ -25,23 +25,33 @@ into this codebase.
 
 | Piece | State |
 | --- | --- |
-| Verification against the live database | **Blocked** — see §2 |
-| Signing into the admin end to end | **Blocked** — same reason. The guard and login render; no CRUD action has been run against a real row. |
-| Product imagery in the Store panel | Not started — `merch_products.image_url` is read but discarded, because `Product` has no image field and the renderer draws a numbered placeholder tile. Adding it means touching `StoreBlock`. |
-| The three EPK videos (`SIcEPXmavDk`, `lXucfyLDE7M`, `xAkX2h97qeE`) | Not added — Music is DB-driven now, so these belong in `music_releases` via the admin, not in a static list. |
+| Verification against the live database | **Done** — 2026-06-10, see §2 |
+| Signing into the admin end to end | **Still blocked** — needs admin credentials. The guard and login render, and reads are proven, but no CRUD action has been run against a real row. |
+| Product imagery in the Store panel | **Done** — `Product` carries an optional `image`, the loader passes `image_url` through `renderableImage()`, and the numbered plate is now the fallback rather than the only option. |
+| The three EPK videos (`SIcEPXmavDk`, `lXucfyLDE7M`, `xAkX2h97qeE`) | **Two are in** `music_releases` — `lXucfyLDE7M` as "Sway in the morning freestyle", `xAkX2h97qeE` as "CHEY - Hair and Nails". `SIcEPXmavDk` appears nowhere and is still unaccounted for. |
 | Page 1 of `CHEY2026.pdf` | Not migrated — it is a single full-bleed image and could not be extracted in this environment. If it carries copy, that copy is not on the site. |
 
 ---
 
 ## 2. Verification — read this before trusting the data layer
 
-**The loaders have never executed against real rows.** The build environment
-blocks egress to `enhduflezmiugpjaovhz.supabase.co`, so every loader fell back
-to its static content during every build. The queries are typed against the
-real schema and mirror the legacy `useSupabaseQuery` hooks, but that is
-correctness by construction, not by observation.
+**Done — 2026-06-10.** This section used to say the loaders had never executed
+against real rows, because the environment could not reach
+`enhduflezmiugpjaovhz.supabase.co`. That is no longer true. With `.env.local`
+set, all twelve content tables answered and a full build logged **no**
+`[loaders] … using static content` lines, so every section read live. Row
+counts are recorded in `HANDOFF.md`, and they contradict several statements
+written while this was still unverified — most importantly that
+`music_releases` was empty. It is not; `music_links` is.
 
-First deploy to an environment with network access, then check in this order:
+What that pass found, beyond "it works": `merch_products.image_url` was
+populated but discarded by the loader, so uploaded product photography never
+reached the page; and seven `gallery_items` rows held Instagram permalinks
+rather than images and were being dropped entirely. Both are fixed. The lesson
+is the general one — correctness by construction had held for the *queries*,
+but not for what the app then did with the rows.
+
+The checklist below stays useful for every new environment:
 
 1. **Env present.** `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    set in the host. Missing values log a warning and silently serve static
@@ -49,9 +59,9 @@ First deploy to an environment with network access, then check in this order:
 2. **No loader warnings.** Any `[loaders] … failed — using static content` line
    in the build output means that section is not live.
 3. **Per section:** Music lists the releases from the admin; Store matches
-   `merch_products` where `active = true`; Events shows only published, future
-   dates; Contact's archive grid matches `gallery_items`; Press lists the four
-   seeded features.
+   `merch_products` where `active = true` and shows their photographs; Events
+   shows only published, future dates; Gallery matches `gallery_items`, with
+   the Instagram rows under "Elsewhere"; Press lists the seeded features.
 4. **Round trip.** Edit a row in the legacy admin, wait ~60s, reload. The change
    should appear. If it does not, ISR is not revalidating.
 5. **Contact form.** Submit it, confirm the row lands in `contact_submissions`.
@@ -101,8 +111,15 @@ admin's writes are authorised by the database, not by the UI.
 - A server-side guard in `app/admin/layout.tsx`: read the user, check
   `user_roles`, redirect non-admins. Treat this as UX, not security; RLS is the
   real boundary.
-- **All `/admin/*` routes must be dynamic.** They read cookies, so they opt out
-  of static rendering by nature. Never put `revalidate` on them.
+- **All `/admin/*` routes must be dynamic.** `app/admin/layout.tsx` declares
+  `export const dynamic = "force-dynamic"` for the whole subtree. Reading
+  cookies does opt a route out of static rendering, but only as a side effect,
+  and that broke: `getAdminUser()` returns early when Supabase env is missing,
+  before it touches `cookies()`, so `/admin` prerendered. Because
+  `NEXT_PUBLIC_*` is inlined at build time, a production build without env
+  would bake a redirect-to-login into the route and keep serving it after env
+  was fixed — every admin locked out by a missing variable. Never put
+  `revalidate` on these routes.
 
 ### 3.2 Routes
 
@@ -252,7 +269,7 @@ injects it. Never put it in `.env.local`, and never in a `NEXT_PUBLIC_*` var.
 | `music_releases` | Music (IV) | Albums + tracks; `parent_album_id` nests tracks. Only YouTube links embed. |
 | `merch_products` | Store (VI) | `active = true` only. |
 | `events` | Events (VIII) | Published + future only; RLS enforces published. |
-| `gallery_items` | Contact archive (X) | `media_type = 'image'` only. |
+| `gallery_items` | Gallery (IX) | Images render in the grid; Instagram permalinks render as link cards. |
 | `press_features` | Press (XI) | Added in this migration; published + linked only. |
 | `blog_posts` | Blog (I) | |
 | `music_products` | Digital (VII) | Paid downloads; checkout not wired here. |

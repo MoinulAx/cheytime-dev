@@ -3,14 +3,23 @@
 The brief was a new front end for the *same* content. This audits what the
 legacy site actually says against what the clock currently shows, page by page.
 
-**Headline finding: the About / bio copy on the new site is not Chey's.** It
-reads "Architect of sound… born from a rejection of the polished and
-predictable… Visuals — Studio Null". None of that appears on the legacy site.
-Chey's real biography — psychology background, her father and free-styling,
-LL Cool J — is on `/about` and `/` and has never been migrated.
+**Original headline finding — since fixed.** The About copy read "Architect of
+sound… born from a rejection of the polished and predictable… Visuals — Studio
+Null". None of it appears on the legacy site. Chey's real biography —
+psychology background, her father and free-styling, LL Cool J — now lives in
+`site_settings.about.bio`, and the invented pull quote has been replaced by her
+own line, *"I don't follow trends, I'm trending."*
 
 `MIGRATION_REPORT.md` §3 recorded that invented copy as "legacy copy", which is
-how it got here. Treat this file as the correct source, not that section.
+how it reached the page.
+
+> ⚠️ **This file made the same mistake.** The Music row below listed "Session
+> III" and "Session IV" among the "real titles". They were invented, in the
+> same pass as the bio — and the two genuine titles beside them were attached
+> to the wrong video ids. Corrected in place below. The lesson is not that one
+> document is trustworthy and another is not: it is that a title with no cited
+> source should be checked against `music_releases` or the legacy site before
+> anyone writes it anywhere.
 
 Status key: **LIVE** on the clock · **MISSING** not carried over · **CHECK**
 needs a decision.
@@ -23,8 +32,8 @@ needs a decision.
 |---|---|
 | "Chey Time" / "Hip Hop's Princess" | LIVE |
 | Staten Island, NY | LIVE |
-| Quote: *"I don't follow trends, I'm trending"* | **MISSING** — the strongest line on the legacy site |
-| Data strip: Based · Genre · Latest · Direction | **MISSING** (see below) |
+| Quote: *"I don't follow trends, I'm trending"* | LIVE — `site_settings.about.quote` |
+| Data strip: Based · Genre · Latest · Direction | LIVE — `site_settings.home.fact.*` |
 | Section labels "001 — The Sound", "002 — The Process" | **MISSING** |
 | Long-form bio (the `bioText` paragraph) | **MISSING** |
 | Portraits: `chey-braids`, `mediakit`, `chey-earring` | **MISSING** — clock uses YouTube stills instead |
@@ -44,12 +53,12 @@ Data strip values, verbatim:
 
 | Content | Status |
 |---|---|
-| Para 1 — Cheyenne, Staten Island, psychology / special-needs background, move to music and acting, family's musical background | **MISSING** |
-| Para 2 — father introduced her to free-styling; grew up musical; LL Cool J's "Mama Said Knock You Out" as a formative track | **MISSING** |
-| Long-form `bioText` (originality, self-confidence, advice to aspiring artists, acting ambitions) | **MISSING** |
-| Current clock bio ("Architect of sound…") | **REMOVE** — not Chey's copy |
-| Credits | LIVE — now Artist/Production/Direction Chey, Visuals + Web rummspace |
-| Quote "The mic captures the exact frequency of the room…" | **CHECK** — invented, same origin as the bio |
+| Para 1 — Cheyenne, Staten Island, psychology / special-needs background, move to music and acting, family's musical background | LIVE — `site_settings.about.bio` |
+| Para 2 — father introduced her to free-styling; grew up musical; LL Cool J's "Mama Said Knock You Out" as a formative track | LIVE — same key |
+| Long-form `bioText` (originality, self-confidence, advice to aspiring artists, acting ambitions) | LIVE — same key |
+| Old clock bio ("Architect of sound…") | REMOVED |
+| Credits | LIVE — Artist/Production/Direction Chey, Visuals + Web rummspace |
+| Quote "The mic captures the exact frequency of the room…" | REMOVED — invented, replaced by Chey's own line |
 
 ---
 
@@ -58,15 +67,25 @@ Data strip values, verbatim:
 | Content | Status |
 |---|---|
 | YouTube channel @CheyMusic127 | LIVE |
-| Four videos | LIVE — **but titled "Video I–IV" in the database** |
-| Real titles: Poppin' (2026), Long Kiss Goodnight (2025), Session III, Session IV | **MISSING** — the clock's static fallback had them; live rows do not |
-| "Whips & Chains Freestyle" — the current single | **MISSING** entirely |
-| Headings "Tracklist", "Singles & Tracks" | **CHECK** — layout copy, may not survive the redesign |
+| Twelve tracks with real titles | LIVE — `music_releases` |
+| "Whips & Chains" — the current single | LIVE — `w0EZCrY0hsY` |
+| Headings "Tracklist", "Singles & Tracks" | Not carried over — the panel renders one flat list |
 | Spotify / Apple Music | **MISSING** — no URLs exist yet |
+| Release years | **CHECK** — no such column; the year shown is the row's insert date |
 
-⚠️ Applying the migration made Music *worse*: `music_links` is seeded with
-placeholder titles, and live data now beats the correct static fallback. Fixing
-those rows is the single highest-value change on this list.
+The earlier warning here — that `music_links` was seeded with "Video I–IV"
+placeholders and was beating the static fallback — no longer applies.
+`music_releases` now holds twelve real tracks and `music_links` is empty.
+
+The four ids the static fallback carries, with their actual titles, since two
+of these pairings were previously recorded wrongly in this file:
+
+| id | Title |
+|---|---|
+| `29vWUXMTkME` | CHEY - Girls Just Wanna Have Fun FT. Steph G (GJWHF) |
+| `OamCSPuswjg` | Poppin freestyle |
+| `4T6mFd2Sz_Y` | Long kiss goodnight |
+| `l62mMBXck70` | CHEY - Bar talk ft Hue Hef & Jmaul |
 
 ---
 
@@ -74,13 +93,14 @@ those rows is the single highest-value change on this list.
 
 | Content | Status |
 |---|---|
-| 6 products, prices, materials | LIVE |
-| Product photography | **MISSING** — `image_url` empty on every row; the clock draws numbered placeholders |
-| Cart, checkout, "Add to cart" | **CHECK** — Stripe still runs from the legacy repo |
+| Products, prices, materials | LIVE — two $15 cotton tees |
+| Product photography | LIVE — both rows carry a `site-assets` image, rendered in the tile |
+| Cart, checkout, "Add to cart" | **CHECK** — Stripe still runs from the legacy repo; Reserve is local state only |
 
-Product names ("Construct Tee", "Volume VII Hoodie", "Material Tension
-Poster") read as scaffold filler in the same voice as the invented bio. Worth
-confirming these are real merch.
+The scaffold-filler names ("Construct Tee", "Volume VII Hoodie", "Material
+Tension Poster") are gone from `merch_products` — the question of whether they
+were real merch is closed. A row without a usable image still falls back to the
+numbered plate.
 
 ---
 
@@ -88,9 +108,15 @@ confirming these are real merch.
 
 | Content | Status |
 |---|---|
-| Every photograph | LIVE — one Gallery section reading all of `gallery_items` |
-| 9 original archive rows | LIVE in admin, invisible until given an `image_url` |
-| 7 real photographs | LIVE — seeded into the archive |
+| Every photograph | LIVE — one Gallery section reading all of `gallery_items` (41 rows) |
+| 34 photographs | LIVE |
+| 7 Instagram appearances | LIVE as link cards under "Elsewhere" — 50 Cent, Method Man ×2, Live at 105.1, Sway's Universe, Mauleano, Yah Yah |
+| 3 rows pointing at `editorial-1/2/3.jpg` | **BROKEN** — the files were deleted in `bd11d93`; the rows still reference them and render 404s |
+
+The Instagram rows hold post and reel permalinks in `image_url`, not images.
+They used to be dropped silently — `next/image` cannot draw them — which is how
+seven rows went missing. `lib/loaders/gallery.ts` now sorts them into link
+cards instead.
 
 There used to be four photo surfaces: chapters on III, V and IX plus a grid
 inside Contact. All four read the same table, sliced up. They are now one
@@ -147,12 +173,22 @@ Newest wins by default, but press and bookings may be deliberately separate.
 
 ## Order of work
 
-1. **Replace the About bio with Chey's real one**, and the Home quote and data
-   strip. Biggest gap, pure content, no new schema.
-2. **Fix `music_links` titles.** Currently a live regression.
-3. **Use the real photography** for panel images and the archive, instead of
-   YouTube stills.
-4. **Confirm with the client:** the contact address, whether the merch names
-   are real, and whether the invented pull quote should stay.
+Items 1–3 of the original list are done: the real bio, quote and data strip are
+in `site_settings`; the music titles are real (and the `music_links` regression
+is moot, that table is empty); the real photography is in place of the YouTube
+stills. What is left:
 
-Everything in 1–3 is content already in hand — no new decisions needed.
+1. **Repoint or delete the three `editorial-*.jpg` gallery rows.** Three 404s
+   render today. A row edit, so it needs an admin session — the anon key cannot
+   write.
+2. **Confirm the contact address** (three candidates, below).
+3. **Resolve "Direction".** `about_credits` says *Chey*; the home data strip
+   says *Borleone Films*. Both render, in different panels.
+4. **Spotify and Apple Music URLs**, if they exist — the chips say "· soon"
+   until `social_links.url` is filled.
+5. **Release years**, if Chey wants them accurate. `music_releases` has no such
+   column, so the year shown is the row's insert date and is the same for every
+   track. Needs a migration, so ask first.
+
+Nothing on this list can be finished without either the client or an admin
+session.
