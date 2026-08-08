@@ -65,12 +65,19 @@ export const STATIC_SECTIONS: Section[] = [
       intro:
         "Relatable lyricism over upbeat, captivating production. Stream the sound, step into the archive, and catch what comes next — on Chey's time.",
       cue: "Choose an hour to begin",
-      // The legacy home data strip, carried over verbatim.
+      // The legacy home data strip. This array decides which pairs exist —
+      // `applyHome` walks it and looks up `home.fact.<label>` for each value,
+      // so a label absent here is never read from the database at all.
+      //
+      // "Direction — Borleone Films" was dropped at the client's request. It
+      // also contradicted `about_credits`, which credits direction to Chey;
+      // both were rendering, in different panels. The `home.fact.direction`
+      // row still exists in `site_settings` and still shows in the admin, but
+      // nothing reads it — delete it there to stop it looking editable.
       facts: [
         { label: "Based", value: "Staten Island, NY" },
         { label: "Genre", value: "Hip-Hop" },
         { label: "Latest", value: "Whips & Chains Freestyle" },
-        { label: "Direction", value: "Borleone Films" },
       ],
     },
   },

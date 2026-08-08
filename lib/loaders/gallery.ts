@@ -25,11 +25,20 @@ function describeLink(raw: string): Omit<GalleryLink, "title" | "meta"> | undefi
   const host = url.hostname.replace(/^www\./, "");
 
   if (host === "instagram.com") {
-    const segment = url.pathname.split("/").filter(Boolean)[0];
+    const [segment, id] = url.pathname.split("/").filter(Boolean);
+    const embeddable = (segment === "p" || segment === "reel") && !!id;
     return {
       url: raw,
       platform: "Instagram",
       kind: segment === "reel" ? "Reel" : segment === "p" ? "Post" : undefined,
+      // Instagram's own embed view, as the legacy gallery used. Built from the
+      // path rather than the raw URL so the share tracking parameter
+      // (`?igsh=…`) is dropped — it is not part of the embed route. The legacy
+      // version always used `/p/`, even for reels; keeping the real segment is
+      // the same idea done correctly.
+      embedUrl: embeddable
+        ? `https://www.instagram.com/${segment}/${id}/embed`
+        : undefined,
     };
   }
 

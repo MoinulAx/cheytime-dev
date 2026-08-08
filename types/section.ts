@@ -62,6 +62,12 @@ export interface GalleryLink {
   platform: string;
   /** What the link opens, when known: "Reel", "Post". */
   kind?: string;
+  /**
+   * Embeddable player URL, when the source offers one. Present for Instagram
+   * posts and reels, matching the legacy gallery. Absent means the entry can
+   * only be linked to, so the card is the whole treatment.
+   */
+  embedUrl?: string;
 }
 
 /** The photograph shown at the top of a section's panel. */

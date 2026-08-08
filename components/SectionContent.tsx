@@ -112,36 +112,86 @@ function GalleryBlock({
           <Item>
             <p className="eyebrow border-b border-bone-100/10 pb-2">Elsewhere</p>
           </Item>
-          <ul className="mt-4 space-y-2">
-            {links.map((link) => (
-              <li key={link.url}>
-                <Item>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-baseline gap-3 border border-bone-100/10 px-4 py-3 transition-colors hover:border-bone-100/35 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-sans text-[13px] leading-snug text-bone-100">
-                        {link.title}
-                      </span>
-                      <span className="mt-1 block font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
-                        {[link.platform, link.kind, link.meta]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </span>
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="shrink-0 font-sans text-[11px] text-bone-500 transition-colors group-hover:text-bone-100"
-                    >
-                      ↗
-                    </span>
-                  </a>
-                </Item>
-              </li>
-            ))}
+          <ul className="mt-4 space-y-8">
+            {links.map((link) => {
+              const label = [link.platform, link.kind, link.meta]
+                .filter(Boolean)
+                .join(" · ");
+
+              // Embeddable entries get the source's own player, as the legacy
+              // gallery did. Everything else stays a link card — the only
+              // treatment available when there is nothing to embed.
+              if (!link.embedUrl) {
+                return (
+                  <li key={link.url}>
+                    <Item>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-baseline gap-3 border border-bone-100/10 px-4 py-3 transition-colors hover:border-bone-100/35 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-sans text-[13px] leading-snug text-bone-100">
+                            {link.title}
+                          </span>
+                          <span className="mt-1 block font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                            {label}
+                          </span>
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className="shrink-0 font-sans text-[11px] text-bone-500 transition-colors group-hover:text-bone-100"
+                        >
+                          ↗
+                        </span>
+                      </a>
+                    </Item>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={link.url}>
+                  <Item>
+                    <figure>
+                      <div className="flex items-baseline justify-between pb-2">
+                        <span className="font-sans text-[13px] leading-snug text-bone-100">
+                          {link.title}
+                        </span>
+                        <span className="shrink-0 pl-3 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                          {label}
+                        </span>
+                      </div>
+                      {/* Instagram's embed renders its own white card, so the
+                          container is light on purpose — a dark frame around it
+                          reads as a rendering fault rather than a choice. */}
+                      <div className="overflow-hidden border border-bone-100/10 bg-white">
+                        <iframe
+                          src={link.embedUrl}
+                          title={link.title}
+                          loading="lazy"
+                          allow="encrypted-media"
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          className="block w-full border-0"
+                          height={link.kind === "Reel" ? 620 : 500}
+                        />
+                      </div>
+                      <figcaption className="mt-2">
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500 transition-colors hover:text-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+                        >
+                          Open on {link.platform} ↗
+                        </a>
+                      </figcaption>
+                    </figure>
+                  </Item>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
