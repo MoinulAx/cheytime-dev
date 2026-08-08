@@ -104,7 +104,34 @@ export default function CheysClock({ sections }: CheysClockProps) {
     [sections],
   );
 
-  const handleClose = useCallback(() => setSelectedId(null), []);
+  const handleClose = useCallback(() => {
+    setSelectedId(null);
+    // Drop the deep-link fragment so a reload does not reopen a panel the
+    // visitor just closed. replaceState, not push — closing a drawer is not a
+    // navigation and should not add a history entry to back out of.
+    if (window.location.hash) {
+      const { pathname, search } = window.location;
+      window.history.replaceState(null, "", pathname + search);
+    }
+  }, []);
+
+  /**
+   * Deep link: `/#blog` opens that section on arrival.
+   *
+   * This is how the Journal pages get back to the panel they came from —
+   * "back to the clock" has to mean the tab you left, not a reset dial.
+   *
+   * The fragment rather than a query parameter because reading `searchParams`
+   * in `app/page.tsx` would opt the home page out of static rendering, and it
+   * has to stay `○ Static` on a 60s revalidate. A hash never reaches the
+   * server, so the page stays cacheable and this runs on the client.
+   */
+  useEffect(() => {
+    const id = window.location.hash.replace(/^#/, "").trim();
+    if (!id) return;
+    const target = sectionById(sections, id as SectionId);
+    if (target && target.id !== "home") setSelectedId(target.id);
+  }, [sections]);
 
   const homeData = home.data.kind === "home" ? home.data : null;
 

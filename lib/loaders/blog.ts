@@ -20,7 +20,7 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
  * pass anything else through untouched rather than showing a blank or
  * "Invalid Date" where a date should be.
  */
-function formatDateLabel(date: string | null): string {
+export function formatDateLabel(date: string | null): string {
   const raw = date?.trim();
   if (!raw) return "";
 
@@ -40,10 +40,11 @@ function formatDateLabel(date: string | null): string {
 /**
  * Blog (I) — live from `blog_posts`, newest first.
  *
- * This site has no per-post route, so a post is only a link when it carries an
- * `external_url`. Everything else renders as title, date and excerpt in the
- * panel. Linking to a `/blog/[slug]` that does not exist would be worse than
- * not linking at all — revisit if a detail route is ever added.
+ * The panel is a preview: title, date, excerpt. The full text lives at
+ * `/journal/[slug]` (see `lib/loaders/journal.ts`), reached through the
+ * panel's "See more" link, so `body` is deliberately not loaded here — it
+ * would ride along in the home page's payload for content nobody has asked to
+ * read yet. `url` still points at an external article where one exists.
  */
 export async function loadBlog(fallback: BlogData): Promise<BlogData> {
   const posts = await withSupabase("loadBlog", async (db) => {

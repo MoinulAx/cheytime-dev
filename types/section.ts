@@ -156,6 +156,30 @@ export interface BlogPost {
   thumbnail?: string;
 }
 
+/**
+ * One entry in the Journal index at `/journal`.
+ *
+ * Deliberately separate from {@link BlogPost}, which is what the clock panel
+ * carries. The panel is a preview and ships inside the home page's payload, so
+ * it must stay small; these pages fetch their own rows and can afford more.
+ */
+export interface JournalEntry {
+  id: string;
+  slug: string;
+  title: string;
+  dateLabel: string;
+  excerpt: string;
+  thumbnail?: string;
+  /** External article, when the post points somewhere as well. */
+  url?: string;
+}
+
+/** A full Journal post at `/journal/[slug]`. */
+export interface JournalPost extends JournalEntry {
+  /** `blog_posts.body`, split into paragraphs on blank lines. */
+  body: string[];
+}
+
 /** A paid digital release (music_products). */
 export interface DigitalRelease {
   id: string;

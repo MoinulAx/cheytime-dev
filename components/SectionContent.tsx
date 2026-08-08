@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
 import type {
@@ -549,6 +550,15 @@ function BlogBlock({
           );
         })}
       </div>
+
+      {/* Out of the panel and into the stack. The drawer is a preview by
+          design — a dispatch is longer than this column can hold without
+          becoming a scroll tunnel, so the full text lives at /journal. */}
+      <Item>
+        <Link href="/journal" className="btn-editorial mt-6">
+          See more
+        </Link>
+      </Item>
     </Stagger>
   );
 }
