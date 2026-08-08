@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import MediaImage from "./MediaImage";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
@@ -93,7 +93,7 @@ export function GalleryBlock({
                 </span>
               </div>
               <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
-                <Image
+                <MediaImage
                   src={img.src}
                   alt={img.alt}
                   fill
@@ -282,7 +282,7 @@ function LiteYouTube({ video }: { video: MusicVideo }) {
           aria-label={`Play ${video.title}`}
           className="group absolute inset-0"
         >
-          <Image
+          <MediaImage
             src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
             alt=""
             fill
@@ -398,7 +398,7 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
                     stand-in rather than pretending to be the product. */}
                 <div className="relative aspect-square overflow-hidden border-b border-bone-100/10 bg-void-800">
                   {p.image ? (
-                    <Image
+                    <MediaImage
                       src={p.image}
                       alt={p.title}
                       fill
@@ -649,7 +649,7 @@ function DigitalBlock({
               <div className="flex gap-4 p-4">
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
                   {r.cover ? (
-                    <Image
+                    <MediaImage
                       src={r.cover}
                       alt=""
                       fill

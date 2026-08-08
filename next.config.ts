@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
+    // Photography on a near-black palette shows JPEG artefacts in shadow long
+    // before it shows them in midtones, and those artefacts read as "blurry".
+    // Next only serves qualities declared here.
+    qualities: [75, 90],
     // YouTube thumbnails used as poster frames in the Music section.
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com" },

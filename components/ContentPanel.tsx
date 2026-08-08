@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import MediaImage from "./MediaImage";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import SectionContent from "./SectionContent";
 import { PANEL_WIDTH_CLASSES } from "@/lib/panel";
@@ -194,7 +194,7 @@ export default function ContentPanel({
               {section.image && (
                 <figure className="mt-8">
                   <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
-                    <Image
+                    <MediaImage
                       src={section.image.src}
                       alt={section.image.alt}
                       fill
