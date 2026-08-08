@@ -10,6 +10,7 @@ import type {
   DigitalRelease,
   EventItem,
   GalleryImage,
+  GalleryLink,
   MusicVideo,
   PressItem,
   Product,
@@ -55,9 +56,11 @@ function Item({ children }: { children: React.ReactNode }) {
 function GalleryBlock({
   description,
   images,
+  links,
 }: {
   description?: string;
   images: GalleryImage[];
+  links?: GalleryLink[];
 }) {
   return (
     <Stagger>
@@ -99,6 +102,49 @@ function GalleryBlock({
           </Item>
         ))}
       </div>
+
+      {/* Off-site entries — appearances that only exist as posts. Grouped
+          below the photographs rather than interleaved: they are a different
+          kind of object, and threading them through the photo stack breaks
+          its rhythm. */}
+      {links && links.length > 0 && (
+        <div className="mt-12">
+          <Item>
+            <p className="eyebrow border-b border-bone-100/10 pb-2">Elsewhere</p>
+          </Item>
+          <ul className="mt-4 space-y-2">
+            {links.map((link) => (
+              <li key={link.url}>
+                <Item>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-baseline gap-3 border border-bone-100/10 px-4 py-3 transition-colors hover:border-bone-100/35 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-sans text-[13px] leading-snug text-bone-100">
+                        {link.title}
+                      </span>
+                      <span className="mt-1 block font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                        {[link.platform, link.kind, link.meta]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </span>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 font-sans text-[11px] text-bone-500 transition-colors group-hover:text-bone-100"
+                    >
+                      ↗
+                    </span>
+                  </a>
+                </Item>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Stagger>
   );
 }
@@ -861,7 +907,13 @@ export default function SectionContent({ section }: { section: Section }) {
         />
       );
     case "gallery":
-      return <GalleryBlock description={data.description} images={data.images} />;
+      return (
+        <GalleryBlock
+          description={data.description}
+          images={data.images}
+          links={data.links}
+        />
+      );
     case "home":
       return (
         <p className="font-sans text-sm leading-relaxed text-bone-200/90">

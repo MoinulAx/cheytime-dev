@@ -45,6 +45,25 @@ export interface GalleryImage {
   position?: string;
 }
 
+/**
+ * An archive entry that lives off-site rather than being a photograph.
+ *
+ * `gallery_items.image_url` holds Instagram permalinks as well as images —
+ * appearances and performances that were only ever posted there. They are not
+ * images, so `next/image` cannot draw them and the loader used to drop them,
+ * silently losing the row. Kept as links instead.
+ */
+export interface GalleryLink {
+  url: string;
+  /** The row's caption, used as the link text. */
+  title: string;
+  meta?: string;
+  /** Recognised source, e.g. "Instagram" — falls back to the hostname. */
+  platform: string;
+  /** What the link opens, when known: "Reel", "Post". */
+  kind?: string;
+}
+
 /** The photograph shown at the top of a section's panel. */
 export interface SectionImage {
   src: string;
@@ -224,6 +243,8 @@ export type SectionData =
       kind: "gallery";
       description?: string;
       images: GalleryImage[];
+      /** Off-site entries, rendered as link cards below the photographs. */
+      links?: GalleryLink[];
     };
 
 export interface Section {
