@@ -64,6 +64,9 @@ up to a minute.
 - `/admin` forced dynamic — see the trap below
 - Store renders the product photographs from `merch_products.image_url`
 - Instagram archive rows render as link cards instead of being dropped
+- Journal, Gallery, Music and Press each have a full page behind a "See all";
+  the panel is a preview
+- Stripe checkout wired to the existing `create-checkout-session` function
 
 ### Verified against the live database — 2026-06-10
 
@@ -167,6 +170,12 @@ Instagram". `lib/loaders/gallery.ts` drops it when it only repeats the
 platform.
 
 **`blog_posts.date` is TEXT**, not a date. Seeds use `2026.02.27`.
+
+**Stripe lives in the edge functions, not here.** This site posts a cart to
+`create-checkout-session` and follows the returned URL; it never holds the
+secret key or builds line items. `stripe-webhook` marks the purchase paid, so
+`/checkout/success` deliberately confirms nothing — it is reached by redirect,
+not by proof of payment, and anyone can open the URL.
 
 **`music_releases` has no release-year column.** `loadMusic()` derives `year`
 from `created_at` — the row's insert date, not when the track came out. Every

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
+import { startCheckout } from "@/lib/checkout";
 import type {
   BlogPost,
   Credit,
@@ -369,20 +370,26 @@ export function MusicBlock({
 /* ── STORE ────────────────────────────────────────────────────────────── */
 
 function StoreBlock({ products, note }: { products: Product[]; note?: string }) {
-  const [reserved, setReserved] = useState<Set<string>>(new Set());
-  const toggle = (id: string) =>
-    setReserved((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  // Which product is mid-redirect, and anything Stripe said went wrong.
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const buy = async (product: Product) => {
+    setBusyId(product.id);
+    setError(null);
+    const result = await startCheckout([
+      { title: product.title, price: product.price, quantity: 1, itemType: "merch" },
+    ]);
+    // Only reached when checkout failed — success navigates away.
+    setBusyId(null);
+    setError(result.error);
+  };
 
   return (
     <Stagger>
       <div className="grid grid-cols-1 gap-5 min-[380px]:grid-cols-2">
         {products.map((p, i) => {
-          const isReserved = reserved.has(p.id);
+          const isBusy = busyId === p.id;
           return (
             <Item key={p.id}>
               <div className="group flex h-full flex-col border border-bone-100/10">
@@ -422,16 +429,11 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
                     </span>
                     <button
                       type="button"
-                      onClick={() => toggle(p.id)}
-                      aria-pressed={isReserved}
-                      className={[
-                        "border px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100",
-                        isReserved
-                          ? "border-bone-100 bg-bone-100 text-void"
-                          : "border-bone-100/25 text-bone-200 hover:border-bone-100",
-                      ].join(" ")}
+                      onClick={() => buy(p)}
+                      disabled={busyId !== null}
+                      className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100 disabled:opacity-40"
                     >
-                      {isReserved ? "Reserved ✓" : "Reserve"}
+                      {isBusy ? "Opening…" : "Buy"}
                     </button>
                   </div>
                 </div>
@@ -443,6 +445,11 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
       {note && (
         <Item>
           <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
+        </Item>
+      )}
+      {error && (
+        <Item>
+          <p className="mt-6 font-sans text-[11px] text-cosmic-400">{error}</p>
         </Item>
       )}
     </Stagger>
@@ -602,6 +609,19 @@ function DigitalBlock({
   note?: string;
   emptyMessage: string;
 }) {
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const buy = async (r: DigitalRelease) => {
+    setBusyId(r.id);
+    setError(null);
+    const result = await startCheckout([
+      { title: r.title, price: r.price, quantity: 1, itemType: "music" },
+    ]);
+    setBusyId(null);
+    setError(result.error);
+  };
+
   if (releases.length === 0) {
     return (
       <div className="border-y border-bone-100/10 py-12 text-center">
@@ -655,9 +675,19 @@ function DigitalBlock({
                     </p>
                   )}
                 </div>
-                <span className="font-display text-lg italic text-bone-50">
-                  ${r.price}
-                </span>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <span className="font-display text-lg italic text-bone-50">
+                    ${r.price}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => buy(r)}
+                    disabled={busyId !== null}
+                    className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100 disabled:opacity-40"
+                  >
+                    {busyId === r.id ? "Opening…" : "Buy"}
+                  </button>
+                </div>
               </div>
               {r.previewUrl && (
                 <div className="border-t border-bone-100/10 px-4 py-3">
@@ -679,6 +709,11 @@ function DigitalBlock({
       {note && (
         <Item>
           <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
+        </Item>
+      )}
+      {error && (
+        <Item>
+          <p className="mt-6 font-sans text-[11px] text-cosmic-400">{error}</p>
         </Item>
       )}
     </Stagger>
