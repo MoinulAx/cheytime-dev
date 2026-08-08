@@ -378,11 +378,11 @@ export const ADMIN_TABLES: TableDef[] = [
   {
     table: "gallery_items",
     title: "Gallery",
-    numeral: "III · V · IX · X",
+    numeral: "IX",
     showsOn:
-      "Gallery (IX) — every image row, in sort order. This is the only place photographs appear on the clock.",
+      "Gallery (IX) — every row, in sort order. This is the only place photographs appear on the clock.",
     blurb:
-      "Every photograph on the clock. The collection decides which hour it appears on. Images only.",
+      "The archive. Image rows render as photographs; an Instagram post or reel link renders as an embed under “Elsewhere”. Every row appears on IX — there is no longer a setting that moves one to a different hour.",
     labelKey: "alt",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -402,14 +402,14 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Collection",
         type: "select",
         options: ["archive", "videos", "sessions", "reel"],
-        hint: "archive → Contact (X) · videos → The Videos (III) · sessions → The Sessions (V) · reel → The Reel (IX)",
+        hint: "Historical grouping from when the archive was split across four hours. Nothing reads it — changing it has no effect on the site.",
       },
       {
         key: "media_type",
         label: "Media type",
         type: "select",
         options: ["image", "video", "youtube", "youtube_short"],
-        hint: "Only “image” rows are rendered on the new site.",
+        hint: "“image” sends the row to the photo grid. Anything else still renders if the URL is an embeddable link, such as an Instagram post or reel.",
       },
       { key: "sort_order", label: "Sort order", type: "number" },
     ],
