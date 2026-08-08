@@ -1,4 +1,5 @@
 import type { SectionData } from "@/types/section";
+import { renderableImage } from "./images";
 import { text, withSupabase } from "./utils";
 
 type StoreData = Extract<SectionData, { kind: "store" }>;
@@ -13,10 +14,10 @@ const normalizePrice = (price: number): number =>
 /**
  * Store (VI) — live from `merch_products`, newest first.
  *
- * The table also carries `image_url`, but `Product` has no image field and the
- * renderer draws its own numbered placeholder tile. Rather than widen the
- * union we ignore the column here; wiring product photography is a follow-up
- * that touches the renderer and is out of scope for this pass.
+ * `image_url` goes through `renderableImage()` like every other DB image: an
+ * admin can paste any URL, and a host `next/image` does not recognise throws
+ * during render and takes the whole page down with it. A dropped URL leaves
+ * `image` undefined, and the tile falls back to its numbered placeholder.
  */
 export async function loadStore(fallback: StoreData): Promise<StoreData> {
   const products = await withSupabase("loadStore", async (db) => {
@@ -32,6 +33,7 @@ export async function loadStore(fallback: StoreData): Promise<StoreData> {
       title: row.title,
       price: normalizePrice(row.price),
       material: text(row.meta) ?? DEFAULT_MATERIAL,
+      image: renderableImage(text(row.image_url)),
     }));
   });
 

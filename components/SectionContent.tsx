@@ -263,14 +263,28 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
           return (
             <Item key={p.id}>
               <div className="group flex h-full flex-col border border-bone-100/10">
-                {/* placeholder product visual (no product imagery in source) */}
+                {/* The photograph when the row has one the loader could keep;
+                    otherwise the numbered plate, which is honest about being a
+                    stand-in rather than pretending to be the product. */}
                 <div className="relative aspect-square overflow-hidden border-b border-bone-100/10 bg-void-800">
-                  <span className="absolute inset-0 grid place-items-center font-display text-5xl italic text-bone-100/15">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="absolute left-0 top-0 border-b border-r border-bone-100/10 bg-void px-2 py-1 font-sans text-[9px] uppercase tracking-wide2 text-bone-500">
-                    Preview
-                  </span>
+                  {p.image ? (
+                    <Image
+                      src={p.image}
+                      alt={p.title}
+                      fill
+                      sizes="(max-width: 1024px) 45vw, 210px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <>
+                      <span className="absolute inset-0 grid place-items-center font-display text-5xl italic text-bone-100/15">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="absolute left-0 top-0 border-b border-r border-bone-100/10 bg-void px-2 py-1 font-sans text-[9px] uppercase tracking-wide2 text-bone-500">
+                        Preview
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="flex flex-1 flex-col p-3">
                   <p className="font-sans text-[13px] leading-tight text-bone-100">

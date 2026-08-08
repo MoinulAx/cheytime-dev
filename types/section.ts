@@ -75,6 +75,12 @@ export interface Product {
   title: string;
   price: number;
   material: string;
+  /**
+   * Product photograph. Optional because a row may genuinely have none, and
+   * because the loader drops any URL `next/image` cannot render. Absent means
+   * the tile falls back to its numbered placeholder.
+   */
+  image?: string;
 }
 
 /** A live event. `placeholder` marks migrated-but-unconfirmed data. */
