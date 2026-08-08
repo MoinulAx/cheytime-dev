@@ -142,16 +142,32 @@ export const STATIC_SECTIONS: Section[] = [
       kind: "music",
       channelLabel: "@CheyMusic127",
       channelUrl: "https://www.youtube.com/@CheyMusic127",
+      // Titles transcribed from `music_releases` (whitespace trimmed) so this
+      // fallback names the same track the id actually plays.
+      //
+      // The four entries that stood here were wrong in both directions: two
+      // titles were invented ("Session III", "Session IV") and the two that
+      // were real were attached to the wrong videos — 29vWUXMTkME was labelled
+      // "Poppin'" when it is "Girls Just Wanna Have Fun", and OamCSPuswjg was
+      // labelled "Long Kiss Goodnight" when it is the Poppin' freestyle. Same
+      // origin as the invented bio recorded in MIGRATION_REPORT.md §3.
+      //
+      // No `year`: the table has no release-year column, so the live loader
+      // derives one from `created_at` (the row's insert date). Guessing a year
+      // here would assert something neither source supports.
       videos: [
-        { id: "v1", title: "Poppin'", youtubeId: "29vWUXMTkME", year: "2026" },
         {
-          id: "v2",
-          title: "Long Kiss Goodnight",
-          youtubeId: "OamCSPuswjg",
-          year: "2025",
+          id: "v1",
+          title: "CHEY - Girls Just Wanna Have Fun FT. Steph G (GJWHF)",
+          youtubeId: "29vWUXMTkME",
         },
-        { id: "v3", title: "Session III", youtubeId: "4T6mFd2Sz_Y" },
-        { id: "v4", title: "Session IV", youtubeId: "l62mMBXck70" },
+        { id: "v2", title: "Poppin freestyle", youtubeId: "OamCSPuswjg" },
+        { id: "v3", title: "Long kiss goodnight", youtubeId: "4T6mFd2Sz_Y" },
+        {
+          id: "v4",
+          title: "CHEY - Bar talk ft Hue Hef & Jmaul",
+          youtubeId: "l62mMBXck70",
+        },
       ],
       note: "Spotify & Apple Music links coming soon.",
     },
