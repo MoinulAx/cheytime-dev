@@ -1,5 +1,5 @@
 import type { Section, SectionId } from "@/types/section";
-import { STATIC_SECTIONS } from "./sections.static";
+import { STATIC_SECTIONS, placeSections } from "./sections.static";
 import {
   applyContact,
   applyHome,
@@ -97,7 +97,7 @@ export async function getSections(): Promise<Section[]> {
     digital: digitalData ?? undefined,
   };
 
-  return STATIC_SECTIONS.map((section) => {
+  const withContent = STATIC_SECTIONS.map((section) => {
     const data = resolved[section.id] ?? section.data;
     const skin = chrome[section.id];
 
@@ -117,6 +117,8 @@ export async function getSections(): Promise<Section[]> {
       placeholder,
     };
   });
+
+  return placeSections(withContent, chrome);
 }
 
 /**

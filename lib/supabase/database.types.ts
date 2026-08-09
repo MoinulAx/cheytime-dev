@@ -23,6 +23,7 @@ export type Database = {
           external_url: string | null
           id: string
           slug: string
+          sort_order: number
           thumbnail_url: string | null
           title: string
         }
@@ -34,6 +35,7 @@ export type Database = {
           external_url?: string | null
           id?: string
           slug: string
+          sort_order?: number
           thumbnail_url?: string | null
           title: string
         }
@@ -45,6 +47,7 @@ export type Database = {
           external_url?: string | null
           id?: string
           slug?: string
+          sort_order?: number
           thumbnail_url?: string | null
           title?: string
         }
@@ -130,6 +133,7 @@ export type Database = {
           image_url: string | null
           location: string
           published: boolean | null
+          sort_order: number
           ticket_link: string | null
           title: string
         }
@@ -141,6 +145,7 @@ export type Database = {
           image_url?: string | null
           location?: string
           published?: boolean | null
+          sort_order?: number
           ticket_link?: string | null
           title: string
         }
@@ -152,6 +157,7 @@ export type Database = {
           image_url?: string | null
           location?: string
           published?: boolean | null
+          sort_order?: number
           ticket_link?: string | null
           title?: string
         }
@@ -293,6 +299,7 @@ export type Database = {
           id: string
           preview_audio_url: string | null
           price: number
+          sort_order: number
           title: string
         }
         Insert: {
@@ -305,6 +312,7 @@ export type Database = {
           id?: string
           preview_audio_url?: string | null
           price?: number
+          sort_order?: number
           title: string
         }
         Update: {
@@ -317,6 +325,7 @@ export type Database = {
           id?: string
           preview_audio_url?: string | null
           price?: number
+          sort_order?: number
           title?: string
         }
         Relationships: []
@@ -374,6 +383,7 @@ export type Database = {
       site_sections: {
         Row: {
           description: string
+          hour_index: number | null
           empty_message: string
           image_alt: string
           image_meta: string
@@ -388,6 +398,7 @@ export type Database = {
         Insert: {
           description?: string
           empty_message?: string
+          hour_index?: number | null
           image_alt?: string
           image_meta?: string
           image_url?: string
@@ -401,6 +412,7 @@ export type Database = {
         Update: {
           description?: string
           empty_message?: string
+          hour_index?: number | null
           image_alt?: string
           image_meta?: string
           image_url?: string

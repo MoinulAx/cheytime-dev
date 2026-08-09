@@ -20,24 +20,35 @@ Supabase is unreachable.
 | Hour | Section | Table |
 | --- | --- | --- |
 | XII | Home | `site_settings` (`home.*`) |
-| I | Journal | `blog_posts` |
+| I | — | free, held for Singles / Latest Updates |
 | II | About | `site_settings` (`about.*`) + `about_credits` |
-| III | — | inactive |
+| III | Album | `music_releases.audio_url` (full tracks) |
 | IV | Music | `music_releases`, falling back to `music_links` |
-| V | — | inactive |
+| V | Journal | `blog_posts` |
 | VI | Store | `merch_products` (+ `merch_product_images`) |
-| VII | Digital | `music_products` |
+| VII | Digital | `music_products` (preview clips only) |
 | VIII | Events | `events` |
 | IX | Gallery | `gallery_items` |
 | X | Contact | `site_settings` (`contact.*`) + `social_links` |
 | XI | Press | `press_features` |
 
+**This table is the default, not the truth.** Positions come from
+`site_sections.hour_index` and are editable in the admin — the numbers above
+are what `lib/sections.static.ts` falls back to when Supabase is unreachable.
+`placeSections` resolves the layout: Home is pinned to XII (the clock treats
+hour 0 as the reset), explicit choices are placed first come first served, and
+anything colliding takes the nearest free hour rather than vanishing. Numeral
+and rotation angle are both derived from the final hour, so a moved section
+never carries its old numeral. Unit tests for the collision cases are in the
+commit that introduced it.
+
 Every section's title, subtitle, panel image and supporting lines come from
 `site_sections`.
 
-III and V are deliberately inactive. They used to hold gallery chapters that
-were the same `gallery_items` rows Gallery already shows — four photo surfaces
-for one table. Padding, so it was removed.
+Hour I is free because Journal moved to V at the client's request, to hold a
+Singles / Latest Updates section. Hour III used to be inactive for the same
+reason V was — both held gallery chapters that were the same `gallery_items`
+rows Gallery already shows — and now carries the record.
 
 ### Admin
 

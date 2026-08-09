@@ -46,6 +46,8 @@ export async function loadJournalEntries(): Promise<JournalEntry[]> {
     const { data, error } = await db
       .from("blog_posts")
       .select("*")
+      // Same order as the Journal panel, so the page and the preview agree.
+      .order("sort_order", { ascending: true })
       .order("date", { ascending: false });
     if (error) throw error;
     return (data ?? []).flatMap((row) => {

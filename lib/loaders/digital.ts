@@ -21,6 +21,8 @@ export async function loadDigital(fallback: DigitalData): Promise<DigitalData> {
       .from("music_products")
       .select("*")
       .eq("active", true)
+      // Admin order first, newest-first as the tiebreak.
+      .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
     if (error) throw error;
 

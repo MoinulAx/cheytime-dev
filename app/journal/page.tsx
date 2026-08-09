@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 /**
  * Journal index — every post, one level down from the clock's panel.
  *
- * The panel at hour I is a preview; this is the full list, and each entry
+ * The Journal panel on the dial is a preview; this is the full list, and each entry
  * opens its own page. Headings come from `site_sections` like every other
  * section's chrome, so the admin controls the wording here too rather than
  * this route quietly having its own copy.

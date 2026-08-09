@@ -51,6 +51,8 @@ export async function loadBlog(fallback: BlogData): Promise<BlogData> {
     const { data, error } = await db
       .from("blog_posts")
       .select("*")
+      // Admin order first, newest-first as the tiebreak.
+      .order("sort_order", { ascending: true })
       .order("date", { ascending: false });
     if (error) throw error;
 

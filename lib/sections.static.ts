@@ -3,11 +3,14 @@ import type { Section } from "@/types/section";
 /**
  * Roman numerals for all twelve dial positions, indexed by hour (0 = XII).
  *
- * Eleven hours open a section: Home XII, Journal I, About II, Album III,
- * Music IV, Store VI, Digital VII, Events VIII, Gallery IX, Contact X,
- * Press XI. Only V is inactive — the photographs that used to fill it and III
- * were the same rows Gallery already shows, so padding the dial with them was
- * redundant rather than generous. III now carries the record itself.
+ * Eleven hours open a section: Home XII, About II, Album III, Music IV,
+ * Journal V, Store VI, Digital VII, Events VIII, Gallery IX, Contact X,
+ * Press XI. Only I is free, held for the Singles / Latest Updates section.
+ *
+ * ⚠️ These positions are the *fallback* only. What a visitor sees comes from
+ * `site_sections.hour_index`, which the admin can edit — see `placeSections`
+ * in this file. Changing an hourIndex here only moves the section when
+ * Supabase is unreachable, so change the database too, not just this file.
  */
 export const ROMAN_NUMERALS = [
   "XII",
@@ -79,23 +82,6 @@ export const STATIC_SECTIONS: Section[] = [
         { label: "Genre", value: "Hip-Hop" },
         { label: "Latest", value: "Whips & Chains Freestyle" },
       ],
-    },
-  },
-  {
-    id: "blog",
-    numeral: "I",
-    hourIndex: 1,
-    angle: angleForHour(1),
-    title: "Journal",
-    subtitle: "Dispatches",
-    data: {
-      kind: "blog",
-      description: "Notes, announcements and long-form from Chey and the team.",
-      // Live from `blog_posts`. Nothing is seeded — the legacy site's posts
-      // are the source, and this renders whatever is in the table.
-      posts: [],
-      emptyMessage:
-        "No entries yet. Announcements and long-form land here first.",
     },
   },
   {
@@ -195,6 +181,23 @@ export const STATIC_SECTIONS: Section[] = [
         },
       ],
       note: "Spotify & Apple Music links coming soon.",
+    },
+  },
+  {
+    id: "blog",
+    numeral: "V",
+    hourIndex: 5,
+    angle: angleForHour(5),
+    title: "Journal",
+    subtitle: "Dispatches",
+    data: {
+      kind: "blog",
+      description: "Notes, announcements and long-form from Chey and the team.",
+      // Live from `blog_posts`. Nothing is seeded — the legacy site's posts
+      // are the source, and this renders whatever is in the table.
+      posts: [],
+      emptyMessage:
+        "No entries yet. Announcements and long-form land here first.",
     },
   },
   {
@@ -373,3 +376,83 @@ export const sectionById = (
 /** The Home section (XII) — the clock's default / reset state. */
 export const homeSection = (sections: Section[]): Section =>
   sections.find((s) => s.id === "home") ?? sections[0];
+
+/**
+ * Decide which hour each section sits on, honouring the admin's choices
+ * without ever dropping a section off the dial.
+ *
+ * `site_sections.hour_index` is a free-text number in a form, so two sections
+ * can be sent to the same hour and one of them has to lose. Rather than let a
+ * collision silently delete content — which is what a plain `Map.set` would
+ * do — every section is guaranteed a slot:
+ *
+ *   1. Home is pinned to XII. The clock treats hour 0 as the reset, so moving
+ *      it would leave no way to close a panel from the dial.
+ *   2. Explicit choices are placed first, in a stable order, first come first
+ *      served.
+ *   3. Anything left takes its built-in hour, or the lowest free hour if that
+ *      is occupied.
+ *
+ * Eleven sections and twelve hours, so step 3 always finds a slot.
+ *
+ * The numeral and the rotation angle are both derived from the result. They
+ * are the same fact written three ways, and a section moved to a new hour
+ * carrying its old numeral would be a dial that lies.
+ */
+export function placeSections(
+  sections: Section[],
+  chrome: Record<string, { hourIndex?: number }>,
+): Section[] {
+  const taken = new Map<number, string>();
+  const placed = new Map<string, number>();
+
+  const home = sections.find((s) => s.id === "home");
+  if (home) {
+    taken.set(0, home.id);
+    placed.set(home.id, 0);
+  }
+
+  const rest = sections.filter((s) => s.id !== "home");
+
+  for (const section of rest) {
+    const wanted = chrome[section.id]?.hourIndex;
+    // Hour 0 is the reset and belongs to Home; a request for it is ignored
+    // rather than honoured and then silently overridden.
+    if (wanted === undefined || wanted === 0) continue;
+    if (taken.has(wanted)) continue;
+    taken.set(wanted, section.id);
+    placed.set(section.id, wanted);
+  }
+
+  for (const section of rest) {
+    if (placed.has(section.id)) continue;
+    let hour = section.hourIndex;
+    if (hour === 0 || taken.has(hour)) {
+      hour = -1;
+      for (let i = 1; i < 12; i += 1) {
+        if (!taken.has(i)) {
+          hour = i;
+          break;
+        }
+      }
+    }
+    // Cannot happen with fewer sections than hours, but a section with
+    // nowhere to go must not become hour -1 and render at a nonsense angle.
+    if (hour < 0) continue;
+    taken.set(hour, section.id);
+    placed.set(section.id, hour);
+  }
+
+  return sections.flatMap((section) => {
+    const hourIndex = placed.get(section.id);
+    if (hourIndex === undefined) return [];
+    return [
+      {
+        ...section,
+        hourIndex,
+        numeral: ROMAN_NUMERALS[hourIndex],
+        angle: angleForHour(hourIndex),
+      },
+    ];
+  });
+}

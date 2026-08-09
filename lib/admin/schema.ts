@@ -140,15 +140,22 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "site_sections",
     title: "Sections",
     numeral: "all",
-    showsOn: "Every panel — the heading, the sub-heading, the photograph at the top, and the supporting lines under it.",
+    showsOn: "Every panel — which hour it sits on, the heading, the sub-heading, the photograph at the top, and the supporting lines under it.",
     blurb:
-      "The shell of each section rather than its content. Leave a field blank to keep the built-in wording. section_id is what the code looks up — do not change it.",
+      "The shell of each section rather than its content, plus where it sits on the clock. Leave a field blank to keep the built-in wording. section_id is what the code looks up — do not change it.",
     labelKey: "section_id",
     canCreate: false,
     primaryKey: "section_id",
-    orderBy: [{ column: "sort_order", ascending: true }],
+    orderBy: [{ column: "hour_index", ascending: true }],
     fields: [
       { key: "section_id", label: "Section ID", type: "text", hint: "Identifier used by the code. Changing it detaches the row from its section." },
+      {
+        key: "hour_index",
+        label: "Clock position",
+        type: "number",
+        nullable: true,
+        hint: "Which hour this section opens from: 0 = XII at the top, then clockwise (1 = I, 2 = II … 11 = XI). Blank keeps its usual spot. Home is always XII and ignores this. If two sections are given the same hour, the first one keeps it and the other moves to the nearest free hour rather than disappearing.",
+      },
       { key: "title", label: "Title", type: "text" },
       { key: "subtitle", label: "Subtitle", type: "text" },
       { key: "description", label: "Description", type: "textarea", hint: "Intro line inside the panel. Used by Journal, Digital, Gallery and Press." },
@@ -157,7 +164,9 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "image_url", label: "Panel image", type: "image" },
       { key: "image_alt", label: "Image alt text", type: "text" },
       { key: "image_meta", label: "Image caption", type: "text" },
-      { key: "sort_order", label: "Sort order", type: "number" },
+      // No "Sort order" here. The column still exists but nothing reads it —
+      // "Clock position" above is what moves a section, and offering two
+      // ordering controls where only one works is worse than offering one.
     ],
     defaults: {},
   },
@@ -349,7 +358,10 @@ export const ADMIN_TABLES: TableDef[] = [
     blurb:
       "Shows. Only published events in the future appear — past dates drop off on their own.",
     labelKey: "title",
-    orderBy: [{ column: "date_time", ascending: true }],
+    orderBy: [
+      { column: "sort_order", ascending: true },
+      { column: "date_time", ascending: true },
+    ],
     fields: [
       { key: "title", label: "Title", type: "text" },
       {
@@ -362,6 +374,7 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "location", label: "Location", type: "text" },
       { key: "description", label: "Description", type: "textarea" },
       { key: "ticket_link", label: "Ticket link", type: "url" },
+      { key: "sort_order", label: "Sort order", type: "number", hint: "Lower numbers come first. Ties fall back to the date." },
       { key: "image_url", label: "Image", type: "image" },
       { key: "published", label: "Published", type: "boolean" },
     ],
@@ -473,15 +486,19 @@ export const ADMIN_TABLES: TableDef[] = [
   {
     table: "blog_posts",
     title: "Journal",
-    numeral: "I",
+    numeral: "V",
     showsOn:
-      "Journal (I). A post only becomes a link if it has an external URL — there is no per-post page on the clock.",
+      "The Journal hour — V unless you have moved it in Sections. Also the /journal page behind “See more”.",
     blurb:
-      "Entries on the clock's Journal hour. A post only becomes a link if it has an external URL — there is no per-post page on the new site.",
+      "Entries on the clock's Journal hour, and the full posts at /journal. Set Sort order to arrange them; ties fall back to newest first.",
     labelKey: "title",
-    orderBy: [{ column: "date", ascending: false }],
+    orderBy: [
+      { column: "sort_order", ascending: true },
+      { column: "date", ascending: false },
+    ],
     fields: [
       { key: "title", label: "Title", type: "text" },
+      { key: "sort_order", label: "Sort order", type: "number", hint: "Lower numbers come first. Ties fall back to newest first." },
       {
         key: "slug",
         label: "Slug",
@@ -513,9 +530,13 @@ export const ADMIN_TABLES: TableDef[] = [
     blurb:
       "Preview-only tracks. Active rows show on the clock with their preview clip; nothing here is for sale, so Price is kept for reference but is not displayed. Full tracks meant for listening belong on the Album hour (III) instead.",
     labelKey: "title",
-    orderBy: [{ column: "created_at", ascending: false }],
+    orderBy: [
+      { column: "sort_order", ascending: true },
+      { column: "created_at", ascending: false },
+    ],
     fields: [
       { key: "title", label: "Title", type: "text" },
+      { key: "sort_order", label: "Sort order", type: "number", hint: "Lower numbers come first. Ties fall back to newest first." },
       { key: "artist", label: "Artist", type: "text" },
       { key: "price", label: "Price", type: "number" },
       { key: "description", label: "Description", type: "textarea" },

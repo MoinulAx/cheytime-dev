@@ -10,6 +10,18 @@ export interface SectionChrome {
   description?: string;
   note?: string;
   emptyMessage?: string;
+  /**
+   * Which hour of the dial this section sits on, 0-11 (0 = XII, clockwise).
+   * Undefined keeps the built-in position. See `placeSections`.
+   */
+  hourIndex?: number;
+}
+
+/** 0-11 or nothing. Anything else in the column is ignored rather than trusted. */
+function hourIndexOf(value: number | null): number | undefined {
+  if (value === null || !Number.isInteger(value)) return undefined;
+  if (value < 0 || value > 11) return undefined;
+  return value;
 }
 
 /**
@@ -46,6 +58,7 @@ export async function loadSectionChrome(): Promise<
         description: text(row.description),
         note: text(row.note),
         emptyMessage: text(row.empty_message),
+        hourIndex: hourIndexOf(row.hour_index),
       };
     }
     return out;

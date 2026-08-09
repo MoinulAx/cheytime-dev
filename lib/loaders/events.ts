@@ -50,6 +50,9 @@ export async function loadEvents(fallback: EventsData): Promise<EventsData> {
       .select("*")
       .eq("published", true)
       .gte("date_time", new Date().toISOString())
+      // Admin order first; the calendar date breaks ties, so a table
+      // nobody has reordered still reads soonest-first.
+      .order("sort_order", { ascending: true })
       .order("date_time", { ascending: true });
     if (error) throw error;
 
