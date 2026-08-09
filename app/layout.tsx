@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/lib/cart";
+import CartIndicator from "@/components/CartIndicator";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -62,7 +64,16 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable} dark`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {/* The basket wraps everything so it survives moving between the clock,
+            the store pages and /cart. `children` is still passed through as a
+            server-rendered subtree — the provider is a client boundary around
+            it, not above it. */}
+        <CartProvider>
+          {children}
+          <CartIndicator />
+        </CartProvider>
+      </body>
     </html>
   );
 }

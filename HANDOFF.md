@@ -67,6 +67,8 @@ up to a minute.
 - Journal, Gallery, Music and Press each have a full page behind a "See all";
   the panel is a preview
 - Stripe checkout wired to the existing `create-checkout-session` function
+- A real basket: `/cart`, a `CartProvider` in the root layout, and Add buttons
+  on Store and Digital in place of the old one-click Buy
 
 ### Verified against the live database — 2026-06-10
 
@@ -176,6 +178,17 @@ platform.
 secret key or builds line items. `stripe-webhook` marks the purchase paid, so
 `/checkout/success` deliberately confirms nothing — it is reached by redirect,
 not by proof of payment, and anyone can open the URL.
+
+**Cart prices are display-only, and nothing validates them yet.** `lib/cart.tsx`
+keeps the basket in `localStorage` under `cheytime.cart.v1`, and `/cart` posts
+those titles, prices and quantities straight to `create-checkout-session`,
+which builds the Stripe line items from what it is sent. Anyone can edit that
+key in devtools and buy a hoodie for a dollar. The legacy store has the same
+hole — this is inherited, not introduced — but it needs closing in the edge
+function (look the price up in `merch_products` / `music_products` by id rather
+than trusting the payload) before this takes real money. The client ids are
+already namespaced `merch:<uuid>` / `music:<uuid>` so the function has
+something to look up.
 
 **`music_releases` has no release-year column.** `loadMusic()` derives `year`
 from `created_at` — the row's insert date, not when the track came out. Every

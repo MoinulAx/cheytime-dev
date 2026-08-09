@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MediaImage from "./MediaImage";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
-import { startCheckout } from "@/lib/checkout";
+import { useCart } from "@/lib/cart";
 import type {
   BlogPost,
   Credit,
@@ -367,29 +367,59 @@ export function MusicBlock({
   );
 }
 
+/* ── BASKET BITS ──────────────────────────────────────────────────────── */
+
+/**
+ * Holds an "Added" label on the button for a moment after a click.
+ *
+ * The basket lives top-right, outside the panel the shopper is looking at, so
+ * without this the only feedback for adding something is a badge they are not
+ * looking at incrementing behind an overlay.
+ */
+function useAddFlash() {
+  const [addedId, setAddedId] = useState<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
+  return [
+    addedId,
+    (id: string) => {
+      setAddedId(id);
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => setAddedId(null), 1800);
+    },
+  ] as const;
+}
+
+/** The way out of the panel and into checkout, once there is something to buy. */
+function CartLink({ totalItems }: { totalItems: number }) {
+  if (totalItems === 0) return null;
+  return (
+    <Link href="/cart" className="btn-editorial mt-6">
+      View cart ({totalItems})
+    </Link>
+  );
+}
+
 /* ── STORE ────────────────────────────────────────────────────────────── */
 
 function StoreBlock({ products, note }: { products: Product[]; note?: string }) {
-  // Which product is mid-redirect, and anything Stripe said went wrong.
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const buy = async (product: Product) => {
-    setBusyId(product.id);
-    setError(null);
-    const result = await startCheckout([
-      { title: product.title, price: product.price, quantity: 1, itemType: "merch" },
-    ]);
-    // Only reached when checkout failed — success navigates away.
-    setBusyId(null);
-    setError(result.error);
-  };
+  // Adding is local and instant now; Stripe is only reached from /cart, which
+  // is the one place that knows about the whole basket rather than one row.
+  const { add, totalItems } = useCart();
+  const [addedId, flash] = useAddFlash();
 
   return (
     <Stagger>
       <div className="grid grid-cols-1 gap-5 min-[380px]:grid-cols-2">
         {products.map((p, i) => {
-          const isBusy = busyId === p.id;
+          const added = addedId === p.id;
           return (
             <Item key={p.id}>
               <div className="group flex h-full flex-col border border-bone-100/10">
@@ -429,11 +459,22 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
                     </span>
                     <button
                       type="button"
-                      onClick={() => buy(p)}
-                      disabled={busyId !== null}
-                      className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100 disabled:opacity-40"
+                      onClick={() => {
+                        // Namespaced: merch and downloads come from separate
+                        // tables, so their ids can collide with each other.
+                        add({
+                          id: `merch:${p.id}`,
+                          title: p.title,
+                          price: p.price,
+                          itemType: "merch",
+                          image: p.image,
+                          meta: p.material,
+                        });
+                        flash(p.id);
+                      }}
+                      className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
                     >
-                      {isBusy ? "Opening…" : "Buy"}
+                      {added ? "Added ✓" : "Add"}
                     </button>
                   </div>
                 </div>
@@ -447,11 +488,9 @@ function StoreBlock({ products, note }: { products: Product[]; note?: string }) 
           <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
         </Item>
       )}
-      {error && (
-        <Item>
-          <p className="mt-6 font-sans text-[11px] text-cosmic-400">{error}</p>
-        </Item>
-      )}
+      <Item>
+        <CartLink totalItems={totalItems} />
+      </Item>
     </Stagger>
   );
 }
@@ -609,18 +648,8 @@ function DigitalBlock({
   note?: string;
   emptyMessage: string;
 }) {
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const buy = async (r: DigitalRelease) => {
-    setBusyId(r.id);
-    setError(null);
-    const result = await startCheckout([
-      { title: r.title, price: r.price, quantity: 1, itemType: "music" },
-    ]);
-    setBusyId(null);
-    setError(result.error);
-  };
+  const { add, totalItems } = useCart();
+  const [addedId, flash] = useAddFlash();
 
   if (releases.length === 0) {
     return (
@@ -681,11 +710,22 @@ function DigitalBlock({
                   </span>
                   <button
                     type="button"
-                    onClick={() => buy(r)}
-                    disabled={busyId !== null}
-                    className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100 disabled:opacity-40"
+                    onClick={() => {
+                      add({
+                        id: `music:${r.id}`,
+                        title: r.title,
+                        price: r.price,
+                        // Stripe creates a customer for these so the
+                        // download link has somewhere to be sent.
+                        itemType: "music",
+                        image: r.cover,
+                        meta: r.artist,
+                      });
+                      flash(r.id);
+                    }}
+                    className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
                   >
-                    {busyId === r.id ? "Opening…" : "Buy"}
+                    {addedId === r.id ? "Added ✓" : "Add"}
                   </button>
                 </div>
               </div>
@@ -711,11 +751,9 @@ function DigitalBlock({
           <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
         </Item>
       )}
-      {error && (
-        <Item>
-          <p className="mt-6 font-sans text-[11px] text-cosmic-400">{error}</p>
-        </Item>
-      )}
+      <Item>
+        <CartLink totalItems={totalItems} />
+      </Item>
     </Stagger>
   );
 }

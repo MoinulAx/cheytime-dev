@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import BackStack from "@/components/BackStack";
+import CartClearOnMount from "@/components/CartClearOnMount";
 
 export const metadata: Metadata = {
   title: "Order complete",
@@ -18,6 +19,9 @@ export const metadata: Metadata = {
 export default function CheckoutSuccessPage() {
   return (
     <>
+      {/* The basket has been paid for; leaving it filled would have them buy
+          the same thing twice. */}
+      <CartClearOnMount />
       <BackStack href="/#store" label="Back to the clock" />
       <div className="py-16">
         <p className="eyebrow mb-3">Chey Time</p>

@@ -4,6 +4,14 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/sup
 
 /** One line on the Stripe checkout — matches the edge function's payload. */
 export interface CheckoutItem {
+  /**
+   * `merch:<uuid>` or `music:<uuid>`. The deployed function ignores it — it
+   * builds line items from `title` and `price` alone. Sent anyway so that when
+   * the function is hardened to look prices up in `merch_products` /
+   * `music_products` rather than trusting the browser, it already has the key
+   * and no client change is needed. See HANDOFF.
+   */
+  id?: string;
   title: string;
   /** Dollars. The function converts to cents itself. */
   price: number;
