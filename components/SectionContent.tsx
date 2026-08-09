@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
 import { useCart } from "@/lib/cart";
 import type {
+  AlbumRecord,
   BlogPost,
   Credit,
   DigitalRelease,
@@ -635,6 +636,136 @@ function BlogBlock({
   );
 }
 
+/* ── ALBUM ────────────────────────────────────────────────────────────── */
+
+/**
+ * Album (III) — the record, playable in full.
+ *
+ * One native `<audio>` per track rather than a custom transport. A bespoke
+ * player would have to re-earn keyboard control, screen-reader labelling,
+ * scrubbing and the OS media keys, and it would still be the second-best way
+ * to listen to a record on a phone.
+ *
+ * `preload="none"` throughout: a tracklist of ten would otherwise start ten
+ * range requests the moment the hour opens, on a panel most visitors are only
+ * passing through.
+ */
+function AlbumBlock({
+  description,
+  albums,
+  emptyMessage,
+}: {
+  description?: string;
+  albums: AlbumRecord[];
+  emptyMessage: string;
+}) {
+  if (albums.length === 0) {
+    return (
+      <div className="border-y border-bone-100/10 py-12 text-center">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+          {emptyMessage}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <Stagger>
+      {description && (
+        <Item>
+          <p className="measure font-display text-lg italic leading-snug text-bone-200">
+            {description}
+          </p>
+        </Item>
+      )}
+
+      <div className="mt-6 space-y-10">
+        {albums.map((album) => {
+          const playable = album.tracks.filter((t) => t.audioUrl).length;
+          return (
+            <Item key={album.id}>
+              <section className="border border-bone-100/10">
+                {/* Sleeve + title, set like a record jacket */}
+                <div className="flex gap-4 border-b border-bone-100/10 p-4">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
+                    {album.cover ? (
+                      <MediaImage
+                        src={album.cover}
+                        alt=""
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="absolute inset-0 grid place-items-center font-display text-3xl italic text-bone-100/15">
+                        ♪
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-2xl leading-tight text-bone-50">
+                      {album.title}
+                    </h3>
+                    <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                      {album.year ? `${album.year} · ` : ""}
+                      {playable} track{playable === 1 ? "" : "s"}
+                    </p>
+                    {album.description && (
+                      <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
+                        {album.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tracklist */}
+                <ol className="divide-y divide-bone-100/10">
+                  {album.tracks.map((track, i) => (
+                    <li key={track.id} className="px-4 py-4">
+                      <div className="flex items-baseline gap-3">
+                        <span className="font-display text-sm italic tabular-nums text-bone-500">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-sans text-[14px] leading-tight text-bone-100">
+                            {track.title}
+                          </p>
+                          {track.description && (
+                            <p className="mt-1 font-sans text-[12px] leading-relaxed text-bone-200/70">
+                              {track.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {track.audioUrl ? (
+                        <audio
+                          controls
+                          preload="none"
+                          src={track.audioUrl}
+                          aria-label={`${track.title} — ${album.title}`}
+                          className="mt-3 w-full"
+                        />
+                      ) : (
+                        // The row exists but no file has been uploaded. Said
+                        // plainly, so the admin can see what is still missing
+                        // rather than wondering why a track has no player.
+                        <p className="mt-3 font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
+                          Audio coming soon
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </Item>
+          );
+        })}
+      </div>
+    </Stagger>
+  );
+}
+
 /* ── DIGITAL ──────────────────────────────────────────────────────────── */
 
 function DigitalBlock({
@@ -648,9 +779,6 @@ function DigitalBlock({
   note?: string;
   emptyMessage: string;
 }) {
-  const { add, totalItems } = useCart();
-  const [addedId, flash] = useAddFlash();
-
   if (releases.length === 0) {
     return (
       <div className="border-y border-bone-100/10 py-12 text-center">
@@ -704,36 +832,17 @@ function DigitalBlock({
                     </p>
                   )}
                 </div>
-                <div className="flex shrink-0 flex-col items-end gap-2">
-                  <span className="font-display text-lg italic text-bone-50">
-                    ${r.price}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      add({
-                        id: `music:${r.id}`,
-                        title: r.title,
-                        price: r.price,
-                        // Stripe creates a customer for these so the
-                        // download link has somewhere to be sent.
-                        itemType: "music",
-                        image: r.cover,
-                        meta: r.artist,
-                      });
-                      flash(r.id);
-                    }}
-                    className="border border-bone-100/25 px-3 py-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-200 transition-colors hover:border-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
-                  >
-                    {addedId === r.id ? "Added ✓" : "Add"}
-                  </button>
-                </div>
+                {/* No price, no Add. Digital is preview-only — the tracks are
+                    here to be heard, not sold. `music_products.price` is still
+                    read by the loader and still editable in the admin, so
+                    turning sales back on is a UI change, not a data migration. */}
               </div>
               {r.previewUrl && (
                 <div className="border-t border-bone-100/10 px-4 py-3">
                   <p className="eyebrow mb-2">Preview</p>
-                  {/* Preview clip only — the full file is never sent to the
-                      browser; it is released after purchase. */}
+                  {/* Still the preview clip, not the master. `audio_url` stays
+                      server-side — full files belong on the Album hour (III),
+                      where they are uploaded deliberately for streaming. */}
                   <audio
                     controls
                     preload="none"
@@ -751,9 +860,6 @@ function DigitalBlock({
           <p className="mt-6 font-display text-sm italic text-bone-400">{note}</p>
         </Item>
       )}
-      <Item>
-        <CartLink totalItems={totalItems} />
-      </Item>
     </Stagger>
   );
 }
@@ -1033,6 +1139,14 @@ export default function SectionContent({ section }: { section: Section }) {
   switch (data.kind) {
     case "about":
       return <AboutBlock bio={data.bio} quote={data.quote} credits={data.credits} />;
+    case "album":
+      return (
+        <AlbumBlock
+          description={data.description}
+          albums={data.albums}
+          emptyMessage={data.emptyMessage}
+        />
+      );
     case "music":
       return (
         <MusicBlock

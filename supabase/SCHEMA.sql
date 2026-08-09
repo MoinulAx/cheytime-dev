@@ -76,8 +76,9 @@ CREATE TABLE public.site_settings (
 -- Read by lib/loaders/chrome.ts. A blank cell means "keep the built-in
 -- wording", so clearing a field cannot blank a heading by accident.
 CREATE TABLE public.site_sections (
-  section_id text PRIMARY KEY,          -- home, blog, about, music, store,
-                                        -- digital, events, gallery, contact, press
+  section_id text PRIMARY KEY,          -- home, blog, about, album, music,
+                                        -- store, digital, events, gallery,
+                                        -- contact, press
   title text NOT NULL DEFAULT '',
   subtitle text NOT NULL DEFAULT '',
   description text NOT NULL DEFAULT '', -- intro line inside the panel

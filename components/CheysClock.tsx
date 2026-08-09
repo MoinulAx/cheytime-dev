@@ -74,10 +74,13 @@ interface CheysClockProps {
  * portrait, and the home copy anchored to the bottom corners (never centred
  * under the dial, so nothing overlaps the numerals).
  *
- * Layers (z): 0 background (page) · 1 face ring · 2 dial marks · 19 live
- * seconds · 20 hand · 21 hub · 30 numerals · 40 content panel. The hand
- * rotates (only) to the selected section's angle on an escapement spring;
- * selecting XII / closing the panel returns it home to 0°.
+ * Layers (z): 0 background (page) · 1 face ring · 2 dial marks · 18 hour hand ·
+ * 19 live seconds · 20 minute hand · 21 hub · 30 numerals · 40 content panel.
+ *
+ * The hour hand is fixed at XII. The minute hand rotates (only) to the
+ * selected section's angle on an escapement spring; selecting XII / closing
+ * the panel returns it home to 0°, where the two hands line up and the dial
+ * reads twelve o'clock.
  */
 export default function CheysClock({ sections }: CheysClockProps) {
   const reduce = useReducedMotion();
@@ -189,10 +192,24 @@ export default function CheysClock({ sections }: CheysClockProps) {
               <ClockFace className="h-full w-full" />
             </div>
 
+            {/* z-[18] — hour hand, parked at XII.
+                It never moves. The dial is a navigation device, not a
+                timepiece: holding the hour at 12 means the pair always reads
+                as "twelve-something", and the minute hand alone carries where
+                you are. No motion wrapper because there is no motion. */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 z-[18] drop-glow"
+              style={{ transformOrigin: HAND_TRANSFORM_ORIGIN }}
+            >
+              <ClockHand variant="hour" className="h-full w-full" />
+            </div>
+
             {/* z-[19] — live seconds, ticking real time beneath the hand */}
             <SecondsHand className="absolute inset-0 z-[19] h-full w-full" />
 
-            {/* z-20 — clock hand (rotates only, around the central pivot) */}
+            {/* z-20 — minute hand: points at whichever section is open, and
+                returns to XII when the panel closes. */}
             <motion.div
               className="absolute inset-0 z-20 drop-glow will-change-transform"
               style={{ transformOrigin: HAND_TRANSFORM_ORIGIN }}

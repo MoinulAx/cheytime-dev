@@ -5,6 +5,7 @@
  * exact `SectionData` variant the renderer already consumes. All adaptation
  * between the legacy schema and the union happens here, never in a component.
  */
+export { loadAlbum } from "./album";
 export { loadMusic } from "./music";
 export { loadStore } from "./store";
 export { loadEvents } from "./events";

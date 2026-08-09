@@ -5,6 +5,7 @@ import {
   applyHome,
   applyMusicChannel,
   loadAbout,
+  loadAlbum,
   loadBlog,
   loadDigital,
   loadEvents,
@@ -46,6 +47,7 @@ export async function getSections(): Promise<Section[]> {
       : null;
   };
 
+  const album = dataOf("album", "album");
   const music = dataOf("music", "music");
   const store = dataOf("store", "store");
   const events = dataOf("events", "events");
@@ -58,6 +60,7 @@ export async function getSections(): Promise<Section[]> {
   const home = dataOf("home", "home");
 
   const [
+    albumData,
     musicData,
     storeData,
     eventsData,
@@ -68,6 +71,7 @@ export async function getSections(): Promise<Section[]> {
     galleryData,
     contactData,
   ] = await Promise.all([
+    album ? loadAlbum(album) : null,
     music ? loadMusic(music) : null,
     store ? loadStore(store) : null,
     events ? loadEvents(events) : null,
@@ -82,6 +86,7 @@ export async function getSections(): Promise<Section[]> {
   const resolved: Partial<Record<string, Section["data"]>> = {
     home: home ? applyHome(home, settings) : undefined,
     about: aboutData ?? undefined,
+    album: albumData ?? undefined,
     music: musicData ? applyMusicChannel(musicData, settings) : undefined,
     store: storeData ?? undefined,
     events: eventsData ?? undefined,

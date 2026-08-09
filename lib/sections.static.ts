@@ -3,11 +3,11 @@ import type { Section } from "@/types/section";
 /**
  * Roman numerals for all twelve dial positions, indexed by hour (0 = XII).
  *
- * Ten hours open a section: Home XII, Journal I, About II, Music IV, Store VI,
- * Digital VII, Events VIII, Gallery IX, Contact X, Press XI. III and V carry
- * no section and render inactive — the photographs that used to fill them were
- * the same rows Gallery already shows, so padding the dial with them was
- * redundant rather than generous.
+ * Eleven hours open a section: Home XII, Journal I, About II, Album III,
+ * Music IV, Store VI, Digital VII, Events VIII, Gallery IX, Contact X,
+ * Press XI. Only V is inactive — the photographs that used to fill it and III
+ * were the same rows Gallery already shows, so padding the dial with them was
+ * redundant rather than generous. III now carries the record itself.
  */
 export const ROMAN_NUMERALS = [
   "XII",
@@ -131,6 +131,24 @@ export const STATIC_SECTIONS: Section[] = [
         { role: "Visuals", name: "rummspace" },
         { role: "Web", name: "rummspace" },
       ],
+    },
+  },
+  {
+    id: "album",
+    numeral: "III",
+    hourIndex: 3,
+    angle: angleForHour(3),
+    title: "Album",
+    subtitle: "The Record",
+    data: {
+      kind: "album",
+      // Empty by design. This hour is entirely DB-backed: `loadAlbum` fills it
+      // from whatever audio has been uploaded through the admin, and there is
+      // no honest static stand-in for a record — a fake tracklist here would
+      // ship placeholder song titles to a live site.
+      albums: [],
+      emptyMessage:
+        "The record is being mastered. Full tracks land here when it drops.",
     },
   },
   {

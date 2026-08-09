@@ -241,12 +241,12 @@ export const ADMIN_TABLES: TableDef[] = [
   },
   {
     table: "music_releases",
-    title: "Music",
-    numeral: "IV",
+    title: "Music & Album",
+    numeral: "III + IV",
     showsOn:
-      "Music (IV). Only rows with a YouTube link appear — Spotify and Apple links are stored but cannot be embedded.",
+      "Two hours, from two different columns. Music (IV) shows any row with a YouTube link. Album (III) shows any row with an audio file uploaded — that hour plays the record in full.",
     blurb:
-      "Albums and tracks. Only rows with a YouTube link appear on the site — Spotify and Apple links are stored but cannot be embedded.",
+      "Albums and tracks. Add a YouTube link to put a row on the Music hour; upload an audio file to put it on the Album hour. A row can do both. To build a tracklist, make one row with Type = album, then paste its ID into each track's “Parent album ID”.",
     labelKey: "title",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -286,7 +286,7 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Audio",
         type: "audio",
         bucket: "music-files",
-        hint: "Optional. The clock embeds the YouTube link above, so this is for reference and future use.",
+        hint: "The full track. Uploading one puts this row on the Album hour (III) and streams it there. The bucket is public, so only upload what you are happy for anyone to download.",
       },
       { key: "description", label: "Description", type: "textarea" },
       { key: "sort_order", label: "Sort order", type: "number" },
@@ -509,9 +509,9 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Digital",
     numeral: "VII",
     showsOn:
-      "Digital (VII). Active products appear with their preview clip; the full audio is only released after purchase.",
+      "Digital (VII). Active rows appear with their preview clip only — there is no longer a Buy button on this hour.",
     blurb:
-      "Paid downloads. Active products show on the clock with their preview clip; the full audio is only released after purchase. Checkout still runs from the legacy repo.",
+      "Preview-only tracks. Active rows show on the clock with their preview clip; nothing here is for sale, so Price is kept for reference but is not displayed. Full tracks meant for listening belong on the Album hour (III) instead.",
     labelKey: "title",
     orderBy: [{ column: "created_at", ascending: false }],
     fields: [
@@ -525,14 +525,14 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Full track",
         type: "audio",
         bucket: "music-files",
-        hint: "The file being sold. Never sent to the site — released by secure-download after purchase. Note the bucket is public, so treat the URL itself as the secret.",
+        hint: "Never sent to the site. Kept for the legacy download flow only. To publish a full track for listening, add it under Music & Album instead.",
       },
       {
         key: "preview_audio_url",
         label: "Preview clip",
         type: "audio",
         bucket: "music-files",
-        hint: "Plays publicly on the Digital hour (VII). Upload a short excerpt, not the full track.",
+        hint: "The only thing this hour plays. Upload a short excerpt, not the full track.",
       },
       { key: "active", label: "Active", type: "boolean" },
     ],

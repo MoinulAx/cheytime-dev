@@ -9,6 +9,7 @@
 export type SectionKind =
   | "home"
   | "about"
+  | "album"
   | "music"
   | "store"
   | "events"
@@ -26,6 +27,7 @@ export type SectionKind =
 export type SectionId =
   | "home"
   | "about"
+  | "album"
   | "music"
   | "store"
   | "events"
@@ -180,6 +182,36 @@ export interface JournalPost extends JournalEntry {
   body: string[];
 }
 
+/**
+ * One track on a record, with a full streamable file.
+ *
+ * Unlike {@link DigitalRelease}, `audioUrl` here is the whole song, not an
+ * excerpt. That is deliberate: the Album hour streams the record in full.
+ * The file lives in the public `music-files` bucket, so anyone who reads the
+ * page source can download it — which is the intent for this hour, but means
+ * nothing paid should ever be pointed at it.
+ */
+export interface AlbumTrack {
+  id: string;
+  title: string;
+  /** Absent when the row exists but no audio has been uploaded yet. */
+  audioUrl?: string;
+  description?: string;
+  /** Sleeve/thumbnail for the individual track, when it carries its own. */
+  artwork?: string;
+}
+
+/** A record: sleeve, editorial, and an ordered tracklist. */
+export interface AlbumRecord {
+  id: string;
+  title: string;
+  description?: string;
+  cover?: string;
+  /** Pre-formatted on the server so the client never re-formats a date. */
+  year?: string;
+  tracks: AlbumTrack[];
+}
+
 /** A paid digital release (music_products). */
 export interface DigitalRelease {
   id: string;
@@ -217,6 +249,12 @@ export type SectionData =
       bio: string[];
       quote: string;
       credits: Credit[];
+    }
+  | {
+      kind: "album";
+      description?: string;
+      albums: AlbumRecord[];
+      emptyMessage: string;
     }
   | {
       kind: "music";
