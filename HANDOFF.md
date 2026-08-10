@@ -20,7 +20,7 @@ Supabase is unreachable.
 | Hour | Section | Table |
 | --- | --- | --- |
 | XII | Home | `site_settings` (`home.*`) |
-| I | — | free, held for Singles / Latest Updates |
+| I | Upcoming | `upcoming_releases` |
 | II | About | `site_settings` (`about.*`) + `about_credits` |
 | III | Album | `music_releases.audio_url` (full tracks) |
 | IV | Music | `music_releases`, falling back to `music_links` |
@@ -45,14 +45,20 @@ commit that introduced it.
 Every section's title, subtitle, panel image and supporting lines come from
 `site_sections`.
 
-Hour I is free because Journal moved to V at the client's request, to hold a
-Singles / Latest Updates section. Hour III used to be inactive for the same
-reason V was — both held gallery chapters that were the same `gallery_items`
-rows Gallery already shows — and now carries the record.
+The dial is now full: twelve sections, twelve hours. Worth knowing before
+adding a thirteenth — `placeSections` guarantees every section a slot, and
+that guarantee holds only while there are at least as many hours as sections.
+
+Hour I is announcements (`upcoming_releases`), deliberately its own table
+rather than a flag on `music_releases`. That table is catalogue and needs the
+thing to exist before it can show it; an announcement is a title, a date that
+may not be fixed, a poster, and often nothing playable. Forcing it in would
+mean `platform_link` doubling as a pre-save URL and every catalogue query
+learning to exclude unreleased rows.
 
 ### Admin
 
-`/admin`, Supabase Auth. Fourteen tabs, one per table, each stating in plain
+`/admin`, Supabase Auth. Fifteen tabs, one per table, each stating in plain
 words which hour its rows appear on — or that they are internal.
 
 Auth goes through the deployed `admin-auth` edge function (service role, so

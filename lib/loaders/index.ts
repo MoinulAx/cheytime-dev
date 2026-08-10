@@ -6,6 +6,7 @@
  * between the legacy schema and the union happens here, never in a component.
  */
 export { loadAlbum } from "./album";
+export { loadUpcoming } from "./upcoming";
 export { loadMusic } from "./music";
 export { loadStore } from "./store";
 export { loadEvents } from "./events";

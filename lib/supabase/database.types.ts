@@ -380,6 +380,48 @@ export type Database = {
           },
         ]
       }
+      upcoming_releases: {
+        Row: {
+          artwork_url: string
+          created_at: string | null
+          description: string
+          id: string
+          link_label: string
+          link_url: string
+          published: boolean | null
+          release_date: string | null
+          sort_order: number
+          status: string
+          title: string
+        }
+        Insert: {
+          artwork_url?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          link_label?: string
+          link_url?: string
+          published?: boolean | null
+          release_date?: string | null
+          sort_order?: number
+          status?: string
+          title?: string
+        }
+        Update: {
+          artwork_url?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          link_label?: string
+          link_url?: string
+          published?: boolean | null
+          release_date?: string | null
+          sort_order?: number
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       site_sections: {
         Row: {
           description: string

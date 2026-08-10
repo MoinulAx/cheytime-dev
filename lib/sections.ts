@@ -15,6 +15,7 @@ import {
   loadSectionChrome,
   loadSettings,
   loadStore,
+  loadUpcoming,
 } from "./loaders";
 
 /**
@@ -47,6 +48,7 @@ export async function getSections(): Promise<Section[]> {
       : null;
   };
 
+  const upcoming = dataOf("upcoming", "upcoming");
   const album = dataOf("album", "album");
   const music = dataOf("music", "music");
   const store = dataOf("store", "store");
@@ -60,6 +62,7 @@ export async function getSections(): Promise<Section[]> {
   const home = dataOf("home", "home");
 
   const [
+    upcomingData,
     albumData,
     musicData,
     storeData,
@@ -71,6 +74,7 @@ export async function getSections(): Promise<Section[]> {
     galleryData,
     contactData,
   ] = await Promise.all([
+    upcoming ? loadUpcoming(upcoming) : null,
     album ? loadAlbum(album) : null,
     music ? loadMusic(music) : null,
     store ? loadStore(store) : null,
@@ -87,6 +91,7 @@ export async function getSections(): Promise<Section[]> {
     home: home ? applyHome(home, settings) : undefined,
     about: aboutData ?? undefined,
     album: albumData ?? undefined,
+    upcoming: upcomingData ?? undefined,
     music: musicData ? applyMusicChannel(musicData, settings) : undefined,
     store: storeData ?? undefined,
     events: eventsData ?? undefined,

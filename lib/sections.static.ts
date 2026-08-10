@@ -3,9 +3,13 @@ import type { Section } from "@/types/section";
 /**
  * Roman numerals for all twelve dial positions, indexed by hour (0 = XII).
  *
- * Eleven hours open a section: Home XII, About II, Album III, Music IV,
- * Journal V, Store VI, Digital VII, Events VIII, Gallery IX, Contact X,
- * Press XI. Only I is free, held for the Singles / Latest Updates section.
+ * All twelve hours now open a section: Home XII, Upcoming I, About II,
+ * Album III, Music IV, Journal V, Store VI, Digital VII, Events VIII,
+ * Gallery IX, Contact X, Press XI.
+ *
+ * The dial being full is worth knowing before adding a thirteenth section:
+ * `placeSections` guarantees a slot for every section, and that guarantee
+ * depends on there being at least as many hours as sections.
  *
  * ⚠️ These positions are the *fallback* only. What a visitor sees comes from
  * `site_sections.hour_index`, which the admin can edit — see `placeSections`
@@ -82,6 +86,23 @@ export const STATIC_SECTIONS: Section[] = [
         { label: "Genre", value: "Hip-Hop" },
         { label: "Latest", value: "Whips & Chains Freestyle" },
       ],
+    },
+  },
+  {
+    id: "upcoming",
+    numeral: "I",
+    hourIndex: 1,
+    angle: angleForHour(1),
+    title: "Upcoming",
+    subtitle: "What's Next",
+    data: {
+      kind: "upcoming",
+      // Empty by design, like Album. Announcements are the most perishable
+      // content on the site — a hard-coded release date is wrong the moment it
+      // passes, and this file is the offline fallback, not the source.
+      releases: [],
+      emptyMessage:
+        "Nothing announced right now. New releases are posted here first.",
     },
   },
   {

@@ -113,6 +113,7 @@ export interface TableDef {
  * in depth and keeps a typo from reaching the database.
  */
 export const WRITABLE_TABLES = [
+  "upcoming_releases",
   "music_releases",
   "merch_products",
   "events",
@@ -247,6 +248,75 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "sort_order", label: "Sort order", type: "number" },
     ],
     defaults: { label: "", url: "", sort_order: 0 },
+  },
+  {
+    table: "upcoming_releases",
+    title: "Upcoming",
+    numeral: "I",
+    showsOn:
+      "Upcoming (I) — the announcements hour. The first row is the lead and gets its poster full width; the rest run underneath as a list. Only published rows appear.",
+    blurb:
+      "What is next. A row only needs a Title to be worth showing — artwork, date and link are all optional and can be filled in as they are confirmed. Set Sort order to choose which one leads.",
+    labelKey: "title",
+    orderBy: [
+      { column: "sort_order", ascending: true },
+      { column: "release_date", ascending: true },
+    ],
+    fields: [
+      { key: "title", label: "Title", type: "text" },
+      {
+        key: "sort_order",
+        label: "Sort order",
+        type: "number",
+        hint: "Lower numbers come first. The lowest is the lead release and gets the big poster.",
+      },
+      {
+        key: "status",
+        label: "Status",
+        type: "select",
+        options: ["announced", "preorder", "out"],
+        hint: "Shows as a badge: Announced / Coming soon · Pre-save · Out now. A release date in the past flips it to Out now on its own.",
+      },
+      {
+        key: "release_date",
+        label: "Release date",
+        type: "date",
+        nullable: true,
+        hint: "Leave blank if the date is not confirmed — the badge says Announced rather than inventing one.",
+      },
+      {
+        key: "artwork_url",
+        label: "Poster / artwork",
+        type: "image",
+        hint: "The lead release shows this full width, so use the largest version you have.",
+      },
+      {
+        key: "link_url",
+        label: "Link",
+        type: "url",
+        placeholder: "https://…",
+        hint: "Where to hear it or pre-save it. Leave blank until there is somewhere to send people — the button only appears when this is set.",
+      },
+      {
+        key: "link_label",
+        label: "Link button text",
+        type: "text",
+        placeholder: "Listen",
+        hint: "Optional. Defaults to Pre-save before release and Listen after.",
+      },
+      { key: "description", label: "Description", type: "textarea" },
+      { key: "published", label: "Published", type: "boolean" },
+    ],
+    defaults: {
+      title: "",
+      status: "announced",
+      artwork_url: "",
+      link_url: "",
+      link_label: "",
+      description: "",
+      sort_order: 0,
+      published: true,
+    },
   },
   {
     table: "music_releases",

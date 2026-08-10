@@ -8,6 +8,7 @@ import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
 import { useCart } from "@/lib/cart";
 import type {
   AlbumRecord,
+  UpcomingRelease,
   BlogPost,
   Credit,
   DigitalRelease,
@@ -636,6 +637,166 @@ function BlogBlock({
   );
 }
 
+/* ── UPCOMING ─────────────────────────────────────────────────────────── */
+
+/**
+ * Upcoming (I) — what is next.
+ *
+ * The first entry gets the poster at full width and the rest run as a list.
+ * An announcement hour with six equal tiles announces nothing; the lead
+ * release is the message, and the others are context.
+ *
+ * Everything below the title is optional. A row can be a title and a status
+ * and still be worth showing — that is what an announcement is before the
+ * artwork and the link exist.
+ */
+function UpcomingBlock({
+  description,
+  releases,
+  emptyMessage,
+}: {
+  description?: string;
+  releases: UpcomingRelease[];
+  emptyMessage: string;
+}) {
+  if (releases.length === 0) {
+    return (
+      <div className="border-y border-bone-100/10 py-12 text-center">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+          {emptyMessage}
+        </p>
+      </div>
+    );
+  }
+
+  const [lead, ...rest] = releases;
+
+  return (
+    <Stagger>
+      {description && (
+        <Item>
+          <p className="measure font-display text-lg italic leading-snug text-bone-200">
+            {description}
+          </p>
+        </Item>
+      )}
+
+      {/* Lead release — the poster leads when there is one. */}
+      <Item>
+        <article className="mt-6 border border-bone-100/10">
+          {lead.artwork && (
+            <div className="relative aspect-[4/5] w-full overflow-hidden border-b border-bone-100/10 bg-void-800 sm:aspect-[16/10]">
+              <MediaImage
+                src={lead.artwork}
+                alt={`${lead.title} — artwork`}
+                fill
+                sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
+          <div className="p-5">
+            <Badge label={lead.statusLabel} released={lead.released} />
+            <h3 className="mt-3 font-display text-3xl leading-[1.05] text-bone-50">
+              {lead.title}
+            </h3>
+            {lead.dateLabel && (
+              <p className="mt-2 font-sans text-[11px] uppercase tracking-wide2 text-bone-400">
+                {lead.dateLabel}
+              </p>
+            )}
+            {lead.description && (
+              <p className="measure mt-3 font-sans text-[14px] leading-relaxed text-bone-200/85">
+                {lead.description}
+              </p>
+            )}
+            {lead.url && (
+              <a
+                href={lead.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-editorial mt-5"
+              >
+                {lead.linkLabel}
+              </a>
+            )}
+          </div>
+        </article>
+      </Item>
+
+      {rest.length > 0 && (
+        <div className="mt-6 divide-y divide-bone-100/10 border-t border-bone-100/10">
+          {rest.map((r) => (
+            <Item key={r.id}>
+              <article className="flex gap-4 py-4">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
+                  {r.artwork ? (
+                    <MediaImage
+                      src={r.artwork}
+                      alt=""
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="absolute inset-0 grid place-items-center font-display text-xl italic text-bone-100/15">
+                      ♪
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Badge label={r.statusLabel} released={r.released} />
+                  <p className="mt-1.5 font-display text-lg leading-tight text-bone-50">
+                    {r.title}
+                  </p>
+                  {r.dateLabel && (
+                    <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                      {r.dateLabel}
+                    </p>
+                  )}
+                  {r.description && (
+                    <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
+                      {r.description}
+                    </p>
+                  )}
+                  {r.url && (
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-block font-sans text-[10px] uppercase tracking-wide2 text-bone-300 underline decoration-bone-100/25 underline-offset-4 transition-colors hover:text-bone-50 hover:decoration-bone-100"
+                    >
+                      {r.linkLabel}
+                    </a>
+                  )}
+                </div>
+              </article>
+            </Item>
+          ))}
+        </div>
+      )}
+    </Stagger>
+  );
+}
+
+/** Out-now reads as an accent; anything still pending stays quiet. */
+function Badge({ label, released }: { label: string; released: boolean }) {
+  return (
+    <span
+      className={[
+        "inline-block border px-2 py-1 font-sans text-[9px] uppercase tracking-wide2",
+        released
+          ? "border-cosmic-400/50 text-cosmic-400"
+          : "border-bone-100/20 text-bone-400",
+      ].join(" ")}
+    >
+      {label}
+    </span>
+  );
+}
+
 /* ── ALBUM ────────────────────────────────────────────────────────────── */
 
 /**
@@ -1139,6 +1300,14 @@ export default function SectionContent({ section }: { section: Section }) {
   switch (data.kind) {
     case "about":
       return <AboutBlock bio={data.bio} quote={data.quote} credits={data.credits} />;
+    case "upcoming":
+      return (
+        <UpcomingBlock
+          description={data.description}
+          releases={data.releases}
+          emptyMessage={data.emptyMessage}
+        />
+      );
     case "album":
       return (
         <AlbumBlock

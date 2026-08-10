@@ -10,6 +10,7 @@ export type SectionKind =
   | "home"
   | "about"
   | "album"
+  | "upcoming"
   | "music"
   | "store"
   | "events"
@@ -28,6 +29,7 @@ export type SectionId =
   | "home"
   | "about"
   | "album"
+  | "upcoming"
   | "music"
   | "store"
   | "events"
@@ -212,6 +214,30 @@ export interface AlbumRecord {
   tracks: AlbumTrack[];
 }
 
+/**
+ * An announced release — something that is coming, or has just landed.
+ *
+ * Distinct from {@link MusicVideo} and {@link AlbumRecord}, which are both
+ * catalogue and need the thing to exist before they can show it. This is the
+ * announcement: a title, a date that may not be fixed yet, a poster, and often
+ * nothing playable at all.
+ */
+export interface UpcomingRelease {
+  id: string;
+  title: string;
+  /** Pre-formatted on the server. Absent when no date is confirmed. */
+  dateLabel?: string;
+  /** "Coming soon" · "Pre-save" · "Out now" — derived from status and date. */
+  statusLabel: string;
+  /** True once it is out, so the card can lead rather than tease. */
+  released: boolean;
+  description?: string;
+  artwork?: string;
+  url?: string;
+  /** Button wording, e.g. "Listen". Falls back to a sensible default. */
+  linkLabel?: string;
+}
+
 /** A paid digital release (music_products). */
 export interface DigitalRelease {
   id: string;
@@ -249,6 +275,12 @@ export type SectionData =
       bio: string[];
       quote: string;
       credits: Credit[];
+    }
+  | {
+      kind: "upcoming";
+      description?: string;
+      releases: UpcomingRelease[];
+      emptyMessage: string;
     }
   | {
       kind: "album";
