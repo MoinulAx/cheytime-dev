@@ -53,6 +53,8 @@ export async function loadSectionChrome(): Promise<
               src,
               alt: text(row.image_alt) ?? "Chey",
               meta: text(row.image_meta),
+              // Blank falls through to the renderer's centred default.
+              position: text(row.image_position),
             }
           : undefined,
         description: text(row.description),

@@ -182,7 +182,6 @@ export function GalleryBlock({
                           src={link.embedUrl}
                           title={link.title}
                           loading="lazy"
-                          allow="encrypted-media"
                           referrerPolicy="strict-origin-when-cross-origin"
                           className="block w-full border-0"
                           height={link.kind === "Reel" ? 620 : 500}
@@ -508,9 +507,9 @@ function EventsBlock({
 }) {
   if (events.length === 0) {
     return (
-      <div className="border-y border-bone-100/10 py-12 text-center">
+      <div className="border-y border-bone-100/10 py-12">
         <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
-        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
         {/* No "placeholder — no dates confirmed" line here. It was a note to
@@ -567,9 +566,9 @@ function BlogBlock({
 }) {
   if (posts.length === 0) {
     return (
-      <div className="border-y border-bone-100/10 py-12 text-center">
+      <div className="border-y border-bone-100/10 py-12">
         <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
-        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
       </div>
@@ -661,9 +660,9 @@ function UpcomingBlock({
 }) {
   if (releases.length === 0) {
     return (
-      <div className="border-y border-bone-100/10 py-12 text-center">
+      <div className="border-y border-bone-100/10 py-12">
         <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
-        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
       </div>
@@ -822,9 +821,9 @@ function AlbumBlock({
 }) {
   if (albums.length === 0) {
     return (
-      <div className="border-y border-bone-100/10 py-12 text-center">
+      <div className="border-y border-bone-100/10 py-12">
         <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
-        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
       </div>
@@ -942,9 +941,9 @@ function DigitalBlock({
 }) {
   if (releases.length === 0) {
     return (
-      <div className="border-y border-bone-100/10 py-12 text-center">
+      <div className="border-y border-bone-100/10 py-12">
         <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
-        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
       </div>
@@ -1045,9 +1044,9 @@ export function PressBlock({
   const hiddenCount = features.length - shownFeatures.length;
   if (features.length === 0) {
     return (
-      <div className="border-y border-bone-100/10 py-12 text-center">
+      <div className="border-y border-bone-100/10 py-12">
         <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
-        <p className="mx-auto mt-3 max-w-xs font-sans text-sm leading-relaxed text-bone-300/80">
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
       </div>

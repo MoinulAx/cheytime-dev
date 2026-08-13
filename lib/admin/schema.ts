@@ -165,6 +165,13 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "image_url", label: "Panel image", type: "image" },
       { key: "image_alt", label: "Image alt text", type: "text" },
       { key: "image_meta", label: "Image caption", type: "text" },
+      {
+        key: "image_position",
+        label: "Image framing",
+        type: "text",
+        placeholder: "50% 50%",
+        hint: "How the photo is cropped into its frame, when the subject is not dead centre. Two values, across then down: \"50% 50%\" is centred, \"50% 20%\" pulls the crop up toward the top, \"left center\" hugs the left edge. Blank means centred.",
+      },
       // No "Sort order" here. The column still exists but nothing reads it —
       // "Clock position" above is what moves a section, and offering two
       // ordering controls where only one works is worse than offering one.

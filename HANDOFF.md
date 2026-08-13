@@ -43,7 +43,11 @@ never carries its old numeral. Unit tests for the collision cases are in the
 commit that introduced it.
 
 Every section's title, subtitle, panel image and supporting lines come from
-`site_sections`.
+`site_sections`, including `image_position` — the CSS `object-position` for
+that panel's photograph. Every hero is drawn into a fixed 16:9 frame with
+`object-fit: cover`, so a portrait crop or an off-centre subject gets pushed
+out of frame; that column is the fix, and it is editable in the admin as
+"Image framing".
 
 The dial is now full: twelve sections, twelve hours. Worth knowing before
 adding a thirteenth — `placeSections` guarantees every section a slot, and

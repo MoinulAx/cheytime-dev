@@ -429,6 +429,7 @@ export type Database = {
           empty_message: string
           image_alt: string
           image_meta: string
+          image_position: string
           image_url: string
           note: string
           section_id: string
@@ -443,6 +444,7 @@ export type Database = {
           hour_index?: number | null
           image_alt?: string
           image_meta?: string
+          image_position?: string
           image_url?: string
           note?: string
           section_id: string
@@ -457,6 +459,7 @@ export type Database = {
           hour_index?: number | null
           image_alt?: string
           image_meta?: string
+          image_position?: string
           image_url?: string
           note?: string
           section_id?: string

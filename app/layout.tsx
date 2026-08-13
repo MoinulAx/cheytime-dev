@@ -6,7 +6,10 @@ import CartIndicator from "@/components/CartIndicator";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  // 400 and 700 only. 900 was loaded in both styles and never used — two font
+  // files preloaded for nothing, which is what the console flags as an unused
+  // preload. Nothing in the design applies font-black.
+  weight: ["400", "700"],
   style: ["normal", "italic"],
   variable: "--font-playfair",
   display: "swap",
