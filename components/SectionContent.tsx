@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import MediaImage from "./MediaImage";
+import Lightbox from "./Lightbox";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { createClient as createSupabaseClient } from "@/lib/supabase/browser";
@@ -73,6 +74,13 @@ export function GalleryBlock({
   const shownLinks = limit ? [] : links;
   const hiddenCount =
     images.length - shownImages.length + (limit ? (links?.length ?? 0) : 0);
+
+  // Lightbox only on the full page. The panel is itself a dialog, and opening
+  // a second one inside it gives you two Escape targets and two close buttons
+  // with no way to tell which is which.
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const isPreview = limit !== undefined;
+
   return (
     <Stagger>
       {description && (
@@ -82,35 +90,57 @@ export function GalleryBlock({
           </p>
         </Item>
       )}
-      <div className="mt-6 space-y-8">
+
+      {/*
+        Masonry, as the original site had it: CSS multi-column with
+        `break-inside-avoid` on each tile. Columns rather than grid because
+        photographs here are three different shapes and a grid would either
+        force one shape on all of them — which is what made the archive look
+        flat and soft — or leave ragged holes.
+
+        The panel gets two columns at most; it is 600-920px wide and three
+        would put each photograph below thumbnail size.
+      */}
+      <div
+        className={[
+          "mt-6 gap-4",
+          isPreview
+            ? "columns-1 min-[420px]:columns-2"
+            : "columns-1 min-[560px]:columns-2 lg:columns-3 md:gap-6",
+        ].join(" ")}
+      >
         {shownImages.map((img, i) => (
-          <Item key={`${img.src}-${i}`}>
-            <figure>
-              <div className="flex items-baseline justify-between pb-2">
-                <span className="font-display text-sm italic text-bone-400">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+          <figure
+            key={`${img.src}-${i}`}
+            className="mb-4 break-inside-avoid md:mb-6"
+          >
+            <GalleryTile
+              image={img}
+              index={i}
+              interactive={!isPreview}
+              onOpen={() => setOpenIndex(i)}
+              sizes={
+                isPreview
+                  ? "(max-width: 419px) 90vw, (max-width: 1023px) 45vw, 440px"
+                  : "(max-width: 559px) 92vw, (max-width: 1023px) 46vw, 330px"
+              }
+            />
+            <figcaption className="mt-2 flex items-baseline justify-between gap-3">
+              <span className="min-w-0 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                {img.alt}
+              </span>
+              {img.meta && (
+                <span className="shrink-0 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
                   {img.meta}
                 </span>
-              </div>
-              <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
-                <MediaImage
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
-                  className="object-cover"
-                  style={{ objectPosition: img.position ?? "50% 50%" }}
-                />
-              </div>
-              {img.caption && (
-                <figcaption className="mt-2 border-l border-bone-100/20 pl-3 font-sans text-[11px] leading-snug text-bone-300">
-                  {img.caption}
-                </figcaption>
               )}
-            </figure>
-          </Item>
+            </figcaption>
+            {img.caption && (
+              <p className="mt-1 border-l border-bone-100/20 pl-3 font-sans text-[11px] leading-snug text-bone-300">
+                {img.caption}
+              </p>
+            )}
+          </figure>
         ))}
       </div>
 
@@ -205,6 +235,7 @@ export function GalleryBlock({
           </ul>
         </div>
       )}
+
       {hiddenCount > 0 && (
         <Item>
           <Link href="/gallery" className="btn-editorial mt-8">
@@ -212,7 +243,80 @@ export function GalleryBlock({
           </Link>
         </Item>
       )}
+
+      {!isPreview && (
+        <Lightbox
+          image={openIndex === null ? null : (shownImages[openIndex] ?? null)}
+          onClose={() => setOpenIndex(null)}
+          onPrev={() =>
+            setOpenIndex((i) =>
+              i === null ? null : (i - 1 + shownImages.length) % shownImages.length,
+            )
+          }
+          onNext={() =>
+            setOpenIndex((i) => (i === null ? null : (i + 1) % shownImages.length))
+          }
+        />
+      )}
     </Stagger>
+  );
+}
+
+const ASPECT: Record<NonNullable<GalleryImage["aspect"]>, string> = {
+  square: "aspect-square",
+  portrait: "aspect-[3/4]",
+  landscape: "aspect-[4/3]",
+};
+
+/**
+ * One photograph in the masonry.
+ *
+ * The frame comes from the row's own `aspect_ratio`, so the container has a
+ * known height before the image arrives — nothing reflows as the archive
+ * loads, which is what "lazy loading breaks the layout" actually was.
+ */
+function GalleryTile({
+  image,
+  index,
+  interactive,
+  onOpen,
+  sizes,
+}: {
+  image: GalleryImage;
+  index: number;
+  interactive: boolean;
+  onOpen: () => void;
+  sizes: string;
+}) {
+  const frame = ASPECT[image.aspect ?? "landscape"];
+  const inner = (
+    <div
+      className={`relative w-full overflow-hidden border border-bone-100/10 bg-void-800 ${frame}`}
+    >
+      <MediaImage
+        src={image.src}
+        alt={image.alt}
+        fill
+        sizes={sizes}
+        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+        style={{ objectPosition: image.position ?? "50% 50%" }}
+        // The first few are above the fold on most screens; the rest stay lazy.
+        priority={index < 2}
+      />
+    </div>
+  );
+
+  if (!interactive) return inner;
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`Open ${image.alt} full size`}
+      className="group block w-full cursor-zoom-in focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+    >
+      {inner}
+    </button>
   );
 }
 

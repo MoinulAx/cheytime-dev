@@ -22,33 +22,51 @@ export default function MediaImage({
   className = "",
   quality = 90,
   onLoad,
+  onError,
   // Destructured rather than left in the spread so the a11y lint can see it —
   // and so a missing alt is a type error here rather than a silent omission.
   alt,
   ...props
 }: ImageProps) {
-  const [loaded, setLoaded] = useState(false);
+  const [state, setState] = useState<"loading" | "loaded" | "failed">("loading");
 
   return (
     <>
       {/* Sits behind the image and is covered once it paints. `motion-reduce`
           stops the pulse for anyone who asked for less movement. */}
-      {!loaded && (
+      {state === "loading" && (
         <span
           aria-hidden="true"
           className="absolute inset-0 animate-pulse bg-bone-100/[0.04] motion-reduce:animate-none"
         />
       )}
+
+      {/* A source that 404s or is blocked never fires `onLoad`, so without
+          this the tile pulsed forever and read as "still loading" rather than
+          "this one is gone". A quiet mark is the honest end state. */}
+      {state === "failed" && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 grid place-items-center bg-void-800 font-display text-2xl italic text-bone-100/15"
+        >
+          ⌾
+        </span>
+      )}
+
       <Image
         {...props}
         alt={alt}
         quality={quality}
         className={`${className} transition-opacity duration-500 ${
-          loaded ? "opacity-100" : "opacity-0"
+          state === "loaded" ? "opacity-100" : "opacity-0"
         }`}
         onLoad={(e) => {
-          setLoaded(true);
+          setState("loaded");
           onLoad?.(e);
+        }}
+        onError={(e) => {
+          setState("failed");
+          onError?.(e);
         }}
       />
     </>

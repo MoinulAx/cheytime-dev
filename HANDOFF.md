@@ -90,6 +90,8 @@ up to a minute.
 - Stripe checkout wired to the existing `create-checkout-session` function
 - A real basket: `/cart`, a `CartProvider` in the root layout, and Add buttons
   on Store and Digital in place of the old one-click Buy
+- Gallery rebuilt as CSS-column masonry matching the legacy site, reading
+  `gallery_items.aspect_ratio` (which nothing used to read), with a lightbox
 
 ### Verified against the live database — 2026-06-10
 
@@ -128,6 +130,8 @@ there to fall back to.
 - `CONTENT_MAP.md` — legacy content vs the clock, page by page
 - `ADMIN_PLAN.md` — admin architecture, Supabase reference, granting access
 - `supabase/SCHEMA.sql` — the whole database in one file
+- `supabase/VERIFY.sql` — read-only post-deploy check: tables, columns, dial
+  layout, RLS, buckets, row counts. Run it after every `db push`.
 - `supabase/migrations/` — what actually runs
 
 ---

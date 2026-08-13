@@ -486,13 +486,20 @@ export const ADMIN_TABLES: TableDef[] = [
         hint: "Also used as the image's alt text — describe what is shown.",
       },
       { key: "meta", label: "Meta", type: "text", placeholder: "Studio · 2026" },
-      { key: "image_url", label: "Image", type: "image" },
+      { key: "image_url", label: "Image", type: "image", hint: "Upload at least 1200px on the long edge. The archive shows three columns on a laptop and screens are mostly 2x, so anything under ~700px wide gets scaled up and looks soft — that is the single biggest cause of a blurry gallery." },
       {
         key: "collection",
         label: "Collection",
         type: "select",
         options: ["archive", "videos", "sessions", "reel"],
         hint: "Historical grouping from when the archive was split across four hours. Nothing reads it — changing it has no effect on the site.",
+      },
+      {
+        key: "aspect_ratio",
+        label: "Shape",
+        type: "select",
+        options: ["landscape", "portrait", "square"],
+        hint: "The frame this photo is shown in. Set it to match the real photo — a portrait shot left on “landscape” gets cropped to a letterbox, which is what made the archive look flat. Blank behaves as landscape.",
       },
       {
         key: "media_type",
@@ -504,6 +511,7 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "sort_order", label: "Sort order", type: "number" },
     ],
     defaults: {
+      aspect_ratio: "landscape",
       alt: "",
       meta: "",
       image_url: "",

@@ -47,6 +47,14 @@ export interface GalleryImage {
   meta?: string;
   /** CSS object-position so one photograph can serve several crops. */
   position?: string;
+  /**
+   * The frame this photograph is drawn into, from `gallery_items.aspect_ratio`.
+   *
+   * Every image used to be forced into 16:9 regardless of its real shape,
+   * which cropped portraits to a letterbox and upscaled small sources three
+   * times over — the single biggest cause of the archive looking soft.
+   */
+  aspect?: "square" | "portrait" | "landscape";
 }
 
 /**

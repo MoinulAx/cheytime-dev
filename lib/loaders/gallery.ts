@@ -5,6 +5,24 @@ import { renderableImage } from "./images";
 type GalleryData = Extract<SectionData, { kind: "gallery" }>;
 
 /**
+ * `gallery_items.aspect_ratio`, which nothing used to read.
+ *
+ * The legacy gallery drew each photograph in its own shape; this one flattened
+ * everything to 16:9. Unknown or blank falls back to landscape, matching the
+ * legacy default.
+ */
+function aspectOf(value: string | null): GalleryImage["aspect"] {
+  switch ((text(value) ?? "").toLowerCase()) {
+    case "square":
+      return "square";
+    case "portrait":
+      return "portrait";
+    default:
+      return "landscape";
+  }
+}
+
+/**
  * Describe an off-site archive URL, or `undefined` if it is not usable.
  *
  * Only https is accepted — anything else is a typo or a stale value, and a
@@ -84,7 +102,7 @@ export async function loadGallery(fallback: GalleryData): Promise<GalleryData> {
       const meta = text(row.meta);
 
       if (src) {
-        images.push({ src, alt: title, meta });
+        images.push({ src, alt: title, meta, aspect: aspectOf(row.aspect_ratio) });
         continue;
       }
 
