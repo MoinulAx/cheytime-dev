@@ -10,6 +10,7 @@ import type {
   TableDef,
 } from "@/lib/admin/schema";
 import { fromInputValue, toInputValue } from "@/lib/admin/datetime";
+import { warningsFor, type Warning } from "@/lib/admin/visibility";
 import { createClient } from "@/lib/supabase/browser";
 
 type Row = Record<string, unknown>;
@@ -89,10 +90,13 @@ function Field({
   def,
   value,
   onChange,
+  warnings = [],
 }: {
   def: FieldDef;
   value: unknown;
   onChange: (v: unknown) => void;
+  /** Reasons this value will stop the row appearing on the site. */
+  warnings?: string[];
 }) {
   const control = () => {
     switch (def.type) {
@@ -260,6 +264,14 @@ function Field({
           {def.hint}
         </p>
       )}
+      {warnings.map((w) => (
+        <p
+          key={w}
+          className="mt-1.5 border-l-2 border-cosmic-400/60 pl-2 font-sans text-[11px] leading-snug text-cosmic-400"
+        >
+          {w}
+        </p>
+      ))}
     </div>
   );
 }
@@ -365,6 +377,13 @@ export default function TableEditor({
   const [pending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
+
+  // Recomputed from the live draft, so a warning appears while typing rather
+  // than after saving and wondering where the row went. Split into the ones
+  // that belong under a field and the ones about the row as a whole.
+  const allWarnings: Warning[] = draft ? warningsFor(def.table, draft) : [];
+  const fieldWarnings = allWarnings.filter((w) => w.field);
+  const rowWarnings = allWarnings.filter((w) => !w.field);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -478,10 +497,25 @@ export default function TableEditor({
                   def={f}
                   value={draft[f.key]}
                   onChange={(v) => setDraft({ ...draft, [f.key]: v })}
+                  warnings={fieldWarnings
+                    .filter((w) => w.field === f.key)
+                    .map((w) => w.message)}
                 />
               </div>
             ))}
           </div>
+          {rowWarnings.length > 0 && (
+            <div className="mt-4 border border-cosmic-400/40 px-4 py-3">
+              {rowWarnings.map((w) => (
+                <p
+                  key={w.message}
+                  className="font-sans text-[12px] leading-relaxed text-cosmic-400"
+                >
+                  {w.message}
+                </p>
+              ))}
+            </div>
+          )}
           <div className="mt-6 flex items-center gap-3">
             <button
               type="button"
