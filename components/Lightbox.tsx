@@ -13,7 +13,7 @@ import type { GalleryImage } from "@/types/section";
  * find its own shape rather than imposing one.
  *
  * Rendered at z-[70], above the content panel (z-50) and the cart indicator
- * (z-60) — it is the most recent thing the visitor asked for, so it has to sit
+ * (z-60), it is the most recent thing the visitor asked for, so it has to sit
  * on top of both.
  */
 export default function Lightbox({

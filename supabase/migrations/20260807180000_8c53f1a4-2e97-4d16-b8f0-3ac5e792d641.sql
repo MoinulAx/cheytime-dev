@@ -36,10 +36,10 @@ WHERE key = 'about.quote';
 
 -- ── 2. The home data strip ─────────────────────────────────────────────────
 INSERT INTO public.site_settings (key, value, label, section_id, sort_order) VALUES
-  ('home.fact.based',     'Staten Island, NY',        'Data strip — Based',     'home', 5),
-  ('home.fact.genre',     'Hip-Hop',                  'Data strip — Genre',     'home', 6),
-  ('home.fact.latest',    'Whips & Chains Freestyle', 'Data strip — Latest',    'home', 7),
-  ('home.fact.direction', 'Borleone Films',           'Data strip — Direction', 'home', 8)
+  ('home.fact.based',     'Staten Island, NY',        'Data strip, Based',     'home', 5),
+  ('home.fact.genre',     'Hip-Hop',                  'Data strip, Genre',     'home', 6),
+  ('home.fact.latest',    'Whips & Chains Freestyle', 'Data strip, Latest',    'home', 7),
+  ('home.fact.direction', 'Borleone Films',           'Data strip, Direction', 'home', 8)
 ON CONFLICT (key) DO NOTHING;
 
 -- ── 3. Real track titles ───────────────────────────────────────────────────
@@ -49,24 +49,24 @@ UPDATE public.music_links SET title = 'Long Kiss Goodnight'  WHERE youtube_id = 
 UPDATE public.music_links SET title = 'Session III'          WHERE youtube_id = '4T6mFd2Sz_Y';
 UPDATE public.music_links SET title = 'Session IV'           WHERE youtube_id = 'l62mMBXck70';
 
--- NOTE: the 2026 press kit links three further videos —
+-- NOTE: the 2026 press kit links three further videos,
 --   SIcEPXmavDk, lXucfyLDE7M, xAkX2h97qeE
--- — and "Whips & Chains Freestyle" is named as the current single. Which id
+--, and "Whips & Chains Freestyle" is named as the current single. Which id
 -- belongs to which title is not recorded anywhere, so they are deliberately
 -- not added: a guessed mapping would put the wrong name on a video. Add them
 -- from the Music tab once the pairing is confirmed.
 
 -- ── 4. Real photography into the archive ───────────────────────────────────
--- The nine existing rows are left alone — they carry captions the client
+-- The nine existing rows are left alone, they carry captions the client
 -- wrote, and are simply invisible until someone gives them an image. These are
 -- new rows for the photographs that already exist in the repo.
 INSERT INTO public.gallery_items (alt, meta, image_url, media_type, collection, sort_order)
 SELECT v.alt, v.meta, v.image_url, 'image', 'archive', v.sort_order
 FROM (VALUES
-  ('Chey — portrait, braids and chain', 'Portrait', '/assets/chey-braids.jpg', 101),
-  ('Chey — 2024 media kit cover',       'Media Kit · 2024', '/assets/chey-mediakit.jpg', 102),
-  ('Chey — portrait with earring',      'Portrait', '/assets/chey-earring.jpg', 103),
-  ('Chey — portrait, fur hat',          'Portrait', '/assets/chey-furhat.jpg', 104)
+  ('Chey, portrait, braids and chain', 'Portrait', '/assets/chey-braids.jpg', 101),
+  ('Chey, 2024 media kit cover',       'Media Kit · 2024', '/assets/chey-mediakit.jpg', 102),
+  ('Chey, portrait with earring',      'Portrait', '/assets/chey-earring.jpg', 103),
+  ('Chey, portrait, fur hat',          'Portrait', '/assets/chey-furhat.jpg', 104)
 ) AS v(alt, meta, image_url, sort_order)
 WHERE NOT EXISTS (
   SELECT 1 FROM public.gallery_items g WHERE g.image_url = v.image_url

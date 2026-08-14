@@ -1,4 +1,4 @@
--- Post-deploy verification. READ-ONLY — safe to paste into the Supabase SQL
+-- Post-deploy verification. READ-ONLY, safe to paste into the Supabase SQL
 -- editor. It changes nothing; it only reports.
 --
 -- Run this after `supabase db push` to confirm the schema landed and that

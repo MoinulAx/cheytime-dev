@@ -24,7 +24,7 @@ import {
  * ⚠️ This module reaches the server-only Supabase client. Client components
  * must import geometry and lookups from `lib/sections.static.ts` instead.
  *
- * Only the clock's geometry is fixed — twelve hours, their numerals and
+ * Only the clock's geometry is fixed, twelve hours, their numerals and
  * angles. Everything a visitor reads is live: copy from `site_settings`,
  * lists from their own tables, and each section's title, subtitle, panel
  * image and supporting lines from `site_sections`. Every loader falls back to
@@ -107,7 +107,7 @@ export async function getSections(): Promise<Section[]> {
     const skin = chrome[section.id];
 
     // The Events section is flagged as placeholder copy while the calendar is
-    // empty — real bookings clear the flag.
+    // empty, real bookings clear the flag.
     const placeholder =
       section.id === "events" && data.kind === "events" && data.events.length > 0
         ? undefined

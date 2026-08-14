@@ -1,4 +1,4 @@
-# Admin Panel — Plan
+# Admin Panel, Plan
 
 Status of the Supabase migration, and the plan for bringing the admin panel
 into this codebase.
@@ -19,44 +19,44 @@ into this codebase.
 | Press section (XI) + `press_features` table and migration | Done |
 | Full migration history mirrored into `supabase/migrations/` | Done |
 | ISR at 60s, route builds `○ Static` | Done |
-| **Admin panel at `/admin`** | Built — see §3. Ten tabs, one per table the legacy admin managed. |
+| **Admin panel at `/admin`** | Built, see §3. Ten tabs, one per table the legacy admin managed. |
 
 ### Not done
 
 | Piece | State |
 | --- | --- |
-| Verification against the live database | **Done** — 2026-06-10, see §2 |
-| Signing into the admin end to end | **Still blocked** — needs admin credentials. The guard and login render, and reads are proven, but no CRUD action has been run against a real row. |
-| Product imagery in the Store panel | **Done** — `Product` carries an optional `image`, the loader passes `image_url` through `renderableImage()`, and the numbered plate is now the fallback rather than the only option. |
-| The three EPK videos (`SIcEPXmavDk`, `lXucfyLDE7M`, `xAkX2h97qeE`) | **Two are in** `music_releases` — `lXucfyLDE7M` as "Sway in the morning freestyle", `xAkX2h97qeE` as "CHEY - Hair and Nails". `SIcEPXmavDk` appears nowhere and is still unaccounted for. |
-| Page 1 of `CHEY2026.pdf` | Not migrated — it is a single full-bleed image and could not be extracted in this environment. If it carries copy, that copy is not on the site. |
+| Verification against the live database | **Done**, 2026-06-10, see §2 |
+| Signing into the admin end to end | **Still blocked**, needs admin credentials. The guard and login render, and reads are proven, but no CRUD action has been run against a real row. |
+| Product imagery in the Store panel | **Done**, `Product` carries an optional `image`, the loader passes `image_url` through `renderableImage()`, and the numbered plate is now the fallback rather than the only option. |
+| The three EPK videos (`SIcEPXmavDk`, `lXucfyLDE7M`, `xAkX2h97qeE`) | **Two are in** `music_releases`, `lXucfyLDE7M` as "Sway in the morning freestyle", `xAkX2h97qeE` as "CHEY - Hair and Nails". `SIcEPXmavDk` appears nowhere and is still unaccounted for. |
+| Page 1 of `CHEY2026.pdf` | Not migrated, it is a single full-bleed image and could not be extracted in this environment. If it carries copy, that copy is not on the site. |
 
 ---
 
-## 2. Verification — read this before trusting the data layer
+## 2. Verification, read this before trusting the data layer
 
-**Done — 2026-06-10.** This section used to say the loaders had never executed
+**Done, 2026-06-10.** This section used to say the loaders had never executed
 against real rows, because the environment could not reach
 `enhduflezmiugpjaovhz.supabase.co`. That is no longer true. With `.env.local`
 set, all twelve content tables answered and a full build logged **no**
 `[loaders] … using static content` lines, so every section read live. Row
 counts are recorded in `HANDOFF.md`, and they contradict several statements
-written while this was still unverified — most importantly that
+written while this was still unverified, most importantly that
 `music_releases` was empty. It is not; `music_links` is.
 
 What that pass found, beyond "it works": `merch_products.image_url` was
 populated but discarded by the loader, so uploaded product photography never
 reached the page; and seven `gallery_items` rows held Instagram permalinks
 rather than images and were being dropped entirely. Both are fixed. The lesson
-is the general one — correctness by construction had held for the *queries*,
+is the general one, correctness by construction had held for the *queries*,
 but not for what the app then did with the rows.
 
 The checklist below stays useful for every new environment:
 
 1. **Env present.** `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    set in the host. Missing values log a warning and silently serve static
-   content — the site looks fine while being stale, so check the logs.
-2. **No loader warnings.** Any `[loaders] … failed — using static content` line
+   content, the site looks fine while being stale, so check the logs.
+2. **No loader warnings.** Any `[loaders] … failed, using static content` line
    in the build output means that section is not live.
 3. **Per section:** Music lists the releases from the admin; Store matches
    `merch_products` where `active = true` and shows their photographs; Events
@@ -70,7 +70,7 @@ The checklist below stays useful for every new environment:
 
 Reads deliberately use a **cookie-free** client (`createStaticClient`). Touching
 `cookies()` opts a route out of static rendering entirely and silently converts
-`revalidate = 60` into render-on-demand — which is what the first build of this
+`revalidate = 60` into render-on-demand, which is what the first build of this
 work did before it was caught.
 
 The consequence: **an admin edit takes up to 60s to appear.** That is the
@@ -79,7 +79,7 @@ intended tradeoff for a marketing site. When the admin moves into this repo,
 
 ---
 
-## 3. Admin panel — as built
+## 3. Admin panel, as built
 
 Ported from the legacy `src/pages/Admin.tsx` (a single 1380-line tabbed CRUD
 surface) to the App Router at `/admin`. Same database, same tables, same job.
@@ -88,7 +88,7 @@ Two things changed in the port:
 
 **Tabs are named by clock hour, not by page.** The old admin mirrored the old
 site's pages; the new site renders hours, so each tab names the numeral it
-feeds — Music IV, Store VI, Events VIII, Archive X, Press XI. Tabs with no
+feeds, Music IV, Store VI, Events VIII, Archive X, Press XI. Tabs with no
 numeral (Submissions, Blog, Digital, Outreach, Purchases) say in the tab
 itself where they do and don't surface, so it is clear that editing Blog
 changes the database but nothing visible.
@@ -101,12 +101,12 @@ payload. There is no per-table component to keep in step.
 
 The schema already has everything: a `user_roles` table, a `has_role()`
 function, and RLS on every table gating writes behind
-`has_role(auth.uid(), 'admin')`. **No new policies are needed** — a logged-in
+`has_role(auth.uid(), 'admin')`. **No new policies are needed**, a logged-in
 admin's writes are authorised by the database, not by the UI.
 
 - Sign-in with Supabase Auth (email + password) at `/admin/login`.
 - `middleware.ts` to refresh the session cookie on `/admin/*`. This is what the
-  cookie-aware `createClient()` in `lib/supabase/server.ts` was built for — it
+  cookie-aware `createClient()` in `lib/supabase/server.ts` was built for, it
   is currently unused and exists for exactly this step.
 - A server-side guard in `app/admin/layout.tsx`: read the user, check
   `user_roles`, redirect non-admins. Treat this as UX, not security; RLS is the
@@ -118,7 +118,7 @@ admin's writes are authorised by the database, not by the UI.
   before it touches `cookies()`, so `/admin` prerendered. Because
   `NEXT_PUBLIC_*` is inlined at build time, a production build without env
   would bake a redirect-to-login into the route and keep serving it after env
-  was fixed — every admin locked out by a missing variable. Never put
+  was fixed, every admin locked out by a missing variable. Never put
   `revalidate` on these routes.
 
 ### 3.2 Routes
@@ -137,7 +137,7 @@ app/admin/messages/page.tsx   contact_submissions (read + mark read)
 
 ### 3.3 Writes
 
-Server Actions rather than client-side mutations — writes stay on the server,
+Server Actions rather than client-side mutations, writes stay on the server,
 and revalidation is a direct call rather than a round trip.
 
 ```ts
@@ -202,7 +202,7 @@ where email = 'person@example.com'
 on conflict (user_id, role) do nothing;
 ```
 
-To revoke, delete the row — the session dies at its next refresh, within the
+To revoke, delete the row, the session dies at its next refresh, within the
 hour:
 
 ```sql
@@ -216,10 +216,10 @@ where user_roles.user_id = auth.users.id
 Notes:
 
 - `app_role` is an enum of `admin | moderator | user`. Only `admin` grants
-  anything — the other two are unused by both apps.
+  anything, the other two are unused by both apps.
 - Creating an account without the role is safe. They can sign in, get bounced
   straight back to the login form, and every write they attempt fails RLS.
-- If public signups are enabled on the project, that remains true — an account
+- If public signups are enabled on the project, that remains true, an account
   alone grants nothing. Worth disabling anyway if nothing else needs it.
 
 ### 3.8 Decisions still needed
@@ -244,7 +244,7 @@ One project serves both codebases. An edit in either admin hits the same rows.
 | URL | `https://enhduflezmiugpjaovhz.supabase.co` |
 | Dashboard | `https://supabase.com/dashboard/project/enhduflezmiugpjaovhz` |
 | Config | `supabase/config.toml` (this repo) |
-| Migrations | `supabase/migrations/` — mirrored from the legacy repo, schema of record |
+| Migrations | `supabase/migrations/`, mirrored from the legacy repo, schema of record |
 
 ### Keys
 
@@ -255,7 +255,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://enhduflezmiugpjaovhz.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon / publishable key>
 ```
 
-Both are public by design — the anon key is shipped to the browser and every
+Both are public by design, the anon key is shipped to the browser and every
 table is guarded by RLS. Find them under Project Settings → API.
 
 **The service role key belongs to neither codebase.** It bypasses RLS
@@ -273,22 +273,22 @@ injects it. Never put it in `.env.local`, and never in a `NEXT_PUBLIC_*` var.
 | `press_features` | Press (XI) | Added in this migration; published + linked only. |
 | `blog_posts` | Blog (I) | |
 | `music_products` | Digital (VII) | Paid downloads; checkout not wired here. |
-| `contact_submissions` | — | Contact form writes; anon INSERT, admin SELECT. |
-| `outreach_logs` | — | Internal PR pipeline, admin-only. |
-| `purchases` | — | Stripe webhook writes. No admin UPDATE/DELETE policy. |
-| `user_roles` | — | Admin grants. See §3.7. |
+| `contact_submissions` |, | Contact form writes; anon INSERT, admin SELECT. |
+| `outreach_logs` |, | Internal PR pipeline, admin-only. |
+| `purchases` |, | Stripe webhook writes. No admin UPDATE/DELETE policy. |
+| `user_roles` |, | Admin grants. See §3.7. |
 
 ### Storage
 
 | Bucket | Public | Use |
 | --- | --- | --- |
 | `site-assets` | Yes | Artwork, gallery and product images. |
-| `music-files` | Yes | Audio — full tracks and preview clips. |
+| `music-files` | Yes | Audio, full tracks and preview clips. |
 
 ⚠️ **Both buckets are `public = true`.** `music-files` does not withhold a paid
 track from anyone holding its URL; `secure-download` issues tokens, but the
 bucket itself does not check them. The site never renders `audio_url` (see
-`lib/loaders/digital.ts`), so the URLs are not discoverable from the page —
+`lib/loaders/digital.ts`), so the URLs are not discoverable from the page,
 but that is obscurity, not access control. Making the bucket private is a
 migration that would also affect the legacy repo's download flow, so it is
 flagged rather than changed.
@@ -300,10 +300,10 @@ uploaded renders through `next/image` with no further config.
 
 Deployed from the **legacy repo** (`supabase/functions/`), not from here:
 
-- `admin-auth` — verifies the JWT and checks the admin role with the service
+- `admin-auth`, verifies the JWT and checks the admin role with the service
   role. This site's guard calls its `login-check` action.
-- `create-checkout-session`, `stripe-webhook` — Stripe. Not wired to this site.
-- `secure-download` — issues download tokens for purchased audio.
+- `create-checkout-session`, `stripe-webhook`, Stripe. Not wired to this site.
+- `secure-download`, issues download tokens for purchased audio.
 
 ### RLS shape
 
@@ -320,5 +320,5 @@ and why a leaked anon key does not expose writes.
   checking against the live pages.
 - **Contact email** is now `Smgproductions2024@gmail.com`, taken from the 2026
   press kit, replacing the placeholder `contact@cheymusic.com`.
-- **Spotify and Apple Music** are still `url: null` — they render as
+- **Spotify and Apple Music** are still `url: null`, they render as
   "· soon" chips. Real URLs would fill them in.

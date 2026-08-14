@@ -61,7 +61,7 @@ export default function AdminTabs({
 
       <div className="rule my-6" />
 
-      {/* Tabs — each names the clock hour it feeds. */}
+      {/* Tabs, each names the clock hour it feeds. */}
       <nav className="flex flex-wrap gap-2">
         {ADMIN_TABLES.map((def) => {
           const isActive = def.table === active;

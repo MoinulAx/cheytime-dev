@@ -11,7 +11,7 @@ type ReleaseRow = Database["public"]["Tables"]["music_releases"]["Row"];
  *
  * A signed URL would expire and leave a dead player on a cached page, and a
  * non-https URL is blocked as mixed content. Anything else is dropped so the
- * track still lists — just without a player — rather than rendering a control
+ * track still lists, just without a player, rather than rendering a control
  * that silently fails.
  */
 function streamableAudio(url: string | null | undefined): string | undefined {
@@ -32,12 +32,12 @@ const toTrack = (row: ReleaseRow): AlbumTrack => ({
 });
 
 /**
- * Album (III) — the record, streamed in full from `music_releases`.
+ * Album (III), the record, streamed in full from `music_releases`.
  *
  * The table is a shallow tree: an album is a row with `release_type = 'album'`
  * and no parent, and its tracks hang off it via `parent_album_id`. Hour IV
  * (Music) flattens that same tree into YouTube embeds; this hour reads the
- * other column — `audio_url`, the file uploaded through the admin — and plays
+ * other column, `audio_url`, the file uploaded through the admin, and plays
  * it.
  *
  * Standalone rows that carry audio but belong to no album are kept as
@@ -72,7 +72,7 @@ export async function loadAlbum(fallback: AlbumData): Promise<AlbumData> {
     for (const row of rows) {
       if (row.parent_album_id || row.release_type !== "album") continue;
       const tracks = (children.get(row.id) ?? []).map(toTrack);
-      // An album row can carry its own file too — a single-file record, or the
+      // An album row can carry its own file too, a single-file record, or the
       // full mix alongside the split tracks.
       const own = streamableAudio(row.audio_url);
       if (own) {

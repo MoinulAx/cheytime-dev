@@ -7,7 +7,7 @@ import PageShell from "@/components/PageShell";
  * Deliberately outside the `(depth)` group, which caps its pages at
  * `max-w-5xl`. That cap is right for video and prose and wrong here: the
  * legacy gallery was full-bleed, and a masonry pinned to 1024px in the middle
- * of a 1920px monitor reads as a small grid marooned in the centre — which is
+ * of a 1920px monitor reads as a small grid marooned in the centre, which is
  * exactly what it looked like.
  */
 export default function GalleryLayout({ children }: { children: ReactNode }) {

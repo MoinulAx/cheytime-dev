@@ -29,7 +29,7 @@ function hourIndexOf(value: number | null): number | undefined {
  * section id.
  *
  * These were the last strings compiled into the bundle. They are shell rather
- * than body — the words around the content — but they were still a deploy away
+ * than body, the words around the content, but they were still a deploy away
  * from being changed, which is the thing this migration set out to remove.
  *
  * A field is only returned when it is non-empty, so a blank cell in the admin

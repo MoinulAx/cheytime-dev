@@ -1,5 +1,5 @@
 # Linked to the same Supabase project as the legacy admin app (chey-music).
-# Both codebases share one database — the migrations in ./migrations are the
+# Both codebases share one database, the migrations in ./migrations are the
 # schema of record, kept in sync with that repo.
 #
 # Edge functions (checkout, stripe webhook, admin auth, secure download) still

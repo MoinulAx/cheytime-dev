@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Chey Time — editorial dark theme.
+ * Chey Time, editorial dark theme.
  * Palette: deep void black, bone/ivory type, cosmic violet used sparingly as
  * an ink accent (never as a glow).
  */
@@ -30,7 +30,7 @@ const config: Config = {
           700: "#6d28d9",
           900: "#3b0d80",
         },
-        // Warm print-paper ivory — the editorial type colour.
+        // Warm print-paper ivory, the editorial type colour.
         bone: {
           50: "#f6f3ec",
           100: "#ece8df",

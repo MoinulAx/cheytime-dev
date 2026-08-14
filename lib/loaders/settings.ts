@@ -17,7 +17,7 @@ export async function loadSettings(): Promise<SiteSettings> {
     const map: SiteSettings = {};
     for (const row of data ?? []) {
       const value = row.value?.trim();
-      // A blank value means "not set" — let the static copy win rather than
+      // A blank value means "not set", let the static copy win rather than
       // rendering an empty line where a sentence should be.
       if (value) map[row.key] = value;
     }

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Journal index — every post, one level down from the clock's panel.
+ * Journal index, every post, one level down from the clock's panel.
  *
  * The Journal panel on the dial is a preview; this is the full list, and each entry
  * opens its own page. Headings come from `site_sections` like every other
@@ -49,7 +49,7 @@ export default async function JournalIndexPage() {
             {shell.description}
           </p>
         )}
-        {/* No rule here — the list below is bordered top and bottom, and the
+        {/* No rule here, the list below is bordered top and bottom, and the
             two together read as a doubled line. */}
       </header>
 

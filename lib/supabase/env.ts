@@ -4,7 +4,7 @@
  * Both clients point at the SAME project the legacy admin app writes to
  * (`enhduflezmiugpjaovhz`), so a content edit in the old repo's Admin panel is
  * visible here within one ISR window. The anon/publishable key is safe to ship
- * to the browser — every table this site reads is protected by the RLS policies
+ * to the browser, every table this site reads is protected by the RLS policies
  * defined in the legacy repo's `supabase/migrations/*.sql` (public SELECT on
  * published content, admin-only writes).
  */
@@ -12,7 +12,7 @@
 /** Project URL, e.g. https://enhduflezmiugpjaovhz.supabase.co */
 export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 
-/** Anon ("publishable") key — public by design, gated by RLS. */
+/** Anon ("publishable") key, public by design, gated by RLS. */
 export const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 

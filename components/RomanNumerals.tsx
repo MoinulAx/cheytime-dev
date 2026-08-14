@@ -5,7 +5,7 @@ import { ROMAN_NUMERALS, sectionByHour } from "@/lib/sections.static";
 import { getNumeralPositions } from "@/lib/clock";
 import type { Section } from "@/types/section";
 
-const POSITIONS = getNumeralPositions(); // constant unit fractions — compute once
+const POSITIONS = getNumeralPositions(); // constant unit fractions, compute once
 
 interface RomanNumeralsProps {
   /** The resolved twelve-hour config (see `CheysClock`). */
@@ -18,8 +18,8 @@ interface RomanNumeralsProps {
 }
 
 /**
- * RomanNumerals — z-30. Twelve numerals laid out on a ring via polar
- * geometry, set in solid bone serif — no gradients, no glows. Every hour now
+ * RomanNumerals, z-30. Twelve numerals laid out on a ring via polar
+ * geometry, set in solid bone serif, no gradients, no glows. Every hour now
  * opens a section or a gallery, so all twelve are interactive; each carries a
  * small uppercase label naming its destination (an index, not just a dial).
  * The active hour is inked in violet.
@@ -32,7 +32,7 @@ export default function RomanNumerals({
 }: RomanNumeralsProps) {
   const reduce = useReducedMotion();
   const fontSize = Math.max(13, stageSize * 0.05);
-  // Labels need room below each numeral — hide them on small stages.
+  // Labels need room below each numeral, hide them on small stages.
   const showLabels = stageSize >= 480;
 
   return (
@@ -78,7 +78,7 @@ export default function RomanNumerals({
               onClick={isInteractive ? () => onSelect(hourIndex) : undefined}
               aria-label={
                 section
-                  ? `${section.title} — ${section.subtitle}`
+                  ? `${section.title}, ${section.subtitle}`
                   : `Numeral ${numeral} (inactive)`
               }
               aria-current={isCurrent ? "true" : undefined}
@@ -105,7 +105,7 @@ export default function RomanNumerals({
                   : { type: "spring", stiffness: 320, damping: 18 }
               }
             >
-              {/* Invisible touch hit-area — keeps tap targets ≥44px on mobile
+              {/* Invisible touch hit-area, keeps tap targets ≥44px on mobile
                 without altering the numeral's visual size. Hidden on desktop. */}
               {isInteractive && (
                 <span

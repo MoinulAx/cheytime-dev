@@ -3,7 +3,7 @@
 -- Two kinds of order were still compiled into the bundle:
 --
 -- 1. Which hour of the dial a section sits on. `site_sections.sort_order`
---    existed and was editable but nothing read it — position came from a
+--    existed and was editable but nothing read it, position came from a
 --    hard-coded `hourIndex`, so moving Journal off hour I was a code change.
 --    A real `hour_index` column now drives the dial.
 --
@@ -44,7 +44,7 @@ WHERE s.section_id = v.section_id
 
 -- Journal specifically. Runs even if hour_index was already seeded by an
 -- earlier run of this migration, but not if someone has since moved it
--- somewhere other than I — their choice wins over ours.
+-- somewhere other than I, their choice wins over ours.
 UPDATE public.site_sections
 SET hour_index = 5
 WHERE section_id = 'blog'

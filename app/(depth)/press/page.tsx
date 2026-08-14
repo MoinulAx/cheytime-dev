@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Press in full — one level down from hour XI.
+ * Press in full, one level down from hour XI.
  *
  * Reads through `getSections()` rather than calling a loader directly, so this
  * page and the panel resolve identical content: same fallbacks, same chrome
  * from `site_sections`, same adaptation. The panel passes a `limit` and this
- * does not — that is the only difference between them.
+ * does not, that is the only difference between them.
  */
 export default async function PressPage() {
   const sections = await getSections();

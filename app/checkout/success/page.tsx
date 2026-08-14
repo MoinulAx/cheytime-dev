@@ -12,7 +12,7 @@ export const metadata: Metadata = {
  * Stripe's success return.
  *
  * Deliberately says nothing about the order. This page is reached by
- * redirect, not by proof of payment — anyone can open the URL — so it must
+ * redirect, not by proof of payment, anyone can open the URL, so it must
  * not confirm anything it has not verified. The `stripe-webhook` function is
  * what actually marks the purchase paid, and the receipt email is Stripe's.
  */

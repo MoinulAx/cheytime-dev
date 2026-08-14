@@ -33,7 +33,7 @@ export async function generateMetadata({
 }
 
 /**
- * One Journal post — the deepest level of the stack.
+ * One Journal post, the deepest level of the stack.
  *
  * `body` is plain text from an admin-editable column, so it renders as text.
  * No markdown pass and no `dangerouslySetInnerHTML`: treating that column as
@@ -51,7 +51,7 @@ export default async function JournalPostPage({
 
   return (
     <>
-      {/* One level up, never straight home — see components/BackStack.tsx. */}
+      {/* One level up, never straight home, see components/BackStack.tsx. */}
       <BackStack href="/journal" label="All entries" />
 
       <article>

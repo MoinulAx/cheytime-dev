@@ -8,8 +8,8 @@
 -- attempts. The live site currently shows "Orange Peel" with no video and no
 -- second entry, which happens either because those migrations were not pushed
 -- or because the deploy is running older code that skipped untitled rows. This
--- reaches the same end state from any of those starting points, and — because
--- both rows end up *titled* — it renders correctly even on the older code,
+-- reaches the same end state from any of those starting points, and, because
+-- both rows end up *titled*, it renders correctly even on the older code,
 -- which is the version that could not display an untitled row.
 --
 -- End state: exactly one row per video, each with its real title, and no

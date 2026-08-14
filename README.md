@@ -1,6 +1,6 @@
-# Chey Time — *Chey's Time*
+# Chey Time, *Chey's Time*
 
-An immersive, single-interaction artist site for **Chey** — "Hip Hop's Princess," a Staten Island rapper. The entire experience is a full-screen interactive clock: a faceted diamond hand sits at the centre over a tick dial, and diamond Roman numerals form the navigation. Selecting a numeral sweeps the hand to that hour and reveals a frosted-glass content panel.
+An immersive, single-interaction artist site for **Chey**, "Hip Hop's Princess," a Staten Island rapper. The entire experience is a full-screen interactive clock: a faceted diamond hand sits at the centre over a tick dial, and diamond Roman numerals form the navigation. Selecting a numeral sweeps the hand to that hour and reveals a frosted-glass content panel.
 
 Built as a ground-up rebuild of the legacy `chey-music` site. See [`MIGRATION_REPORT.md`](./MIGRATION_REPORT.md) for the full discovery/content audit.
 
@@ -18,7 +18,7 @@ npm run lint     # eslint
 npm run typecheck
 ```
 
-Status: `dev`, `build`, `lint`, and `typecheck` all pass clean — zero TS/ESLint errors, no `create-next-app` boilerplate.
+Status: `dev`, `build`, `lint`, and `typecheck` all pass clean, zero TS/ESLint errors, no `create-next-app` boilerplate.
 
 ## Architecture
 
@@ -47,7 +47,7 @@ Only the clock and panel are client components; everything else is server-render
 
 ## Adding / editing navigation
 
-Everything is driven by the typed `SECTIONS` array in [`lib/sections.ts`](./lib/sections.ts) — `{ id, numeral, hourIndex, angle, title, subtitle, data }`. Angles are derived once from `hourIndex` via `angleForHour()`; nothing re-declares them. Add a section by adding one entry (and a `case` in `SectionContent`).
+Everything is driven by the typed `SECTIONS` array in [`lib/sections.ts`](./lib/sections.ts), `{ id, numeral, hourIndex, angle, title, subtitle, data }`. Angles are derived once from `hourIndex` via `angleForHour()`; nothing re-declares them. Add a section by adding one entry (and a `case` in `SectionContent`).
 
 ## Tuning the hand
 
@@ -64,11 +64,11 @@ export const HAND_SPRING = { type: "spring", stiffness: 45, damping: 14, mass: 1
 ## Performance & accessibility
 
 - Animates only `transform` / `opacity`; targets 60fps.
-- Honours `prefers-reduced-motion` — springs become simple fades.
+- Honours `prefers-reduced-motion`, springs become simple fades.
 - Geometry is measured (ResizeObserver) + polar-computed, so the clock stays correct at every size; never overflows or clips the arm.
 - Numerals are real buttons with `aria-label` / `aria-current`; the panel is a focus-trapped `role="dialog"` closable via button, Escape, or backdrop, and restores focus on close.
 - YouTube embeds use a click-to-load facade (poster → iframe) to keep first load light.
 
 ## Content & data
 
-All copy/links are migrated real content (YouTube `@cheymusic127`, the "Poppin'"/"Long Kiss Goodnight" videos, merch with prices, credits, contact). **Supabase is currently a mock** — content is hard-coded in `lib/sections.ts` with shapes mirroring the future DB tables, so wiring it up later is mechanical. Clearly-labelled placeholders mark missing data (Spotify/Apple/Instagram links, upcoming events, product imagery). The cosmic backdrop and contact email are placeholders pending real assets / client confirmation.
+All copy/links are migrated real content (YouTube `@cheymusic127`, the "Poppin'"/"Long Kiss Goodnight" videos, merch with prices, credits, contact). **Supabase is currently a mock**, content is hard-coded in `lib/sections.ts` with shapes mirroring the future DB tables, so wiring it up later is mechanical. Clearly-labelled placeholders mark missing data (Spotify/Apple/Instagram links, upcoming events, product imagery). The cosmic backdrop and contact email are placeholders pending real assets / client confirmation.

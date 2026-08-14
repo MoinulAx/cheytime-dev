@@ -18,7 +18,7 @@ export async function withSupabase<T>(
 ): Promise<T | null> {
   if (!isSupabaseConfigured) {
     console.warn(
-      `[loaders] ${label}: Supabase env missing — using static content. ` +
+      `[loaders] ${label}: Supabase env missing, using static content. ` +
         `Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.`,
     );
     return null;
@@ -27,7 +27,7 @@ export async function withSupabase<T>(
     return await run(createStaticClient());
   } catch (error) {
     if (isFrameworkSignal(error)) throw error;
-    console.error(`[loaders] ${label} failed — using static content.`, error);
+    console.error(`[loaders] ${label} failed, using static content.`, error);
     return null;
   }
 }
@@ -52,7 +52,7 @@ const YOUTUBE_ID = /^[\w-]{11}$/;
  *
  * The legacy `music_releases` table stores a generic `platform_link`, so a row
  * may point at Spotify or Apple Music instead. Those cannot drive the
- * `LiteYouTube` player, so they resolve to `null` and the loader drops them —
+ * `LiteYouTube` player, so they resolve to `null` and the loader drops them,
  * adapting at the fetch layer rather than widening `MusicVideo`.
  */
 export function youtubeIdFrom(link: string | null | undefined): string | null {

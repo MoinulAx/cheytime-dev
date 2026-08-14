@@ -12,7 +12,7 @@ import type { Section } from "@/types/section";
  * depends on there being at least as many hours as sections.
  *
  * ⚠️ These positions are the *fallback* only. What a visitor sees comes from
- * `site_sections.hour_index`, which the admin can edit — see `placeSections`
+ * `site_sections.hour_index`, which the admin can edit, see `placeSections`
  * in this file. Changing an hourIndex here only moves the section when
  * Supabase is unreachable, so change the database too, not just this file.
  */
@@ -35,7 +35,7 @@ export const ROMAN_NUMERALS = [
 export const DEGREES_PER_HOUR = 360 / 12; // 30
 
 /**
- * Arm rotation for a given hour index. Single source of truth for angle —
+ * Arm rotation for a given hour index. Single source of truth for angle,
  * sections derive their `angle` from this and nothing else re-declares it.
  * XII (index 0) => 0° (arm points straight up).
  */
@@ -55,7 +55,7 @@ export const angleForHour = (hourIndex: number): number =>
  * The About biography and the Home data strip are Chey's own words, verbatim
  * from the legacy /about and / pages. Earlier copy here ("Architect of
  * sound…", "Studio Null") was invented and appears nowhere on the legacy site
- * — read CONTENT_MAP.md before trusting MIGRATION_REPORT.md §3.
+ *, read CONTENT_MAP.md before trusting MIGRATION_REPORT.md §3.
  */
 export const STATIC_SECTIONS: Section[] = [
   {
@@ -70,17 +70,17 @@ export const STATIC_SECTIONS: Section[] = [
       tagline: "Hip Hop's Princess",
       location: "Staten Island, New York",
       intro:
-        "Relatable lyricism over upbeat, captivating production. Stream the sound, step into the archive, and catch what comes next — on Chey's time.",
+        "Relatable lyricism over upbeat, captivating production. Stream the music, dig through the archive, and catch what lands next, all on Chey's time.",
       cue: "Choose an hour to begin",
-      // The legacy home data strip. This array decides which pairs exist —
+      // The legacy home data strip. This array decides which pairs exist,
       // `applyHome` walks it and looks up `home.fact.<label>` for each value,
       // so a label absent here is never read from the database at all.
       //
-      // "Direction — Borleone Films" was dropped at the client's request. It
+      // "Direction, Borleone Films" was dropped at the client's request. It
       // also contradicted `about_credits`, which credits direction to Chey;
       // both were rendering, in different panels. The `home.fact.direction`
       // row still exists in `site_settings` and still shows in the admin, but
-      // nothing reads it — delete it there to stop it looking editable.
+      // nothing reads it, delete it there to stop it looking editable.
       facts: [
         { label: "Based", value: "Staten Island, NY" },
         { label: "Genre", value: "Hip-Hop" },
@@ -98,7 +98,7 @@ export const STATIC_SECTIONS: Section[] = [
     data: {
       kind: "upcoming",
       // Empty by design, like Album. Announcements are the most perishable
-      // content on the site — a hard-coded release date is wrong the moment it
+      // content on the site, a hard-coded release date is wrong the moment it
       // passes, and this file is the offline fallback, not the source.
       releases: [],
       emptyMessage:
@@ -114,14 +114,14 @@ export const STATIC_SECTIONS: Section[] = [
     subtitle: "The Manifesto",
     image: {
       src: "/assets/chey-braids.jpg",
-      alt: "Chey — portrait",
+      alt: "Portrait of Chey",
       meta: "Portrait · Staten Island",
     },
     data: {
       kind: "about",
       // Chey's own biography, verbatim from the legacy /about and / pages.
       // The copy that used to sit here ("Architect of sound…", "Studio Null")
-      // appears nowhere on the legacy site — see CONTENT_MAP.md.
+      // appears nowhere on the legacy site, see CONTENT_MAP.md.
       bio: [
         "Cheyenne, professionally known as “Chey”, is a multifaceted rap artist and musician originally from Staten Island, NY. Her deep-rooted passion for music led her to pursue a career in the industry after initially working in the field of psychology, specifically with children with special needs. Transitioning from her previous profession, Chey fully committed herself to her music and acting aspirations, drawing inspiration from her family's strong musical background.",
         "Chey's introduction to rap music came from her father, who exposed her to the art of free-styling and rhymes. Having grown up in a musically inclined environment, she developed a love for both singing and performing from an early age. Her exposure to rap music, including iconic tracks like “Mama Said Knock You Out” by LL Cool J, played a pivotal role in shaping her artistic journey within the rap genre.",
@@ -151,7 +151,7 @@ export const STATIC_SECTIONS: Section[] = [
       kind: "album",
       // Empty by design. This hour is entirely DB-backed: `loadAlbum` fills it
       // from whatever audio has been uploaded through the admin, and there is
-      // no honest static stand-in for a record — a fake tracklist here would
+      // no honest static stand-in for a record, a fake tracklist here would
       // ship placeholder song titles to a live site.
       albums: [],
       emptyMessage:
@@ -167,7 +167,7 @@ export const STATIC_SECTIONS: Section[] = [
     subtitle: "The Sound",
     image: {
       src: "/assets/chey-furhat.jpg",
-      alt: "Chey — portrait",
+      alt: "Portrait of Chey",
       meta: "Portrait · The Sound",
     },
     data: {
@@ -179,7 +179,7 @@ export const STATIC_SECTIONS: Section[] = [
       //
       // The four entries that stood here were wrong in both directions: two
       // titles were invented ("Session III", "Session IV") and the two that
-      // were real were attached to the wrong videos — 29vWUXMTkME was labelled
+      // were real were attached to the wrong videos, 29vWUXMTkME was labelled
       // "Poppin'" when it is "Girls Just Wanna Have Fun", and OamCSPuswjg was
       // labelled "Long Kiss Goodnight" when it is the Poppin' freestyle. Same
       // origin as the invented bio recorded in MIGRATION_REPORT.md §3.
@@ -214,7 +214,7 @@ export const STATIC_SECTIONS: Section[] = [
     data: {
       kind: "blog",
       description: "Notes, announcements and long-form from Chey and the team.",
-      // Live from `blog_posts`. Nothing is seeded — the legacy site's posts
+      // Live from `blog_posts`. Nothing is seeded, the legacy site's posts
       // are the source, and this renders whatever is in the table.
       posts: [],
       emptyMessage:
@@ -231,7 +231,7 @@ export const STATIC_SECTIONS: Section[] = [
     data: {
       kind: "store",
       products: [
-        { id: "p1", title: "Construct Tee — Black", price: 65, material: "Cotton 220gsm" },
+        { id: "p1", title: "Construct Tee in Black", price: 65, material: "Cotton 220gsm" },
         { id: "p2", title: "Volume VII Hoodie", price: 120, material: "French Terry 350gsm" },
         { id: "p3", title: "Scaffold Cap", price: 45, material: "Washed Canvas" },
         { id: "p4", title: "Absence Longsleeve", price: 75, material: "Cotton 200gsm" },
@@ -250,12 +250,12 @@ export const STATIC_SECTIONS: Section[] = [
     subtitle: "Downloads",
     image: {
       src: "/assets/chey-earring.jpg",
-      alt: "Chey — portrait",
+      alt: "Portrait of Chey",
       meta: "Digital · Downloads",
     },
     data: {
       kind: "digital",
-      description: "Buy the record outright — yours to keep, no stream needed.",
+      description: "Preview what is out now. The full record streams on the Album hour.",
       // Live from `music_products`. Only previews are exposed here; the full
       // file is released by the secure-download function after purchase.
       releases: [],
@@ -276,7 +276,7 @@ export const STATIC_SECTIONS: Section[] = [
       kind: "events",
       events: [],
       emptyMessage:
-        "No dates on the calendar right now. New shows are announced here first — check back soon.",
+        "No dates on the calendar right now. New shows get announced here first, so check back soon.",
     },
   },
   {
@@ -289,7 +289,7 @@ export const STATIC_SECTIONS: Section[] = [
     data: {
       kind: "gallery",
       description: "Every frame, in one place.",
-      // Live from `gallery_items` — all of it. This is the only photo surface
+      // Live from `gallery_items`, all of it. This is the only photo surface
       // on the clock; the chapters that used to sit on III, V and IX, and the
       // grid that used to sit inside Contact, were four views of one table.
       images: [],
@@ -301,7 +301,7 @@ export const STATIC_SECTIONS: Section[] = [
     hourIndex: 10,
     angle: angleForHour(10),
     title: "Contact",
-    subtitle: "Transmission & Archive",
+    subtitle: "Bookings & Press",
     data: {
       kind: "contact",
       // Management address as published in the 2026 press kit.
@@ -326,7 +326,7 @@ export const STATIC_SECTIONS: Section[] = [
     subtitle: "The Record",
     image: {
       src: "/assets/chey-mediakit.jpg",
-      alt: "Chey — 2024 media kit cover",
+      alt: "Chey, 2024 media kit cover",
       meta: "Press · Media Kit",
     },
     data: {
@@ -362,9 +362,9 @@ export const STATIC_SECTIONS: Section[] = [
         },
       ],
       // Logos on the press kit with no article behind them.
-      affiliations: ["SiriusXM — Hip-Hop & R&B", "Live Nation"],
+      affiliations: ["SiriusXM, Hip-Hop & R&B", "Live Nation"],
       emptyMessage:
-        "Coverage is being gathered. Press enquiries are welcome — the line is open on X.",
+        "Coverage is still being gathered. For press enquiries, the line is open on X.",
     },
   },
 ];
@@ -394,7 +394,7 @@ export const sectionById = (
   id: string,
 ): Section | undefined => sections.find((s) => s.id === id);
 
-/** The Home section (XII) — the clock's default / reset state. */
+/** The Home section (XII), the clock's default / reset state. */
 export const homeSection = (sections: Section[]): Section =>
   sections.find((s) => s.id === "home") ?? sections[0];
 
@@ -404,8 +404,8 @@ export const homeSection = (sections: Section[]): Section =>
  *
  * `site_sections.hour_index` is a free-text number in a form, so two sections
  * can be sent to the same hour and one of them has to lose. Rather than let a
- * collision silently delete content — which is what a plain `Map.set` would
- * do — every section is guaranteed a slot:
+ * collision silently delete content, which is what a plain `Map.set` would
+ * do, every section is guaranteed a slot:
  *
  *   1. Home is pinned to XII. The clock treats hour 0 as the reset, so moving
  *      it would leave no way to close a panel from the dial.

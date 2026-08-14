@@ -17,7 +17,7 @@ export interface AdminUser {
  * The function verifies the JWT and then reads `user_roles` with the service
  * role, so the answer does not depend on what the caller is allowed to see.
  * That makes it the authoritative check, and it is shared with the legacy
- * admin — one definition of "is an admin" for both apps.
+ * admin, one definition of "is an admin" for both apps.
  *
  * Returns `true`/`false` when the function answers, and `null` when it cannot
  * be reached, so the caller can distinguish "denied" from "unavailable".
@@ -52,7 +52,7 @@ async function askAdminAuth(accessToken: string): Promise<boolean | null> {
  *
  * Authoritative check is the `admin-auth` edge function above. If it cannot be
  * reached we fall back to reading `user_roles` directly under the user's own
- * session — the table's RLS lets a user read their own roles, so this is a
+ * session, the table's RLS lets a user read their own roles, so this is a
  * genuine check rather than a bypass, just one that depends on that policy
  * staying in place.
  *
@@ -67,7 +67,7 @@ export async function getAdminUser(): Promise<AdminUser | null> {
   if (!isSupabaseConfigured) {
     console.error(
       "[admin] NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are " +
-        "missing from this environment — nobody can sign in until they are set.",
+        "missing from this environment. Nobody can sign in until they are set.",
     );
     return null;
   }
@@ -101,7 +101,7 @@ export async function getAdminUser(): Promise<AdminUser | null> {
     if (error || !roles || roles.length === 0) return null;
     return { id: user.id, email: user.email ?? null };
   } catch (error) {
-    // Next's own control flow must not be caught here — swallowing the
+    // Next's own control flow must not be caught here, swallowing the
     // bail-out signal lets it believe an authenticated route is cacheable.
     if (isFrameworkSignal(error)) throw error;
     // Anything else is treated as "not an admin" rather than allowed to

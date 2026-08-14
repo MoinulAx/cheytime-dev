@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-/** Stripe's cancel return — nothing was charged. */
+/** Stripe's cancel return, nothing was charged. */
 export default function CheckoutCancelledPage() {
   return (
     <>

@@ -17,7 +17,7 @@ const FOCUSABLE =
   'a[href],button:not([disabled]),input,textarea,select,[tabindex]:not([tabindex="-1"])';
 
 /**
- * ContentPanel — z-40. Desktop: slides from the right. Mobile: rises as a
+ * ContentPanel, z-40. Desktop: slides from the right. Mobile: rises as a
  * bottom sheet. A solid editorial surface (no blur, square corners, hairline
  * border) that opens on the section's own photograph. AnimatePresence
  * entry/exit and three close affordances (button · Escape · backdrop).
@@ -37,7 +37,7 @@ export default function ContentPanel({
    * The hero's true shape, once it decodes.
    *
    * The frame was a fixed 16:9 with `object-cover`, so every hero that was not
-   * 16:9 lost its edges — a portrait press shot got carved down to a letterbox
+   * 16:9 lost its edges, a portrait press shot got carved down to a letterbox
    * band, which is why Press, Digital, Journal and Contact all looked cut off.
    * Starting at 16:9 reserves the height so the panel does not jump, then the
    * photograph's own ratio takes over and `object-cover` has nothing to crop.
@@ -142,7 +142,7 @@ export default function ContentPanel({
     <AnimatePresence mode="wait">
       {isOpen && section && (
         <>
-          {/* Backdrop — a plain darken, no blur; kept light on desktop so
+          {/* Backdrop, a plain darken, no blur; kept light on desktop so
               the clock stays visible */}
           <motion.button
             key="backdrop"
@@ -162,7 +162,7 @@ export default function ContentPanel({
             ref={panelRef}
             role="dialog"
             aria-modal="true"
-            aria-label={`${section.title} — ${section.subtitle}`}
+            aria-label={`${section.title}, ${section.subtitle}`}
             tabIndex={-1}
             className={[
               "panel panel-scroll fixed z-50 overflow-y-auto outline-none",
@@ -184,7 +184,7 @@ export default function ContentPanel({
             )}
 
             <div className="px-6 pb-24 pt-8 md:px-10 md:pt-12 xl:px-14 2xl:px-16">
-              {/* Header — index row, then the title like a chapter opener */}
+              {/* Header, index row, then the title like a chapter opener */}
               <div className="flex items-baseline justify-between gap-4">
                 <p className="eyebrow">
                   Hour {section.numeral}&ensp;·&ensp;
@@ -218,7 +218,7 @@ export default function ContentPanel({
 
               <div className="rule mt-8" />
 
-              {/* Opening photograph — each section gets its own */}
+              {/* Opening photograph, each section gets its own */}
               {section.image && (
                 <figure className="mt-8">
                   <div

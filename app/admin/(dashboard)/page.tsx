@@ -4,14 +4,14 @@ import { getAdminUser } from "@/lib/admin/auth";
 import { ADMIN_TABLES } from "@/lib/admin/schema";
 import AdminTabs, { type TableRows } from "@/components/admin/AdminTabs";
 
-export const metadata = { title: "Admin — Chey Time" };
+export const metadata = { title: "Admin · Chey Time" };
 
 /**
  * Admin dashboard.
  *
  * Reads every table server-side in one pass and hands the rows to the client
  * shell, so the panel arrives populated instead of flashing through a loading
- * state per tab. Dynamic by nature — it reads cookies. Never cache it.
+ * state per tab. Dynamic by nature, it reads cookies. Never cache it.
  */
 export default async function AdminPage() {
   const user = await getAdminUser();

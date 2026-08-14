@@ -4,7 +4,7 @@ import { getAdminUser } from "@/lib/admin/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import LoginForm from "@/components/admin/LoginForm";
 
-export const metadata = { title: "Admin — Chey Time" };
+export const metadata = { title: "Admin · Chey Time" };
 
 export default async function LoginPage() {
   if (await getAdminUser()) redirect("/admin");
@@ -25,7 +25,7 @@ export default async function LoginPage() {
           <p className="mt-3 font-sans text-[13px] leading-relaxed text-bone-300/80">
             Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
             <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in this site&apos;s
-            hosting environment, then <strong>redeploy</strong> — a reload will
+            hosting environment, then <strong>redeploy</strong>. A reload will
             not pick them up, because <code>NEXT_PUBLIC_*</code> values are
             baked into the build.
           </p>

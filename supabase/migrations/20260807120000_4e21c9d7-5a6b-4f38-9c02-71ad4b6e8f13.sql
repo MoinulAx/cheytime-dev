@@ -6,7 +6,7 @@
 -- line of copy meant a deploy. These four changes close that.
 --
 -- Seeds reproduce exactly what is in lib/sections.static.ts today, so applying
--- this migration changes nothing visible — it only moves the content.
+-- this migration changes nothing visible, it only moves the content.
 
 -- ── 1. Free-text copy that isn't a list ────────────────────────────────────
 -- Key/value rather than a column per string: these are a handful of unrelated
@@ -35,13 +35,13 @@ CREATE POLICY "Admins can delete settings" ON public.site_settings FOR DELETE TO
 INSERT INTO public.site_settings (key, value, label, section_id, sort_order) VALUES
   ('home.tagline',      'Hip Hop''s Princess', 'Tagline', 'home', 1),
   ('home.location',     'Staten Island, New York', 'Location', 'home', 2),
-  ('home.intro',        'Relatable lyricism over upbeat, captivating production. Stream the sound, step into the archive, and catch what comes next — on Chey''s time.', 'Intro', 'home', 3),
+  ('home.intro',        'Relatable lyricism over upbeat, captivating production. Stream the sound, step into the archive, and catch what comes next, on Chey''s time.', 'Intro', 'home', 3),
   ('home.cue',          'Choose an hour to begin', 'Cue', 'home', 4),
-  ('about.bio',         'Chey. Architect of sound — blending raw, relatable lyricism with heavy, captivating production.
+  ('about.bio',         'Chey. Architect of sound, blending raw, relatable lyricism with heavy, captivating production.
 
 Born from a rejection of the polished and predictable. In a landscape saturated with overproduced noise, the choice was rawness. In a world addicted to trends, the choice was substance.
 
-Every release is a document of a specific tension — silence against static, restraint against aggression. The work lives at the intersection of sound and vision.', 'Biography (blank line between paragraphs)', 'about', 1),
+Every release is a document of a specific tension, silence against static, restraint against aggression. The work lives at the intersection of sound and vision.', 'Biography (blank line between paragraphs)', 'about', 1),
   ('about.quote',       'The mic captures the exact frequency of the room. The imperfections are intentional.', 'Pull quote', 'about', 2),
   ('music.channelLabel','@CheyMusic127', 'YouTube handle', 'music', 1),
   ('music.channelUrl',  'https://www.youtube.com/@CheyMusic127', 'YouTube URL', 'music', 2),
@@ -80,7 +80,7 @@ ON CONFLICT DO NOTHING;
 
 -- ── 3. Contact channel links ───────────────────────────────────────────────
 -- `social_embeds` holds embeddable post URLs; these are plain profile links,
--- and a null url is meaningful — it renders as a "· soon" chip.
+-- and a null url is meaningful, it renders as a "· soon" chip.
 CREATE TABLE IF NOT EXISTS public.social_links (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   label text NOT NULL DEFAULT '',
@@ -127,22 +127,22 @@ CREATE INDEX IF NOT EXISTS gallery_items_collection_idx
 INSERT INTO public.gallery_items (alt, meta, image_url, media_type, collection, sort_order)
 SELECT v.alt, v.meta, v.image_url, 'image', v.collection, v.sort_order
 FROM (VALUES
-  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq1.jpg', 'videos', 1),
-  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'videos', 2),
-  ('Chey — Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq3.jpg', 'videos', 3),
-  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'videos', 4),
-  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq2.jpg', 'videos', 5),
-  ('Chey — Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq3.jpg', 'videos', 6),
-  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq1.jpg', 'sessions', 1),
-  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'sessions', 2),
-  ('Chey — Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq3.jpg', 'sessions', 3),
-  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq1.jpg', 'sessions', 4),
-  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq2.jpg', 'sessions', 5),
-  ('Chey — Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'sessions', 6),
-  ('Chey — Poppin'' video still', '2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'reel', 1),
-  ('Chey — Long Kiss Goodnight video still', '2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'reel', 2),
-  ('Chey — Session III still', 'YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'reel', 3),
-  ('Chey — Session IV still', 'YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'reel', 4)
+  ('Chey, Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq1.jpg', 'videos', 1),
+  ('Chey, Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'videos', 2),
+  ('Chey, Poppin'' video still', 'Music Video · 2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq3.jpg', 'videos', 3),
+  ('Chey, Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'videos', 4),
+  ('Chey, Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq2.jpg', 'videos', 5),
+  ('Chey, Long Kiss Goodnight video still', 'Music Video · 2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq3.jpg', 'videos', 6),
+  ('Chey, Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq1.jpg', 'sessions', 1),
+  ('Chey, Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'sessions', 2),
+  ('Chey, Session III still', 'Session · YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq3.jpg', 'sessions', 3),
+  ('Chey, Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq1.jpg', 'sessions', 4),
+  ('Chey, Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq2.jpg', 'sessions', 5),
+  ('Chey, Session IV still', 'Session · YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'sessions', 6),
+  ('Chey, Poppin'' video still', '2026', 'https://i.ytimg.com/vi/29vWUXMTkME/hq2.jpg', 'reel', 1),
+  ('Chey, Long Kiss Goodnight video still', '2025', 'https://i.ytimg.com/vi/OamCSPuswjg/hq1.jpg', 'reel', 2),
+  ('Chey, Session III still', 'YouTube', 'https://i.ytimg.com/vi/4T6mFd2Sz_Y/hq2.jpg', 'reel', 3),
+  ('Chey, Session IV still', 'YouTube', 'https://i.ytimg.com/vi/l62mMBXck70/hq3.jpg', 'reel', 4)
 ) AS v(alt, meta, image_url, collection, sort_order)
 WHERE NOT EXISTS (
   SELECT 1 FROM public.gallery_items g WHERE g.collection = v.collection

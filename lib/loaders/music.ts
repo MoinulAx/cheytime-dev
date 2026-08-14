@@ -9,7 +9,7 @@ type LinkRow = Database["public"]["Tables"]["music_links"]["Row"];
 /**
  * Flatten `music_releases` into the panel's single ordered video list.
  *
- * The table is a shallow tree — albums are rows with `release_type = 'album'`
+ * The table is a shallow tree, albums are rows with `release_type = 'album'`
  * and no parent, tracks hang off an album via `parent_album_id`. The panel
  * renders one flat list, so we walk album-then-children and finish with the
  * standalone singles, which keeps an album's tracks together on screen.
@@ -36,7 +36,7 @@ function fromReleases(rows: ReleaseRow[]): MusicVideo[] {
       id: row.id,
       title: row.title,
       youtubeId,
-      // `created_at` is the only date the table carries — treat it as the
+      // `created_at` is the only date the table carries, treat it as the
       // release year until a dedicated column exists.
       year: yearOf(row.created_at),
       note,
@@ -62,7 +62,7 @@ function fromReleases(rows: ReleaseRow[]): MusicVideo[] {
   return videos;
 }
 
-/** Older YouTube-only rows — already one embeddable id per record. */
+/** Older YouTube-only rows, already one embeddable id per record. */
 function fromLinks(rows: LinkRow[]): MusicVideo[] {
   const videos: MusicVideo[] = [];
   for (const row of rows) {
@@ -79,7 +79,7 @@ function fromLinks(rows: LinkRow[]): MusicVideo[] {
 }
 
 /**
- * Music (IV) — live from `music_releases`, falling back to the legacy
+ * Music (IV), live from `music_releases`, falling back to the legacy
  * `music_links` table and finally to the static config.
  *
  * `channelLabel` / `channelUrl` / `note` are editorial and have no DB column,

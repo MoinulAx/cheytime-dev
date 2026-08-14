@@ -268,7 +268,7 @@ function Field({
  * Extra images for one parent row (merch product → merch_product_images).
  *
  * Adding uploads first, then writes the row, so a failed upload never leaves a
- * record pointing at nothing. Deleting only removes the row — the file stays
+ * record pointing at nothing. Deleting only removes the row, the file stays
  * in the bucket, matching the legacy admin and keeping a mis-click recoverable.
  */
 function ChildImages({

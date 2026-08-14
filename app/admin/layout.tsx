@@ -4,12 +4,12 @@ import type { ReactNode } from "react";
  * Every `/admin/*` route is rendered per request, never prerendered.
  *
  * These routes read cookies, so in practice they already opt out of static
- * rendering — but only as a side effect, and that is too thin a thread to hang
+ * rendering, but only as a side effect, and that is too thin a thread to hang
  * an authenticated surface on. Two ways it snaps:
  *
  *   • `getAdminUser()` returns early when Supabase env is missing, before it
  *     ever touches `cookies()`. Nothing dynamic is read, so Next prerenders
- *     `/admin` — and because `NEXT_PUBLIC_*` is inlined at build time, a
+ *     `/admin`, and because `NEXT_PUBLIC_*` is inlined at build time, a
  *     production build without env bakes a redirect-to-login into the route
  *     and keeps serving it after env is fixed. Every admin is locked out.
  *   • Any future path that decides "not an admin" before reading the session
@@ -22,13 +22,13 @@ import type { ReactNode } from "react";
 export const dynamic = "force-dynamic";
 
 /**
- * Admin shell — chrome only, no auth.
+ * Admin shell, chrome only, no auth.
  *
  * The gate lives in `(dashboard)/layout.tsx` so it wraps every real admin
  * route while leaving `/admin/login` reachable. Requiring a session to render
  * the sign-in form would lock everyone out.
  *
- * `body` sets `overflow: hidden` for the clock, which would trap this content —
+ * `body` sets `overflow: hidden` for the clock, which would trap this content,
  * the fixed, scrollable wrapper opts back out without touching global CSS.
  */
 export default function AdminLayout({ children }: { children: ReactNode }) {

@@ -12,7 +12,7 @@ const normalizePrice = (price: number): number =>
   Number.isFinite(price) ? Number(price.toFixed(2)) : 0;
 
 /**
- * Store (VI) — live from `merch_products`, newest first.
+ * Store (VI), live from `merch_products`, newest first.
  *
  * `image_url` goes through `renderableImage()` like every other DB image: an
  * admin can paste any URL, and a host `next/image` does not recognise throws

@@ -3,7 +3,7 @@
  *
  * `datetime-local` inputs have no timezone: they hand back the wall-clock time
  * the admin typed. The public site renders event times in New York, so the
- * admin has to enter them in New York too — otherwise a show booked from a
+ * admin has to enter them in New York too, otherwise a show booked from a
  * laptop in another timezone silently lands hours off.
  */
 

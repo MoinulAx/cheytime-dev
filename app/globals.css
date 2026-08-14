@@ -55,7 +55,7 @@
 }
 
 @layer components {
-  /* Solid editorial surface for the content panel — opaque paper-on-night,
+  /* Solid editorial surface for the content panel, opaque paper-on-night,
      no backdrop blur, hairline border. */
   .panel {
     background-color: #0a0613;
@@ -75,7 +75,7 @@
     max-width: 62ch;
   }
 
-  /* Hairline rule — the recurring editorial divider. */
+  /* Hairline rule, the recurring editorial divider. */
   .rule {
     @apply h-px w-full;
     background-color: rgba(236, 232, 223, 0.14);

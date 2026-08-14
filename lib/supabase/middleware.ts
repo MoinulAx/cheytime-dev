@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Touching the user is what triggers the refresh — do not remove.
+  // Touching the user is what triggers the refresh, do not remove.
   await supabase.auth.getUser();
 
   return response;

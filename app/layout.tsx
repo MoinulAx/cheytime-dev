@@ -6,7 +6,7 @@ import CartIndicator from "@/components/CartIndicator";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  // 400 and 700 only. 900 was loaded in both styles and never used — two font
+  // 400 and 700 only. 900 was loaded in both styles and never used, two font
   // files preloaded for nothing, which is what the console flags as an unused
   // preload. Nothing in the design applies font-black.
   weight: ["400", "700"],
@@ -24,11 +24,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://cheytime.com"),
   title: {
-    default: "Chey Time — Hip Hop's Princess",
+    default: "Chey Time: Hip Hop's Princess",
     template: "%s · Chey Time",
   },
   description:
-    "Chey Time — Hip Hop's Princess. Staten Island rapper blending relatable lyricism with upbeat, captivating production. Step into Chey's Time: an interactive clock to stream music, shop merch, and catch live events.",
+    "Hip Hop's Princess out of Staten Island. Chey pairs relatable lyricism with upbeat, captivating production. Step into Chey's Time, an interactive clock built to stream the music, shop the merch and catch live dates.",
   keywords: [
     "Chey Time",
     "Chey",
@@ -38,21 +38,21 @@ export const metadata: Metadata = {
     "music",
   ],
   authors: [{ name: "Chey" }],
-  // Site design and build credit — surfaced in the page metadata as well as
+  // Site design and build credit, surfaced in the page metadata as well as
   // in the footer credit on the dial.
   creator: "rummspace",
   publisher: "rummspace",
   openGraph: {
     type: "profile",
-    title: "Chey Time — Hip Hop's Princess",
+    title: "Chey Time, Hip Hop's Princess",
     description:
-      "Staten Island rapper. Step into Chey's Time — an interactive clock to stream music, shop merch, and catch live events.",
+      "Staten Island rapper. Step into Chey's Time, an interactive clock built to stream the music, shop the merch and catch live dates.",
     siteName: "Chey Time",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Chey Time — Hip Hop's Princess",
+    title: "Chey Time, Hip Hop's Princess",
     description: "Staten Island rapper. Stream music, shop merch, catch live events.",
   },
 };
@@ -70,7 +70,7 @@ export default function RootLayout({
       <body className="antialiased">
         {/* The basket wraps everything so it survives moving between the clock,
             the store pages and /cart. `children` is still passed through as a
-            server-rendered subtree — the provider is a client boundary around
+            server-rendered subtree, the provider is a client boundary around
             it, not above it. */}
         <CartProvider>
           {children}

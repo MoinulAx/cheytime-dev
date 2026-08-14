@@ -3,7 +3,7 @@
 -- /assets/chey-earring.jpg is 300x168 and /assets/chey-furhat.jpg is 403x494.
 -- Both render as a panel banner around 800px wide, so the browser upscales
 -- them two to three times. That is what "blurry" looks like, and no amount of
--- encoding quality fixes an upscale — the pixels are not there.
+-- encoding quality fixes an upscale, the pixels are not there.
 --
 -- Same treatment as the other heroes: take a photograph from gallery_items
 -- that is not already in use. The mechanical pick is a sane default, not an

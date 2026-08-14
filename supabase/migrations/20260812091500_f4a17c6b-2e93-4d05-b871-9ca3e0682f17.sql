@@ -1,8 +1,8 @@
--- Hour I — Upcoming. What is next, rather than what is out.
+-- Hour I, Upcoming. What is next, rather than what is out.
 --
 -- The dial's last free numeral. Music (IV) and Album (III) are catalogue: both
 -- read `music_releases`, and both need a thing to exist before they can show
--- it. An announcement is the opposite — a title, a date that may not be fixed,
+-- it. An announcement is the opposite, a title, a date that may not be fixed,
 -- a poster, and often no playable audio at all. Forcing that into
 -- `music_releases` would mean `platform_link` doing double duty as a pre-save
 -- URL and every catalogue query learning to exclude rows that are not out yet.
@@ -61,7 +61,7 @@ ON CONFLICT (section_id) DO NOTHING;
 -- The link and the poster are deliberately blank: two YouTube URLs were shared
 -- but neither could be confirmed as this track, and putting the wrong video
 -- behind a song title is the exact mistake that had to be undone in
--- `music_links` once already (see CONTENT_MAP.md). Paste both in the admin —
+-- `music_links` once already (see CONTENT_MAP.md). Paste both in the admin,
 -- the row renders as an announcement without them.
 INSERT INTO public.upcoming_releases (title, status, sort_order, description)
 SELECT 'Orange Peel', 'announced', 1, ''

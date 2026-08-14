@@ -1,8 +1,8 @@
 -- Upcoming (I): a video option, alongside the poster.
 --
 -- The hour could only ever show a still. A single announced with a visualiser
--- or a teaser had nowhere to put it, so the video went to Music (IV) — a
--- catalogue hour — and the announcement lost the thing people actually click.
+-- or a teaser had nowhere to put it, so the video went to Music (IV), a
+-- catalogue hour, and the announcement lost the thing people actually click.
 --
 -- `video_url` takes any YouTube form the rest of the site accepts (watch,
 -- youtu.be, shorts, embed). When it is set the card plays the video; when it

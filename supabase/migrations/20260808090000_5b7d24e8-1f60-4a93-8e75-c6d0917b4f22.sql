@@ -2,12 +2,12 @@
 --
 -- Two changes:
 --
--- 1. site_sections — each section's title, subtitle, panel image and
+-- 1. site_sections, each section's title, subtitle, panel image and
 --    supporting lines. These were the final strings compiled into the bundle,
 --    so changing a section heading still meant a deploy.
 --
--- 2. The photographs were split across four surfaces — gallery chapters on
---    III, V and IX, plus a grid inside Contact — which were four views of the
+-- 2. The photographs were split across four surfaces, gallery chapters on
+--    III, V and IX, plus a grid inside Contact, which were four views of the
 --    same table. They are now a single Gallery section at IX that reads every
 --    row, so `gallery_items.collection` no longer decides where a photo
 --    appears. The column is left in place (harmless, and it still records how
@@ -50,28 +50,28 @@ INSERT INTO public.site_sections
               'No entries yet. Announcements and long-form land here first.',
               '', '', '', 1),
   ('about',   'About', 'The Manifesto', '', '', '',
-              '/assets/chey-braids.jpg', 'Chey — portrait', 'Portrait · Staten Island', 2),
+              '/assets/chey-braids.jpg', 'Chey, portrait', 'Portrait · Staten Island', 2),
   ('music',   'Music', 'The Sound', '',
               'Spotify & Apple Music links coming soon.', '',
-              '/assets/chey-furhat.jpg', 'Chey — portrait', 'Portrait · The Sound', 4),
+              '/assets/chey-furhat.jpg', 'Chey, portrait', 'Portrait · The Sound', 4),
   ('store',   'Store', 'The Objects', '',
               'Secure checkout returns soon. Reserve a piece and we''ll hold it.', '',
               '', '', '', 6),
   ('digital', 'Digital', 'Downloads',
-              'Buy the record outright — yours to keep, no stream needed.',
+              'Buy the record outright, yours to keep, no stream needed.',
               'Checkout runs from the legacy store while payments are being moved across.',
               'Nothing on sale right now. New drops are announced here and on the Journal.',
-              '/assets/chey-earring.jpg', 'Chey — portrait', 'Digital · Downloads', 7),
+              '/assets/chey-earring.jpg', 'Chey, portrait', 'Digital · Downloads', 7),
   ('events',  'Events', 'Upcoming', '', '',
-              'No dates on the calendar right now. New shows are announced here first — check back soon.',
+              'No dates on the calendar right now. New shows are announced here first, check back soon.',
               '', '', '', 8),
   ('gallery', 'Gallery', 'The Archive', 'Every frame, in one place.', '',
               '', '', '', '', 9),
   ('contact', 'Contact', 'Transmission', '', '', '',
               '', '', '', 10),
   ('press',   'Press', 'The Record', 'Where the work has been written about.', '',
-              'Coverage is being gathered. Press enquiries are welcome — the line is open on X.',
-              '/assets/chey-mediakit.jpg', 'Chey — 2024 media kit cover', 'Press · Media Kit', 11)
+              'Coverage is being gathered. Press enquiries are welcome, the line is open on X.',
+              '/assets/chey-mediakit.jpg', 'Chey, 2024 media kit cover', 'Press · Media Kit', 11)
 ON CONFLICT (section_id) DO NOTHING;
 
 COMMENT ON COLUMN public.gallery_items.collection IS 'Historical grouping only. The Gallery section renders every row regardless of this value, kept so the original chaptering is not lost.';

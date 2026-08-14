@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Music in full — one level down from hour IV.
+ * Music in full, one level down from hour IV.
  *
  * Reads through `getSections()` rather than calling a loader directly, so this
  * page and the panel resolve identical content: same fallbacks, same chrome
  * from `site_sections`, same adaptation. The panel passes a `limit` and this
- * does not — that is the only difference between them.
+ * does not, that is the only difference between them.
  */
 export default async function MusicPage() {
   const sections = await getSections();

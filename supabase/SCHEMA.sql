@@ -1,20 +1,20 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Chey Time — full Supabase schema, current state
+-- Chey Time, full Supabase schema, current state
 -- Project: enhduflezmiugpjaovhz
 -- ═══════════════════════════════════════════════════════════════════════════
 --
--- ⚠️ REFERENCE ONLY — DO NOT RUN THIS FILE.
+-- ⚠️ REFERENCE ONLY, DO NOT RUN THIS FILE.
 --
 -- This is the whole database in one place so it can be read without stitching
 -- together twelve migrations. The files in ./migrations are what actually runs
 -- and remain the source of truth; this is regenerated to match them.
 --
 -- One database serves two codebases:
---   • cheytime-dev  (this repo)  — Next.js clock + /admin
---   • cheytime-old  (legacy)     — Vite app + the deployed edge functions
+--   • cheytime-dev  (this repo), Next.js clock + /admin
+--   • cheytime-old  (legacy), Vite app + the deployed edge functions
 --
 -- RLS shape, consistent across every content table:
---   • public SELECT — sometimes narrowed to published = true
+--   • public SELECT, sometimes narrowed to published = true
 --   • ALL WRITES gated behind has_role(auth.uid(), 'admin')
 -- That is why the admin needs no policies of its own, and why shipping the
 -- anon key to the browser is safe.
@@ -33,7 +33,7 @@ CREATE TABLE public.user_roles (
   role app_role NOT NULL,
   UNIQUE (user_id, role)
 );
--- RLS: users may read their own rows only. No self-service writes — granting
+-- RLS: users may read their own rows only. No self-service writes, granting
 -- admin is a manual SQL step, see ADMIN_PLAN.md §3.7.
 
 -- SECURITY DEFINER so policies can call it without recursing through
@@ -52,7 +52,7 @@ $$;
 -- Each block notes the hour it feeds and the loader that reads it.
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- ── site_settings — copy across Home XII, About II, Music IV, Contact X ────
+-- ── site_settings, copy across Home XII, About II, Music IV, Contact X ────
 -- Read by lib/loaders/settings.ts. Key/value because these are unrelated
 -- sentences spread across four sections; a column per string would need a
 -- migration every time the client wants to say something new.
@@ -72,7 +72,7 @@ CREATE TABLE public.site_settings (
 --   contact.email · contact.blurb · contact.sla
 -- RLS: public SELECT · admin write.
 
--- ── site_sections — every panel's shell ───────────────────────────────────
+-- ── site_sections, every panel's shell ───────────────────────────────────
 -- Read by lib/loaders/chrome.ts. A blank cell means "keep the built-in
 -- wording", so clearing a field cannot blank a heading by accident.
 CREATE TABLE public.site_sections (
@@ -92,7 +92,7 @@ CREATE TABLE public.site_sections (
 );
 -- RLS: public SELECT · admin write.
 
--- ── about_credits — About II ──────────────────────────────────────────────
+-- ── about_credits, About II ──────────────────────────────────────────────
 CREATE TABLE public.about_credits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   role text NOT NULL DEFAULT '',
@@ -102,7 +102,7 @@ CREATE TABLE public.about_credits (
 );
 -- RLS: public SELECT · admin write.
 
--- ── music_releases — Music IV (primary) ───────────────────────────────────
+-- ── music_releases, Music IV (primary) ───────────────────────────────────
 -- Read by lib/loaders/music.ts. Shallow tree: albums have no parent, tracks
 -- point at one. Only rows whose platform_link yields a YouTube id can be
 -- embedded; Spotify/Apple rows are stored but dropped at the fetch layer.
@@ -121,9 +121,9 @@ CREATE TABLE public.music_releases (
 );
 -- RLS: public SELECT · admin write.
 
--- ── music_links — Music IV (fallback) ─────────────────────────────────────
+-- ── music_links, Music IV (fallback) ─────────────────────────────────────
 -- The older YouTube-only table. loadMusic() reads it only when
--- music_releases is empty — which is no longer the case. As of 2026-06-10
+-- music_releases is empty, which is no longer the case. As of 2026-06-10
 -- music_releases holds twelve real tracks and this table holds nothing, so
 -- the fallback path is dead code in practice. (Earlier notes had this the
 -- other way round.)
@@ -137,7 +137,7 @@ CREATE TABLE public.music_links (
 );
 -- RLS: public SELECT · admin write.
 
--- ── merch_products — Store VI ─────────────────────────────────────────────
+-- ── merch_products, Store VI ─────────────────────────────────────────────
 -- `meta` is the material line under the product name.
 CREATE TABLE public.merch_products (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -150,7 +150,7 @@ CREATE TABLE public.merch_products (
 );
 -- RLS: public SELECT · admin write. Only active = true is rendered.
 
--- ── merch_product_images — extra shots per product ────────────────────────
+-- ── merch_product_images, extra shots per product ────────────────────────
 -- Managed inline from the Store tab. The clock renders only the parent's
 -- image_url; these back the legacy store's carousel.
 CREATE TABLE public.merch_product_images (
@@ -163,7 +163,7 @@ CREATE TABLE public.merch_product_images (
 );
 -- RLS: public SELECT · admin write.
 
--- ── music_products — Digital VII ──────────────────────────────────────────
+-- ── music_products, Digital VII ──────────────────────────────────────────
 -- Paid downloads. Only preview_audio_url reaches the browser; audio_url is
 -- the file being sold and is released by the secure-download function.
 CREATE TABLE public.music_products (
@@ -180,7 +180,7 @@ CREATE TABLE public.music_products (
 );
 -- RLS: public SELECT · admin write.
 
--- ── events — Events VIII ──────────────────────────────────────────────────
+-- ── events, Events VIII ──────────────────────────────────────────────────
 -- Times are entered and displayed in America/New_York.
 CREATE TABLE public.events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -196,13 +196,13 @@ CREATE TABLE public.events (
 -- RLS: public SELECT **narrowed to published = true** · admins read all ·
 -- admin write. The site additionally filters date_time >= now().
 
--- ── gallery_items — Gallery IX ────────────────────────────────────────────
--- Every archive entry on the clock. `collection` is historical only — Gallery
+-- ── gallery_items, Gallery IX ────────────────────────────────────────────
+-- Every archive entry on the clock. `collection` is historical only, Gallery
 -- renders all rows regardless. Rows with no image_url are invisible.
 --
 -- image_url carries two different things: image URLs, and Instagram post /
 -- reel permalinks for appearances that were only ever posted there.
--- lib/loaders/gallery.ts sorts them — images to the photo grid, permalinks to
+-- lib/loaders/gallery.ts sorts them, images to the photo grid, permalinks to
 -- link cards. On the permalink rows `meta` is the marker string 'instagram'
 -- rather than a caption, left over from the legacy gallery keying its embed
 -- off it.
@@ -220,7 +220,7 @@ CREATE TABLE public.gallery_items (
 CREATE INDEX gallery_items_collection_idx ON public.gallery_items (collection, sort_order);
 -- RLS: public SELECT · admin write.
 
--- ── social_links — Contact X ──────────────────────────────────────────────
+-- ── social_links, Contact X ──────────────────────────────────────────────
 -- A NULL url is meaningful: it renders a greyed "· soon" chip, not a dead link.
 CREATE TABLE public.social_links (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -231,7 +231,7 @@ CREATE TABLE public.social_links (
 );
 -- RLS: public SELECT · admin write.
 
--- ── press_features — Press XI ─────────────────────────────────────────────
+-- ── press_features, Press XI ─────────────────────────────────────────────
 CREATE TABLE public.press_features (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   outlet text NOT NULL,
@@ -245,7 +245,7 @@ CREATE TABLE public.press_features (
 -- RLS: public SELECT narrowed to published = true · admins read all ·
 -- admin write. Rows without a url are dropped at the fetch layer.
 
--- ── blog_posts — Journal I ────────────────────────────────────────────────
+-- ── blog_posts, Journal I ────────────────────────────────────────────────
 -- NOTE: `date` is TEXT, not a date type. Seeded rows use '2026.02.27'; the
 -- admin's date input produces '2026-02-27'. lib/loaders/blog.ts normalises
 -- both and passes anything else through untouched.
@@ -269,7 +269,7 @@ CREATE TABLE public.blog_posts (
 -- NOT RENDERED PUBLICLY
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- ── contact_submissions — the Contact form's inbox ────────────────────────
+-- ── contact_submissions, the Contact form's inbox ────────────────────────
 CREATE TABLE public.contact_submissions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
@@ -282,7 +282,7 @@ CREATE TABLE public.contact_submissions (
 -- RLS: anon+authenticated INSERT (that is how the form posts) ·
 -- SELECT/UPDATE/DELETE admin only. Nothing is readable back from the browser.
 
--- ── outreach_logs — internal PR pipeline ──────────────────────────────────
+-- ── outreach_logs, internal PR pipeline ──────────────────────────────────
 CREATE TABLE public.outreach_logs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   contact_name text NOT NULL,
@@ -294,7 +294,7 @@ CREATE TABLE public.outreach_logs (
 );
 -- RLS: admin only, all operations. Never public.
 
--- ── purchases — written by the Stripe webhook ─────────────────────────────
+-- ── purchases, written by the Stripe webhook ─────────────────────────────
 CREATE TABLE public.purchases (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL,
@@ -306,10 +306,10 @@ CREATE TABLE public.purchases (
   created_at timestamptz DEFAULT now()
 );
 -- RLS: admin SELECT · unrestricted INSERT (the webhook).
--- ⚠️ No admin UPDATE or DELETE policy exists — the admin treats this as
+-- ⚠️ No admin UPDATE or DELETE policy exists, the admin treats this as
 -- read-only, because offering those buttons would only produce failures.
 
--- ── download_tokens — post-purchase delivery ──────────────────────────────
+-- ── download_tokens, post-purchase delivery ──────────────────────────────
 CREATE TABLE public.download_tokens (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   purchase_id uuid NOT NULL REFERENCES public.purchases(id),
@@ -323,7 +323,7 @@ CREATE TABLE public.download_tokens (
 -- RLS: anon may read/insert/update (the token itself is the secret) ·
 -- admins read all.
 
--- ── social_embeds — legacy embed URLs, unused by the clock ────────────────
+-- ── social_embeds, legacy embed URLs, unused by the clock ────────────────
 CREATE TABLE public.social_embeds (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   embed_type text NOT NULL DEFAULT 'instagram',  -- 'instagram' | 'youtube'
@@ -368,19 +368,19 @@ CREATE FUNCTION public.record_page_view(p_page text, p_session text) RETURNS voi
 --   music-files   public = true   audio: full tracks and preview clips
 --
 -- ⚠️ BOTH BUCKETS ARE PUBLIC. music-files does not withhold a paid track from
--- anyone holding its URL — secure-download issues tokens, but the bucket does
+-- anyone holding its URL, secure-download issues tokens, but the bucket does
 -- not check them. The site never renders audio_url, so the URLs are not
 -- discoverable from the page, but that is obscurity, not access control.
 --
 -- Storage RLS: public SELECT on both · admin-only INSERT/UPDATE/DELETE.
 --
 -- next.config.ts allows *.supabase.co/storage/v1/object/public/** through
--- next/image. Signed URLs (/object/sign/) are NOT allowed and would throw —
+-- next/image. Signed URLs (/object/sign/) are NOT allowed and would throw,
 -- lib/loaders/images.ts drops them at the fetch layer.
 
 
 -- ═══════════════════════════════════════════════════════════════════════════
--- EDGE FUNCTIONS — deployed from the LEGACY repo, not this one
+-- EDGE FUNCTIONS, deployed from the LEGACY repo, not this one
 -- ═══════════════════════════════════════════════════════════════════════════
 --
 --   admin-auth               verifies the JWT and checks the admin role with

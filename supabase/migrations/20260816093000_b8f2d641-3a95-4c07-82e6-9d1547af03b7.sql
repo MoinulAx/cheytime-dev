@@ -1,6 +1,6 @@
 -- The two client videos, on Upcoming (I).
 --
--- They were added to Music (IV) — the catalogue hour — which is where videos
+-- They were added to Music (IV), the catalogue hour, which is where videos
 -- normally live, but the ask is for them on the announcements hour. Music
 -- keeps its copies; a video can legitimately be both a release and an
 -- announcement, and removing them from IV would be deleting content nobody
@@ -9,7 +9,7 @@
 -- Titles are blank again, for the reason they were blank the first time:
 -- youtube.com is unreachable from the build environment, so the names are not
 -- known here, and a wrong name over a real song is worse than no name. A row
--- with a video and no title renders as the video plus its status — which is a
+-- with a video and no title renders as the video plus its status, which is a
 -- complete announcement card.
 --
 -- The existing "Orange Peel" row is left exactly as it is. If one of these

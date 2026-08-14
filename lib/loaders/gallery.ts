@@ -25,7 +25,7 @@ function aspectOf(value: string | null): GalleryImage["aspect"] {
 /**
  * Describe an off-site archive URL, or `undefined` if it is not usable.
  *
- * Only https is accepted — anything else is a typo or a stale value, and a
+ * Only https is accepted, anything else is a typo or a stale value, and a
  * dead card is worse than a dropped row. Instagram is named explicitly because
  * that is what the archive actually holds and because `/p/` and `/reel/` say
  * what the link opens; everything else falls back to its hostname, so a
@@ -51,7 +51,7 @@ function describeLink(raw: string): Omit<GalleryLink, "title" | "meta"> | undefi
       kind: segment === "reel" ? "Reel" : segment === "p" ? "Post" : undefined,
       // Instagram's own embed view, as the legacy gallery used. Built from the
       // path rather than the raw URL so the share tracking parameter
-      // (`?igsh=…`) is dropped — it is not part of the embed route. The legacy
+      // (`?igsh=…`) is dropped, it is not part of the embed route. The legacy
       // version always used `/p/`, even for reels; keeping the real segment is
       // the same idea done correctly.
       embedUrl: embeddable
@@ -64,16 +64,16 @@ function describeLink(raw: string): Omit<GalleryLink, "title" | "meta"> | undefi
 }
 
 /**
- * Gallery (IX) — every archive entry, from `gallery_items`.
+ * Gallery (IX), every archive entry, from `gallery_items`.
  *
  * There used to be four views of this one table: chapters on III, V and IX,
  * plus a grid inside Contact. They were the same photographs sliced up, so
- * they are now a single section and there is no `collection` filter — the
+ * they are now a single section and there is no `collection` filter, the
  * column still exists but nothing reads it.
  *
  * The table mixes two kinds of row under one `image_url` column: photographs,
  * and Instagram permalinks for appearances that were only ever posted there.
- * Both are sorted here rather than in the renderer — the grid only knows how
+ * Both are sorted here rather than in the renderer, the grid only knows how
  * to draw a photograph, and an off-allowlist src would throw during render and
  * take the whole page with it. A permalink now becomes a link card instead of
  * being dropped, which is how seven rows went missing from the page.
@@ -98,7 +98,7 @@ export async function loadGallery(fallback: GalleryData): Promise<GalleryData> {
       // else falls through to the link branch rather than being discarded.
       const isImageRow = !row.media_type || row.media_type === "image";
       const src = isImageRow ? renderableImage(raw) : undefined;
-      const title = text(row.alt) ?? "Chey — photograph";
+      const title = text(row.alt) ?? "Photograph of Chey";
       const meta = text(row.meta);
 
       if (src) {
@@ -109,7 +109,7 @@ export async function loadGallery(fallback: GalleryData): Promise<GalleryData> {
       const described = describeLink(raw);
       if (!described) continue;
 
-      // On these rows `meta` is a type marker ("instagram"), not a caption —
+      // On these rows `meta` is a type marker ("instagram"), not a caption,
       // the legacy gallery keyed its embed off it. Passing it straight
       // through renders "Instagram · Reel · Instagram", so drop it when it
       // only repeats the platform we already derived from the URL.

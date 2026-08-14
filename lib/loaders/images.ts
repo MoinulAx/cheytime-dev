@@ -3,7 +3,7 @@
  *
  * ── WHY THIS EXISTS ──────────────────────────────────────────────────────
  * `next/image` throws when given a src whose host is not configured, and that
- * throw happens during render — so one bad row in the CMS takes down the whole
+ * throw happens during render, so one bad row in the CMS takes down the whole
  * page, not just its own panel. Content editors can paste any URL, so this is
  * a matter of when, not if.
  *
@@ -15,7 +15,7 @@
  */
 const ALLOWED_EXACT = new Set(["i.ytimg.com", "img.youtube.com"]);
 
-/** Supabase Storage — only the public object path is served. */
+/** Supabase Storage, only the public object path is served. */
 const SUPABASE_HOST = /\.supabase\.co$/;
 const SUPABASE_PUBLIC_PATH = "/storage/v1/object/public/";
 
@@ -24,12 +24,12 @@ const SUPABASE_PUBLIC_PATH = "/storage/v1/object/public/";
  *
  * "Relative paths are served by this app" was assumed rather than checked, and
  * it stopped being true the moment a commit deleted three files that six
- * database rows still pointed at — a broken hero on Journal, Events and
+ * database rows still pointed at, a broken hero on Journal, Events and
  * Contact, plus three dead tiles in the archive, all from one deletion. The
  * URL shape was still valid, so nothing upstream could catch it.
  *
- * **Fails open.** If `public/` cannot be read at all — a runtime where the
- * directory is served by a CDN rather than sitting on the function's disk —
+ * **Fails open.** If `public/` cannot be read at all, a runtime where the
+ * directory is served by a CDN rather than sitting on the function's disk,
  * we must not conclude the files are missing, or every local image on the site
  * would disappear at once. That is far worse than the handful this catches. So
  * a missing *directory* means "cannot judge, allow"; only a readable directory
@@ -55,7 +55,7 @@ function publicFileExists(pathname: string): boolean {
       verdict = fs.existsSync(path.join(root, pathname.replace(/^\//, "")));
     }
   } catch {
-    // No filesystem here (edge runtime, bundling). Cannot judge — allow.
+    // No filesystem here (edge runtime, bundling). Cannot judge, allow.
     verdict = true;
   }
 
@@ -66,7 +66,7 @@ function publicFileExists(pathname: string): boolean {
 /**
  * `true` when `next/image` can render this URL without throwing.
  *
- * Relative paths (`/assets/...`) are served by this app — but only if the file
+ * Relative paths (`/assets/...`) are served by this app, but only if the file
  * is still there; see {@link publicFileExists}.
  */
 export function isRenderableImage(url: string | undefined): url is string {

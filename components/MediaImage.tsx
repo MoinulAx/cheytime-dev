@@ -13,7 +13,7 @@ import { useState } from "react";
  *
  * `quality` is raised from Next's default of 75. These are dark, low-contrast
  * photographs, and JPEG artefacts in shadow are exactly what "blurry" looks
- * like on this palette — the extra weight is worth it on a handful of images.
+ * like on this palette, the extra weight is worth it on a handful of images.
  *
  * Not a blur-up placeholder: that needs a base64 `blurDataURL` per image, and
  * these come from a CMS where nobody is going to generate one.
@@ -23,7 +23,7 @@ export default function MediaImage({
   quality = 90,
   onLoad,
   onError,
-  // Destructured rather than left in the spread so the a11y lint can see it —
+  // Destructured rather than left in the spread so the a11y lint can see it,
   // and so a missing alt is a type error here rather than a silent omission.
   alt,
   ...props

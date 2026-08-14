@@ -73,14 +73,14 @@ function parseStored(raw: string | null): CartItem[] {
  * The basket, kept in localStorage.
  *
  * The legacy cart lived in memory, so a reload emptied it. This survives one,
- * which is what the checkout-cancelled page promises — Stripe takes the buyer
+ * which is what the checkout-cancelled page promises, Stripe takes the buyer
  * off-site, and coming back to an empty basket after deciding not to pay is a
  * bad way to lose a sale.
  *
  * Nothing here is trusted for pricing. Prices are carried for display only;
  * `create-checkout-session` builds the Stripe line items from what it is sent,
  * and a real price check belongs there rather than in a browser store anyone
- * can edit. Worth closing before this takes live payments — see HANDOFF.
+ * can edit. Worth closing before this takes live payments, see HANDOFF.
  */
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);

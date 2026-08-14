@@ -10,7 +10,7 @@ import Link from "next/link";
  * Always the same control in the same place, so going back never requires
  * finding a different affordance at a different depth. A `<Link>` rather than
  * `router.back()` because the destination has to be the level above, not
- * whatever the browser happened to visit last — arriving from a shared link
+ * whatever the browser happened to visit last, arriving from a shared link
  * should still walk up the stack, not out of the site.
  */
 export default function BackStack({

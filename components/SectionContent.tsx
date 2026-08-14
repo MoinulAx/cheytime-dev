@@ -110,8 +110,8 @@ export function GalleryBlock({
         Masonry, as the original site had it: CSS multi-column with
         `break-inside-avoid` on each tile. Columns rather than grid because
         photographs here are three different shapes and a grid would either
-        force one shape on all of them — which is what made the archive look
-        flat and soft — or leave ragged holes.
+        force one shape on all of them, which is what made the archive look
+        flat and soft, or leave ragged holes.
 
         The panel gets two columns at most; it is 600-920px wide and three
         would put each photograph below thumbnail size.
@@ -169,7 +169,7 @@ export function GalleryBlock({
         page went full-bleed: an Instagram embed stretched across 1900px
         renders its card adrift in a sea of white and clips its own content.
         Instagram's embed is happiest between about 326 and 540px, which is
-        almost exactly a masonry column — so it goes in the column, as the
+        almost exactly a masonry column, so it goes in the column, as the
         legacy gallery had it.
       */}
       {shownLinks && shownLinks.length > 0 && (
@@ -178,7 +178,7 @@ export function GalleryBlock({
             <p className="eyebrow border-b border-bone-100/10 pb-2">Elsewhere</p>
           </Item>
           {/* Column count tuned so each embed lands in Instagram's comfortable
-              range (roughly 326-540px) at every width — too narrow and it
+              range (roughly 326-540px) at every width, too narrow and it
               clips its own card, too wide and it floats in white. */}
           <div className="mt-5 columns-1 gap-4 min-[560px]:columns-2 lg:columns-3 2xl:columns-4 min-[2200px]:columns-5 md:gap-6">
             {shownLinks.map((link) => {
@@ -187,7 +187,7 @@ export function GalleryBlock({
                 .join(" · ");
 
               // Embeddable entries get the source's own player, as the legacy
-              // gallery did. Everything else stays a link card — the only
+              // gallery did. Everything else stays a link card, the only
               // treatment available when there is nothing to embed.
               if (!link.embedUrl) {
                 return (
@@ -231,7 +231,7 @@ export function GalleryBlock({
                     </span>
                   </div>
                   {/* Instagram's embed renders its own white card, so the
-                      container is light on purpose — a dark frame around it
+                      container is light on purpose, a dark frame around it
                       reads as a rendering fault rather than a choice.
                       `overflow-hidden` clips the embed's own horizontal
                       scrollbar, which is what pushed the card past the right
@@ -306,8 +306,8 @@ const HINT_RATIO: Record<NonNullable<GalleryImage["aspect"]>, number> = {
 /**
  * One photograph in the masonry.
  *
- * The frame starts at the row's declared shape — which reserves height, so
- * nothing reflows as the archive streams in — and then adopts the image's
+ * The frame starts at the row's declared shape, which reserves height, so
+ * nothing reflows as the archive streams in, and then adopts the image's
  * true ratio the moment it decodes. That is what stops photographs being
  * cropped: `object-cover` only ever crops when the frame disagrees with the
  * picture, and after load it never does.
@@ -483,14 +483,14 @@ export function MusicBlock({
           rel="noopener noreferrer"
           className="btn-editorial"
         >
-          Subscribe — {channelLabel}
+          Subscribe on {channelLabel}
         </a>
       </Item>
       <div className="mt-7 space-y-8">
         {shownVideos.map((v, i) => (
           <Item key={v.id}>
             <div className="mb-2 flex items-baseline justify-between border-b border-bone-100/10 pb-2">
-              {/* A row can legitimately have no title yet — a video added
+              {/* A row can legitimately have no title yet, a video added
                   before anyone typed its name. The number carries the row on
                   its own; inventing a title would be worse than showing none. */}
               <p className="font-sans text-sm text-bone-100">
@@ -669,7 +669,7 @@ function EventsBlock({
         <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
           {emptyMessage}
         </p>
-        {/* No "placeholder — no dates confirmed" line here. It was a note to
+        {/* No "placeholder, no dates confirmed" line here. It was a note to
             ourselves about the seed data and it was rendering to visitors,
             telling them the section is unfinished rather than that there is
             nothing on the calendar yet. `emptyMessage` already says that, and
@@ -743,7 +743,7 @@ function BlogBlock({
       )}
       <div className="mt-6 divide-y divide-bone-100/10 border-y border-bone-100/10">
         {posts.map((post) => {
-          // Only a link when the post actually points somewhere — this site
+          // Only a link when the post actually points somewhere, this site
           // has no per-post route, so a bare title must not look clickable.
           const Title = post.url ? "a" : "h3";
           return (
@@ -782,7 +782,7 @@ function BlogBlock({
       </div>
 
       {/* Out of the panel and into the stack. The drawer is a preview by
-          design — a dispatch is longer than this column can hold without
+          design, a dispatch is longer than this column can hold without
           becoming a scroll tunnel, so the full text lives at /journal. */}
       <Item>
         <Link href="/journal" className="btn-editorial mt-6">
@@ -796,14 +796,14 @@ function BlogBlock({
 /* ── UPCOMING ─────────────────────────────────────────────────────────── */
 
 /**
- * Upcoming (I) — what is next.
+ * Upcoming (I), what is next.
  *
  * The first entry gets the poster at full width and the rest run as a list.
  * An announcement hour with six equal tiles announces nothing; the lead
  * release is the message, and the others are context.
  *
  * Everything below the title is optional. A row can be a title and a status
- * and still be worth showing — that is what an announcement is before the
+ * and still be worth showing, that is what an announcement is before the
  * artwork and the link exist.
  */
 function UpcomingBlock({
@@ -827,7 +827,7 @@ function UpcomingBlock({
   }
 
   // Split rather than one mixed list. "Upcoming" that opens on something
-  // released last spring is not an announcement hour, it is a feed — and the
+  // released last spring is not an announcement hour, it is a feed, and the
   // one thing a visitor is here for, what is next, was buried among things
   // that already happened. Order within each group is still the admin's.
   const ahead = releases.filter((r) => !r.released);
@@ -851,13 +851,13 @@ function UpcomingBlock({
         </Item>
       )}
 
-      {/* Lead release — its video if it has one, otherwise its poster. */}
+      {/* Lead release, its video if it has one, otherwise its poster. */}
       <Item>
         <article className="mt-6 border border-bone-100/10">
           <LeadMedia release={lead} />
           <div className="p-5">
             <Badge label={lead.statusLabel} released={lead.released} />
-            {/* An untitled row is a real state — a video added before anyone
+            {/* An untitled row is a real state, a video added before anyone
                 typed its name. The badge, date and video carry the card;
                 printing an empty heading would just leave a gap. */}
             {lead.title && (
@@ -925,7 +925,7 @@ function LeadMedia({ release }: { release: UpcomingRelease }) {
       <div className="relative aspect-[4/5] w-full overflow-hidden border-b border-bone-100/10 bg-void-800 sm:aspect-[16/10]">
         <MediaImage
           src={release.artwork}
-          alt={`${release.title} — artwork`}
+          alt={`Artwork for ${release.title}`}
           fill
           sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
           className="object-cover"
@@ -941,7 +941,7 @@ function LeadMedia({ release }: { release: UpcomingRelease }) {
  * The rows under the lead.
  *
  * A row with a video gets a player, not a thumbnail. This hour exists to show
- * what is coming, and a teaser reduced to a 64px still is not showing it —
+ * what is coming, and a teaser reduced to a 64px still is not showing it,
  * `LiteYouTube` only loads a poster frame until someone presses play, so a
  * handful of them costs one image each.
  */
@@ -1058,7 +1058,7 @@ function Badge({ label, released }: { label: string; released: boolean }) {
 /* ── ALBUM ────────────────────────────────────────────────────────────── */
 
 /**
- * Album (III) — the record, playable in full.
+ * Album (III), the record, playable in full.
  *
  * One native `<audio>` per track rather than a custom transport. A bespoke
  * player would have to re-earn keyboard control, screen-reader labelling,
@@ -1162,7 +1162,7 @@ function AlbumBlock({
                           controls
                           preload="none"
                           src={track.audioUrl}
-                          aria-label={`${track.title} — ${album.title}`}
+                          aria-label={`${track.title}, from ${album.title}`}
                           className="mt-3 w-full"
                         />
                       ) : (
@@ -1251,7 +1251,7 @@ function DigitalBlock({
                     </p>
                   )}
                 </div>
-                {/* No price, no Add. Digital is preview-only — the tracks are
+                {/* No price, no Add. Digital is preview-only, the tracks are
                     here to be heard, not sold. `music_products.price` is still
                     read by the loader and still editable in the admin, so
                     turning sales back on is a UI change, not a data migration. */}
@@ -1260,7 +1260,7 @@ function DigitalBlock({
                 <div className="border-t border-bone-100/10 px-4 py-3">
                   <p className="eyebrow mb-2">Preview</p>
                   {/* Still the preview clip, not the master. `audio_url` stays
-                      server-side — full files belong on the Album hour (III),
+                      server-side, full files belong on the Album hour (III),
                       where they are uploaded deliberately for streaming. */}
                   <audio
                     controls
@@ -1420,7 +1420,7 @@ function ContactBlock({
     if (Object.keys(next).length > 0) return;
 
     // Lands in `contact_submissions`, which the legacy Admin panel reads.
-    // RLS grants anon INSERT only — nothing is readable back from the browser.
+    // RLS grants anon INSERT only, nothing is readable back from the browser.
     setSending(true);
     setFailed(false);
     const { error } = await createSupabaseClient()
@@ -1459,7 +1459,7 @@ function ContactBlock({
       <Item>
         {sent ? (
           <div className="mt-6 border-y border-bone-100/20 py-6">
-            <p className="eyebrow">Transmission received</p>
+            <p className="eyebrow">Message sent</p>
             <p className="mt-2 font-display text-xl italic text-bone-50">Thank you.</p>
             <p className="mt-1 font-sans text-sm text-bone-300/80">{sla}</p>
           </div>
@@ -1504,7 +1504,7 @@ function ContactBlock({
             </div>
             {failed && (
               <p className="font-sans text-[11px] text-cosmic-400">
-                Transmission failed — please try again, or email {email} directly.
+                That didn&apos;t send. Try again, or email {email} directly.
               </p>
             )}
             <button
@@ -1512,7 +1512,7 @@ function ContactBlock({
               disabled={sending}
               className="btn-editorial mt-2 disabled:opacity-50"
             >
-              {sending ? "Sending…" : "Send Transmission →"}
+              {sending ? "Sending…" : "Send Message →"}
             </button>
           </form>
         )}

@@ -7,7 +7,7 @@
 -- off to the left". Until now the only fix was replacing the photograph.
 --
 -- `SectionImage.position` already existed in the type and was already applied
--- by the renderer — nothing ever populated it. This is the column that does.
+-- by the renderer, nothing ever populated it. This is the column that does.
 --
 -- Safe to re-run.
 

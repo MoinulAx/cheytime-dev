@@ -10,7 +10,7 @@ import { getSections } from "@/lib/sections";
 export const revalidate = 60;
 
 /**
- * Home — the entire experience is the clock. This server component resolves the
+ * Home, the entire experience is the clock. This server component resolves the
  * live section content, renders the static cosmic backdrop and mounts the
  * client-only interactive clock, keeping everything but the interaction
  * server-rendered.

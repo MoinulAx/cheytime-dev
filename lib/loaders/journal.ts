@@ -40,7 +40,7 @@ function toEntry(row: {
   };
 }
 
-/** Every post, newest first. Empty when unreachable — never invented. */
+/** Every post, newest first. Empty when unreachable, never invented. */
 export async function loadJournalEntries(): Promise<JournalEntry[]> {
   const entries = await withSupabase("loadJournalEntries", async (db) => {
     const { data, error } = await db
@@ -60,7 +60,7 @@ export async function loadJournalEntries(): Promise<JournalEntry[]> {
 }
 
 /**
- * One post by slug, or `null` when it does not exist — which the page turns
+ * One post by slug, or `null` when it does not exist, which the page turns
  * into a 404 rather than an empty article.
  *
  * The body is split on blank lines into paragraphs. `blog_posts.body` is plain

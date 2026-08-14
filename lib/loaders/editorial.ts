@@ -8,7 +8,7 @@ type AboutData = Extract<SectionData, { kind: "about" }>;
 type ContactData = Extract<SectionData, { kind: "contact" }>;
 type MusicData = Extract<SectionData, { kind: "music" }>;
 
-/** Home (XII) — copy and the data strip, all from `site_settings`. */
+/** Home (XII), copy and the data strip, all from `site_settings`. */
 /**
  * The production logo, when one has been uploaded.
  *
@@ -50,7 +50,7 @@ export function applyHome(fallback: HomeData, s: SiteSettings): HomeData {
 }
 
 /**
- * About (II) — copy from `site_settings`, credits from `about_credits`.
+ * About (II), copy from `site_settings`, credits from `about_credits`.
  *
  * The bio is stored as one block and split on blank lines, so the client edits
  * it in a single textarea instead of managing numbered paragraph rows.
@@ -90,7 +90,7 @@ export async function loadAbout(
   };
 }
 
-/** Music (IV) — the channel strings; videos come from `loadMusic`. */
+/** Music (IV), the channel strings; videos come from `loadMusic`. */
 export function applyMusicChannel(
   data: MusicData,
   s: SiteSettings,
@@ -103,7 +103,7 @@ export function applyMusicChannel(
 }
 
 /**
- * Contact (X) — address and channel list.
+ * Contact (X), address and channel list.
  *
  * No photographs here any more: the grid that used to sit in this panel was a
  * fourth view of `gallery_items`, and the Gallery section owns them now.
@@ -122,7 +122,7 @@ export async function applyContact(
 
     return (rows ?? []).flatMap((row) => {
       const label = text(row.label);
-      // A null url is meaningful — it renders as a "· soon" chip.
+      // A null url is meaningful, it renders as a "· soon" chip.
       return label ? [{ label, url: text(row.url) ?? null }] : [];
     }) as SocialLink[];
   });

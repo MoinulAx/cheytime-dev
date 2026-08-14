@@ -25,7 +25,7 @@ const CLOCK_FIT = 0.9;
  * How the clock stage should move when the panel opens on desktop.
  *
  * Shifting by `-panelWidth / 2` re-centres the stage in the strip left of the
- * panel — the free space is `vw - panelWidth`, whose centre sits exactly that
+ * panel, the free space is `vw - panelWidth`, whose centre sits exactly that
  * far left of the viewport centre. Scale only shrinks when the dial would
  * otherwise be wider than the strip, so on roomy screens it stays large.
  */

@@ -38,11 +38,11 @@ export function formatDateLabel(date: string | null): string {
 }
 
 /**
- * Blog (I) — live from `blog_posts`, newest first.
+ * Blog (I), live from `blog_posts`, newest first.
  *
  * The panel is a preview: title, date, excerpt. The full text lives at
  * `/journal/[slug]` (see `lib/loaders/journal.ts`), reached through the
- * panel's "See more" link, so `body` is deliberately not loaded here — it
+ * panel's "See more" link, so `body` is deliberately not loaded here, it
  * would ride along in the home page's payload for content nobody has asked to
  * read yet. `url` still points at an external article where one exists.
  */

@@ -4,7 +4,7 @@ import { text, withSupabase } from "./utils";
 type PressData = Extract<SectionData, { kind: "press" }>;
 
 /**
- * Coverage dates are a month and year at most — no clock involved, so format
+ * Coverage dates are a month and year at most, no clock involved, so format
  * in UTC. Parsing a bare `date` column in local time can roll it back a day.
  */
 const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
@@ -21,7 +21,7 @@ function formatDateLabel(date: string | null): string | undefined {
 }
 
 /**
- * Press (XI) — live from `press_features`, published rows only.
+ * Press (XI), live from `press_features`, published rows only.
  *
  * The affiliation list (SiriusXM, Live Nation) is editorial: those are logos on
  * the press kit with no article behind them, so they stay in the static config
@@ -39,7 +39,7 @@ export async function loadPress(fallback: PressData): Promise<PressData> {
 
     return (data ?? []).flatMap((row) => {
       const url = text(row.url);
-      // A feature with no link is just a logo — the affiliation list covers those.
+      // A feature with no link is just a logo, the affiliation list covers those.
       if (!url) return [];
       return [
         {

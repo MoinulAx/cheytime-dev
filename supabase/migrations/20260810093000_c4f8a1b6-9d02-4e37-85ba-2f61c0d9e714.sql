@@ -6,12 +6,12 @@
 -- tightened, and have had no photograph since.
 --
 -- Rather than reuse one of the four local portraits two or three times over,
--- these are drawn from `gallery_items` — real photographs the client has
+-- these are drawn from `gallery_items`, real photographs the client has
 -- already uploaded, of which there are far more than four.
 --
 -- The choice is deliberately mechanical: the first images in gallery order
 -- that are not already a section hero, one each, no duplicates. That is a
--- sensible default, not an editorial decision — whoever picks the *right*
+-- sensible default, not an editorial decision, whoever picks the *right*
 -- photograph should do it in the admin's Sections tab, which now takes one
 -- click per section.
 --

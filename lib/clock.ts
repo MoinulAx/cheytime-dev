@@ -11,7 +11,7 @@
 /** The shared SVG viewBox edge length for the hand + face. */
 export const VIEWBOX = 1000;
 
-/** The hand pivot in viewBox units — the centre of the stage. */
+/** The hand pivot in viewBox units, the centre of the stage. */
 export const PIVOT = { x: VIEWBOX / 2, y: VIEWBOX / 2 } as const;
 
 /**
@@ -36,7 +36,7 @@ export interface NumeralPosition {
 /**
  * Generate the twelve numeral positions on a ring using polar coordinates.
  * Returned as unit fractions [0..1] of the stage so the caller can multiply by
- * the measured pixel size — geometry stays perfect at any screen size.
+ * the measured pixel size, geometry stays perfect at any screen size.
  *
  * @param radius ring radius as a fraction of half the stage (0..1). 0.86 keeps
  *               numerals just inside the stage edge.
@@ -72,7 +72,7 @@ export const HAND_SPRING = {
 
 /**
  * Spring for a single deadbeat-seconds step. Stiff and light so each 6° tick
- * lands crisply with a faint recoil — the mechanical "tick" you feel more than
+ * lands crisply with a faint recoil, the mechanical "tick" you feel more than
  * you see. Must settle well inside one second or ticks pile up.
  */
 export const TICK_SPRING = {
@@ -85,5 +85,5 @@ export const TICK_SPRING = {
 /** Radius (viewBox units) of the outer minute track. */
 export const MINUTE_TRACK_R = 404;
 
-/** How far the seconds hand reaches — just past the minute track. */
+/** How far the seconds hand reaches, just past the minute track. */
 export const SECONDS_HAND_TIP = 108;

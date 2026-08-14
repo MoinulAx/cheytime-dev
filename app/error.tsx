@@ -6,7 +6,7 @@ import { useEffect } from "react";
  * Last-resort boundary.
  *
  * The loaders already degrade to static content on any Supabase failure, so
- * reaching this means something got past them — a bad value that only breaks
+ * reaching this means something got past them, a bad value that only breaks
  * at render. Better to show the brand and a way forward than React's blank
  * production error, and logging the digest here is what makes the server-side
  * stack findable in the hosting logs.
@@ -30,7 +30,7 @@ export default function Error({
           The clock stopped.
         </h1>
         <p className="mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
-          Something went wrong loading this page. Try again — if it keeps
+          Something went wrong loading this page. Try again, and if it keeps
           happening, the details are in the server logs.
         </p>
         <button type="button" onClick={reset} className="btn-editorial mt-6">

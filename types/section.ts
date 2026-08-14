@@ -2,7 +2,7 @@
  * Section type definitions for Chey's Time.
  *
  * The clock is driven entirely by the typed `Section[]` config in
- * `lib/sections.ts`. To add or change navigation you only edit that array —
+ * `lib/sections.ts`. To add or change navigation you only edit that array,
  * geometry, the arm, the numerals and the panel all read from it.
  */
 
@@ -52,7 +52,7 @@ export interface GalleryImage {
    *
    * Every image used to be forced into 16:9 regardless of its real shape,
    * which cropped portraits to a letterbox and upscaled small sources three
-   * times over — the single biggest cause of the archive looking soft.
+   * times over, the single biggest cause of the archive looking soft.
    */
   aspect?: "square" | "portrait" | "landscape";
 }
@@ -60,7 +60,7 @@ export interface GalleryImage {
 /**
  * An archive entry that lives off-site rather than being a photograph.
  *
- * `gallery_items.image_url` holds Instagram permalinks as well as images —
+ * `gallery_items.image_url` holds Instagram permalinks as well as images,
  * appearances and performances that were only ever posted there. They are not
  * images, so `next/image` cannot draw them and the loader used to drop them,
  * silently losing the row. Kept as links instead.
@@ -70,7 +70,7 @@ export interface GalleryLink {
   /** The row's caption, used as the link text. */
   title: string;
   meta?: string;
-  /** Recognised source, e.g. "Instagram" — falls back to the hostname. */
+  /** Recognised source, e.g. "Instagram", falls back to the hostname. */
   platform: string;
   /** What the link opens, when known: "Reel", "Post". */
   kind?: string;
@@ -145,7 +145,7 @@ export interface Fact {
   value: string;
 }
 
-/** A press feature — one piece of editorial coverage. */
+/** A press feature, one piece of editorial coverage. */
 export interface PressItem {
   id: string;
   /** Publication name, e.g. "BET". */
@@ -198,7 +198,7 @@ export interface JournalPost extends JournalEntry {
  * Unlike {@link DigitalRelease}, `audioUrl` here is the whole song, not an
  * excerpt. That is deliberate: the Album hour streams the record in full.
  * The file lives in the public `music-files` bucket, so anyone who reads the
- * page source can download it — which is the intent for this hour, but means
+ * page source can download it, which is the intent for this hour, but means
  * nothing paid should ever be pointed at it.
  */
 export interface AlbumTrack {
@@ -223,7 +223,7 @@ export interface AlbumRecord {
 }
 
 /**
- * An announced release — something that is coming, or has just landed.
+ * An announced release, something that is coming, or has just landed.
  *
  * Distinct from {@link MusicVideo} and {@link AlbumRecord}, which are both
  * catalogue and need the thing to exist before they can show it. This is the
@@ -235,7 +235,7 @@ export interface UpcomingRelease {
   title: string;
   /** Pre-formatted on the server. Absent when no date is confirmed. */
   dateLabel?: string;
-  /** "Coming soon" · "Pre-save" · "Out now" — derived from status and date. */
+  /** "Coming soon" · "Pre-save" · "Out now", derived from status and date. */
   statusLabel: string;
   /** True once it is out, so the card can lead rather than tease. */
   released: boolean;
@@ -243,7 +243,7 @@ export interface UpcomingRelease {
   artwork?: string;
   /**
    * YouTube id, when the announcement has a video rather than just a still.
-   * Takes priority over `artwork` — a teaser is the thing people click.
+   * Takes priority over `artwork`, a teaser is the thing people click.
    */
   youtubeId?: string;
   url?: string;
@@ -259,7 +259,7 @@ export interface DigitalRelease {
   price: number;
   description?: string;
   cover?: string;
-  /** Short preview clip — the only audio playable without buying. */
+  /** Short preview clip, the only audio playable without buying. */
   previewUrl?: string;
 }
 
@@ -285,7 +285,7 @@ export type SectionData =
       /**
        * Production credit mark shown beside the build credit in the footer.
        *
-       * Absent when no logo has been uploaded — the footer then renders the
+       * Absent when no logo has been uploaded, the footer then renders the
        * text credit alone rather than a gap or a broken image.
        */
       brandLogo?: { src: string; alt: string; url?: string };
@@ -333,7 +333,7 @@ export type SectionData =
       socials: SocialLink[];
       /**
        * Kept as an optional escape hatch, but the panel no longer renders a
-       * grid here — photographs live in the Gallery section, which is the one
+       * grid here, photographs live in the Gallery section, which is the one
        * place they come from. See CONTENT_MAP.md.
        */
       archive?: ArchiveItem[];
@@ -375,7 +375,7 @@ export interface Section {
   /** Position on the 12-hour dial (0 = XII at top, clockwise). */
   hourIndex: number;
   /**
-   * Arm rotation in degrees for this section. Single source of truth —
+   * Arm rotation in degrees for this section. Single source of truth,
    * derived once from `hourIndex` in `lib/sections.ts`, never re-declared
    * elsewhere.
    */

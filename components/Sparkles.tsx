@@ -1,9 +1,9 @@
 /**
- * Sparkles — twinkling stars layered over the background portrait to give the
+ * Sparkles, twinkling stars layered over the background portrait to give the
  * otherwise-static image a bit of living shimmer (the glowing hearts are
  * already baked into the photo, so none are drawn here). Positions, sizes and
  * animation delays are hardcoded (no Math.random) so the server and client
- * render identically — no hydration mismatch, no client JS. All motion is
+ * render identically, no hydration mismatch, no client JS. All motion is
  * paused under prefers-reduced-motion.
  */
 

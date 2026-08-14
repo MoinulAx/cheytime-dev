@@ -25,7 +25,7 @@ const TIME_FORMAT = new Intl.DateTimeFormat("en-US", {
 });
 
 /**
- * "Sat, Mar 14, 2026 — 8:00 PM". The label is built on the server and shipped
+ * "Sat, Mar 14, 2026, 8:00 PM". The label is built on the server and shipped
  * as a plain string, so the client never re-formats it and there is no
  * hydration mismatch. The em dash keeps it legible once the renderer joins it
  * to the venue with a middot.
@@ -33,15 +33,15 @@ const TIME_FORMAT = new Intl.DateTimeFormat("en-US", {
 function formatDateLabel(iso: string): string {
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) return "Date to be announced";
-  return `${DATE_FORMAT.format(at)} — ${TIME_FORMAT.format(at)}`;
+  return `${DATE_FORMAT.format(at)} at ${TIME_FORMAT.format(at)}`;
 }
 
 /**
- * Events (VIII) — live from `events`, published and upcoming only.
+ * Events (VIII), live from `events`, published and upcoming only.
  *
  * RLS already restricts anon reads to `published = true`; the explicit filter
  * mirrors the legacy `usePublishedEvents` hook and keeps the intent readable.
- * No rows means no shows booked — the section keeps its static empty state.
+ * No rows means no shows booked, the section keeps its static empty state.
  */
 export async function loadEvents(fallback: EventsData): Promise<EventsData> {
   const events = await withSupabase("loadEvents", async (db) => {

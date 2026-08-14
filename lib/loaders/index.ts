@@ -1,5 +1,5 @@
 /**
- * Server-side data loaders — one per DB-backed section.
+ * Server-side data loaders, one per DB-backed section.
  *
  * Every loader takes the section's static content as a fallback and returns the
  * exact `SectionData` variant the renderer already consumes. All adaptation

@@ -33,7 +33,7 @@ export default function CartView() {
         itemType: i.itemType,
       })),
     );
-    // Only reached on failure — success is a full navigation to Stripe.
+    // Only reached on failure, success is a full navigation to Stripe.
     setBusy(false);
     setError(result.error);
   };
@@ -187,7 +187,7 @@ function Line({
           />
         ) : (
           <span className="absolute inset-0 grid place-items-center font-display text-2xl italic text-bone-100/15">
-            {item.itemType === "music" ? "♪" : "—"}
+            {item.itemType === "music" ? "♪" : "◦"}
           </span>
         )}
       </div>

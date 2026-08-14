@@ -1,15 +1,15 @@
-# CheyTime — Migration & Discovery Report
+# CheyTime, Migration & Discovery Report
 
-> ## ⚠️ Superseded — do not use this file as a content source
+> ## ⚠️ Superseded, do not use this file as a content source
 >
 > This was the first-pass audit, and parts of it are wrong in a way that
 > caused real damage. **§3 presents invented copy as content quoted from the
-> legacy site** — "Architect of sound…", "Studio Null", the "mic captures the
+> legacy site**, "Architect of sound…", "Studio Null", the "mic captures the
 > exact frequency of the room" quote. None of it is Chey's. It was written
 > here, read back as if sourced, and shipped to the live site.
 >
 > The same pass invented two music titles ("Session III", "Session IV") and
-> mispaired two real ones — see §4, where the video ids are listed without the
+> mispaired two real ones, see §4, where the video ids are listed without the
 > titles that were later attached to them.
 >
 > For content, read **`CONTENT_MAP.md`**, and check anything naming Chey's
@@ -22,9 +22,9 @@
 **Date:** 2026-06-06
 **Author:** Discovery audit for the `cheytime-dev` rebuild
 **Sources audited:**
-1. Live site — https://cheytime.com/ (current production, JS-rendered SPA)
-2. Legacy repository — `/Users/moinulk/Documents/chey-music` (Vite + React + shadcn + Supabase, deployed to chey-music.netlify.app)
-3. Design / asset files — `chey-music/src/assets/*` and `chey-music/public/*` (no separate design folder exists)
+1. Live site, https://cheytime.com/ (current production, JS-rendered SPA)
+2. Legacy repository, `/Users/moinulk/Documents/chey-music` (Vite + React + shadcn + Supabase, deployed to chey-music.netlify.app)
+3. Design / asset files, `chey-music/src/assets/*` and `chey-music/public/*` (no separate design folder exists)
 
 > **Scope note from client:** Supabase is currently a *mock* and will be integrated later. For this rebuild, the legacy repo is the authoritative **content source**, and all content is hard-coded into a typed config (`lib/sections.ts`) structured so it can later be swapped for Supabase queries with no UI changes.
 
@@ -34,12 +34,12 @@
 
 There are **two brand identities** in the source material, and they conflict. This is the single most important finding.
 
-| Aspect | Legacy repo (`chey-music`) | Live site (`cheytime.com`) — **NEWER, canonical** |
+| Aspect | Legacy repo (`chey-music`) | Live site (`cheytime.com`), **NEWER, canonical** |
 |---|---|---|
 | Name | "CHEY MUSIC" | **"Chey Time"** / "Chey's Time" |
 | Positioning | "Architect of sound", "Raw / Uncut", "No Compromise" | **"Hip Hop's Princess"**, **Staten Island rapper** |
 | Tone | Brutalist, abrasive, "founded in refusal" | "relatable lyricism with upbeat, captivating production" |
-| Aesthetic | Light bone-white bg, black brutalism, radius 0, no shadows, pink accent | (rebrand — premium/regal implied) |
+| Aesthetic | Light bone-white bg, black brutalism, radius 0, no shadows, pink accent | (rebrand, premium/regal implied) |
 
 **Decision:** Adopt the **live-site brand** (`Chey Time` / "Hip Hop's Princess" / Staten Island) as canonical identity, and the **rebuild brief's aesthetic** (luxury, cinematic, dark, premium, mysterious; diamond/silver numerals; deep-black + purple-cosmic; the "Chey's Time" interactive clock). Legacy *copy* (manifesto, track names, merch, credits) is migrated where it fits the elevated tone; the legacy *visual language* (brutalist light theme) is **not** carried over.
 
@@ -50,36 +50,36 @@ There are **two brand identities** in the source material, and they conflict. Th
 | Route | Page | Migrates to clock section |
 |---|---|---|
 | `/` | Index (hero) | **XII → Home** |
-| `/about` | About — "The Manifesto" | **II → About** |
-| `/music` | Music — "The Sound" | **IV → Music** |
-| `/merch` | Merch — "The Objects" | **VI → Store** |
-| `/events` | Events — "Upcoming" | **VIII → Events** |
-| `/contact` | Contact — "Get in Touch" | **X → Contact / Archive** |
-| `/gallery` | Gallery — "The Archive" | folded into **X** (Archive) |
-| `/blog`, `/blog/:slug` | Blog / BlogPost | optional — folded into About/Archive as journal entries |
-| `/portfolio` | Portfolio | legacy/unused — not migrated |
+| `/about` | About, "The Manifesto" | **II → About** |
+| `/music` | Music, "The Sound" | **IV → Music** |
+| `/merch` | Merch, "The Objects" | **VI → Store** |
+| `/events` | Events, "Upcoming" | **VIII → Events** |
+| `/contact` | Contact, "Get in Touch" | **X → Contact / Archive** |
+| `/gallery` | Gallery, "The Archive" | folded into **X** (Archive) |
+| `/blog`, `/blog/:slug` | Blog / BlogPost | optional, folded into About/Archive as journal entries |
+| `/portfolio` | Portfolio | legacy/unused, not migrated |
 | `/admin` | Admin CMS (Supabase) | out of scope (mock Supabase, later) |
 
 ---
 
 ## 3. Existing Content (verbatim, migratable)
 
-### Artist bio / descriptor (from live site `<meta>` — canonical)
-> "Chey Time — Hip Hop's Princess. Staten Island rapper blending relatable lyricism with upbeat, captivating production. Stream music, shop merch, and catch live events."
+### Artist bio / descriptor (from live site `<meta>`, canonical)
+> "Chey Time, Hip Hop's Princess. Staten Island rapper blending relatable lyricism with upbeat, captivating production. Stream music, shop merch, and catch live events."
 
 ### About / Manifesto (legacy copy)
 - "Chey. Architect of sound. Blending raw lyricism with heavy, uncompromising production."
 - "Chey Music was born from a rejection of the polished and predictable…"
 - Quote: *"The mic captures the exact frequency of the room. The imperfections are intentional."*
-- Credits: Artist — Chey · Visuals — Studio Null · Production — Chey · Direction — Chey · Web — rummspace
+- Credits: Artist, Chey · Visuals, Studio Null · Production, Chey · Direction, Chey · Web, rummspace
 
 ### Hero copy (legacy)
-- "Raw Sound — No Compromise" · "2026 — The Frequency"
+- "Raw Sound, No Compromise" · "2026, The Frequency"
 - Quote: *"The raw vocal is the final architecture. No overwriting, no polishing the edges to make them comfortable."*
-- Data strip: Based — Worldwide · Genre — Raw / Uncut · Latest — "Poppin' — 2026" · Direction — Chey
+- Data strip: Based, Worldwide · Genre, Raw / Uncut · Latest, "Poppin', 2026" · Direction, Chey
 
 ### Blog / journal posts (3, with full bodies)
-1. **Off the Dome: The Freestyle Tapes** (2026.02.27) — "Poppin'" & "Long Kiss Goodnight" recorded in single takes.
+1. **Off the Dome: The Freestyle Tapes** (2026.02.27), "Poppin'" & "Long Kiss Goodnight" recorded in single takes.
 2. **The Live Room: No Backing Tracks** (2026.02.25)
 3. **'Absence' Visual Identity & Merch** (2026.02.10)
 
@@ -96,7 +96,7 @@ There are **two brand identities** in the source material, and they conflict. Th
 
 | Product | Price | Material |
 |---|---|---|
-| Construct Tee — Black | $65 | Cotton 220gsm |
+| Construct Tee, Black | $65 | Cotton 220gsm |
 | Volume VII Hoodie | $120 | French Terry 350gsm |
 | Scaffold Cap | $45 | Washed Canvas |
 | Absence Longsleeve | $75 | Cotton 200gsm |
@@ -106,24 +106,24 @@ There are **two brand identities** in the source material, and they conflict. Th
 > Checkout was Stripe via a Supabase Edge Function (`create-checkout-session`). Out of scope now; Store renders products + "Add to cart" stub.
 
 ## 6. Existing Contact Information
-- **Email:** `contact@cheymusic.com` (legacy) — *flagged for client confirmation; may need a `@cheytime.com` address.*
+- **Email:** `contact@cheymusic.com` (legacy), *flagged for client confirmation; may need a `@cheytime.com` address.*
 - Form fields: Name, Email, Subject, Message (Zod-validated) → Supabase + EmailJS. Rebuild keeps the validated form UI; submission wiring deferred with Supabase.
 - Response SLA copy: "We will respond within 48 hours."
 
 ## 7. Existing Social Links
 - **YouTube:** @cheymusic127 (confirmed)
-- **Instagram:** referenced (gallery had IG-embed support) but **no handle found** — *MISSING, placeholder.*
-- TikTok / Spotify / Apple artist pages — **MISSING.**
+- **Instagram:** referenced (gallery had IG-embed support) but **no handle found**, *MISSING, placeholder.*
+- TikTok / Spotify / Apple artist pages, **MISSING.**
 
 ## 8. Existing Imagery / Assets
-- `src/assets/editorial-1.jpg` — full-length B&W of a woman in a long dark coat (concrete underpass). **Primary silhouette reference for the clock figure.**
-- `src/assets/editorial-2.jpg` — B&W close-up of ringed hands (diamond/silver rings — ties to "diamond numerals" motif).
-- `src/assets/editorial-3.jpg` — B&W of a woman in flowing dark chiffon, dynamic motion (arm/fabric extended — motion reference).
-- `public/og-image.png` — "CHEY MUSIC" wordmark, white-on-black (will be regenerated for "Chey Time").
-- `public/favicon.svg` — black square, serif white "C".
+- `src/assets/editorial-1.jpg`, full-length B&W of a woman in a long dark coat (concrete underpass). **Primary silhouette reference for the clock figure.**
+- `src/assets/editorial-2.jpg`, B&W close-up of ringed hands (diamond/silver rings, ties to "diamond numerals" motif).
+- `src/assets/editorial-3.jpg`, B&W of a woman in flowing dark chiffon, dynamic motion (arm/fabric extended, motion reference).
+- `public/og-image.png`, "CHEY MUSIC" wordmark, white-on-black (will be regenerated for "Chey Time").
+- `public/favicon.svg`, black square, serif white "C".
 
 ## 9. Events
-- Events table exists but **no events seeded** → render an elegant "No upcoming events — check back soon" empty state (clearly labeled placeholder). One historical reference: an April Berlin booking inquiry (not a confirmed event).
+- Events table exists but **no events seeded** → render an elegant "No upcoming events, check back soon" empty state (clearly labeled placeholder). One historical reference: an April Berlin booking inquiry (not a confirmed event).
 
 ## 10. Existing Functionality (legacy)
 Smooth scroll (Lenis), custom cursor, film-grain overlay, page loader, vertical nav marquee, scroll-reveal, cart drawer + floating cart button, Supabase-backed CMS/admin, Stripe checkout, EmailJS contact, view counter, Instagram/Spotify/Apple/YouTube embeds, blog. **None of the brutalist UI is reused**; relevant *capabilities* (embeds, contact form, reveal motion) are re-expressed in the new premium clock experience.

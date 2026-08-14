@@ -1,7 +1,7 @@
 -- Remove the stock black-and-white imagery.
 --
 -- editorial-1/2/3.jpg were carried over from the legacy repo with everything
--- else, but they are not Chey — generic monochrome stock ("a woman in a long
+-- else, but they are not Chey, generic monochrome stock ("a woman in a long
 -- dark coat", "ringed hands"). The four chey-*.jpg files are genuine
 -- photographs of her and stay.
 --

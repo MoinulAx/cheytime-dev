@@ -8,7 +8,7 @@ const normalizePrice = (price: number): number =>
   Number.isFinite(price) ? Number(price.toFixed(2)) : 0;
 
 /**
- * Digital (VII) — live from `music_products`, active only.
+ * Digital (VII), live from `music_products`, active only.
  *
  * Only `preview_audio_url` is exposed. `audio_url` is the full track and is
  * deliberately never sent to the browser: it is released through the

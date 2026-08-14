@@ -19,7 +19,7 @@ export interface ActionResult {
  * Clear the public site's ISR cache.
  *
  * Without this an edit sits behind the 60s window even though we know exactly
- * when it happened — the whole point of moving the admin into this codebase.
+ * when it happened, the whole point of moving the admin into this codebase.
  */
 function revalidateSite() {
   revalidatePath("/");
@@ -30,7 +30,7 @@ function revalidateSite() {
  * Normalise a blank field to whatever its column actually accepts.
  *
  * Most text columns in this schema are `NOT NULL DEFAULT ''`, so blanking one
- * has to write `''` — writing `null` trips the not-null constraint and
+ * has to write `''`, writing `null` trips the not-null constraint and
  * surfaces to the admin as a raw database error. Only columns marked
  * `nullable` (uuid, date, timestamp) get `null`, because an empty string
  * cannot be cast to those types at all.
@@ -40,7 +40,7 @@ function revalidateSite() {
  */
 /**
  * Which column identifies a row. Almost always `id`, but `site_settings` is
- * keyed on `key` — filtering that by `id` matches nothing and the update
+ * keyed on `key`, filtering that by `id` matches nothing and the update
  * silently succeeds against zero rows.
  */
 function primaryKeyOf(table: WritableTable): string {
@@ -126,7 +126,7 @@ export async function deleteRecord(
  *
  * Exposed so the login form can report a non-admin account clearly instead of
  * bouncing the user back to the form with no explanation. The answer comes
- * from the same `admin-auth` edge function the guard uses — the browser never
+ * from the same `admin-auth` edge function the guard uses, the browser never
  * decides this for itself.
  */
 export async function isAdmin(): Promise<boolean> {

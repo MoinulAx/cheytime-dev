@@ -2,10 +2,10 @@
 
 import { SUPABASE_ANON_KEY, SUPABASE_URL, isSupabaseConfigured } from "@/lib/supabase/env";
 
-/** One line on the Stripe checkout — matches the edge function's payload. */
+/** One line on the Stripe checkout, matches the edge function's payload. */
 export interface CheckoutItem {
   /**
-   * `merch:<uuid>` or `music:<uuid>`. The deployed function ignores it — it
+   * `merch:<uuid>` or `music:<uuid>`. The deployed function ignores it, it
    * builds line items from `title` and `price` alone. Sent anyway so that when
    * the function is hardened to look prices up in `merch_products` /
    * `music_products` rather than trusting the browser, it already has the key
@@ -26,7 +26,7 @@ export interface CheckoutItem {
  * Stripe lives entirely in the `create-checkout-session` edge function, which
  * is already deployed against this project and already used by the legacy
  * store. This site does not hold the secret key, build line items, or talk to
- * Stripe — it posts a cart and follows the URL it gets back. The
+ * Stripe, it posts a cart and follows the URL it gets back. The
  * `stripe-webhook` function marks the purchase paid, so nothing here has to.
  *
  * The function declares `verify_jwt = false`, so the anon key is the only

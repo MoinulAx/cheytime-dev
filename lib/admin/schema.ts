@@ -3,7 +3,7 @@
  *
  * The legacy admin was organised around the old site's *pages* (blog,
  * portfolio, shop). This one is organised around the clock's *hours*, because
- * that is what the new site actually renders — each tab names the numeral it
+ * that is what the new site actually renders, each tab names the numeral it
  * feeds, so it is obvious where an edit will show up.
  *
  * Adding a field here adds it to the form, the create defaults and the save
@@ -24,7 +24,7 @@ export type FieldType =
 
 /**
  * Storage buckets. Both are `public = true` on this project, so neither one
- * withholds a file from someone holding its URL — `music-files` is separated
+ * withholds a file from someone holding its URL, `music-files` is separated
  * for organisation and because `secure-download` issues tokens against it, not
  * because the bucket itself restricts reads.
  */
@@ -36,14 +36,14 @@ export interface FieldDef {
   type: FieldType;
   options?: readonly string[];
   placeholder?: string;
-  /** Rendered under the input — use for anything non-obvious. */
+  /** Rendered under the input, use for anything non-obvious. */
   hint?: string;
   /** Upload target for `image` / `audio` fields. Defaults to `site-assets`. */
   bucket?: StorageBucket;
   /**
    * Send `null` when the field is left blank.
    *
-   * Only for columns where an empty string cannot be cast — uuid, date,
+   * Only for columns where an empty string cannot be cast, uuid, date,
    * timestamp. Most text columns here are `NOT NULL DEFAULT ''`, so blanking
    * them must write `''`; writing `null` instead trips the not-null
    * constraint and surfaces as a confusing database error.
@@ -66,7 +66,7 @@ export interface ChildTableDef {
 
 export interface TableDef {
   /**
-   * Supabase table name, constrained to the write allowlist — that constraint
+   * Supabase table name, constrained to the write allowlist, that constraint
    * is also what lets the typed client accept it without a cast.
    */
   table: WritableTable;
@@ -76,7 +76,7 @@ export interface TableDef {
   numeral?: string;
   /**
    * Where these rows appear for a visitor, in plain words. Shown at the top of
-   * every tab so nobody has to guess whether an edit is visible — the tables
+   * every tab so nobody has to guess whether an edit is visible, the tables
    * that surface nowhere say so outright.
    */
   showsOn: string;
@@ -89,11 +89,11 @@ export interface TableDef {
   labelKey: string;
   /** Ordering applied when reading. */
   orderBy: { column: string; ascending: boolean }[];
-  /** When false, the tab is an inbox — no create button. */
+  /** When false, the tab is an inbox, no create button. */
   canCreate?: boolean;
   /**
    * When true, rows can only be viewed. Used for `purchases`, which has no
-   * admin UPDATE or DELETE policy — offering the buttons would just produce
+   * admin UPDATE or DELETE policy, offering the buttons would just produce
    * failures.
    */
   readOnly?: boolean;
@@ -141,9 +141,9 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "site_sections",
     title: "Sections",
     numeral: "all",
-    showsOn: "Every panel — which hour it sits on, the heading, the sub-heading, the photograph at the top, and the supporting lines under it.",
+    showsOn: "Every panel, which hour it sits on, the heading, the sub-heading, the photograph at the top, and the supporting lines under it.",
     blurb:
-      "The shell of each section rather than its content, plus where it sits on the clock. Leave a field blank to keep the built-in wording. section_id is what the code looks up — do not change it.",
+      "The shell of each section rather than its content, plus where it sits on the clock. Leave a field blank to keep the built-in wording. section_id is what the code looks up, do not change it.",
     labelKey: "section_id",
     canCreate: false,
     primaryKey: "section_id",
@@ -172,7 +172,7 @@ export const ADMIN_TABLES: TableDef[] = [
         placeholder: "50% 50%",
         hint: "How the photo is cropped into its frame, when the subject is not dead centre. Two values, across then down: \"50% 50%\" is centred, \"50% 20%\" pulls the crop up toward the top, \"left center\" hugs the left edge. Blank means centred.",
       },
-      // No "Sort order" here. The column still exists but nothing reads it —
+      // No "Sort order" here. The column still exists but nothing reads it,
       // "Clock position" above is what moves a section, and offering two
       // ordering controls where only one works is worse than offering one.
     ],
@@ -182,9 +182,9 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "site_settings",
     title: "Copy",
     showsOn:
-      "Home (XII) and About (II) mostly — plus the YouTube handle on Music (IV) and the address on Contact (X). Each row says which section it belongs to.",
+      "Home (XII) and About (II) mostly, plus the YouTube handle on Music (IV) and the address on Contact (X). Each row says which section it belongs to.",
     blurb:
-      "The written copy across the clock — the Home lines, the About biography and quote, the contact details. Editing a value here changes the site; the key is what the code looks up, so leave it alone.",
+      "The written copy across the clock, the Home lines, the About biography and quote, the contact details. Editing a value here changes the site; the key is what the code looks up, so leave it alone.",
     labelKey: "label",
     canCreate: false,
     primaryKey: "key",
@@ -216,7 +216,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Credits",
     numeral: "II",
     showsOn:
-      "About (II) — the credits list at the foot of the panel.",
+      "About (II), the credits list at the foot of the panel.",
     blurb: "The role/name list at the bottom of the About panel.",
     labelKey: "role",
     orderBy: [
@@ -235,7 +235,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Channels",
     numeral: "X",
     showsOn:
-      "Contact (X) — the row of channel chips. A blank URL renders a greyed-out “· soon” chip instead of a dead link.",
+      "Contact (X), the row of channel chips. A blank URL renders a greyed-out “· soon” chip instead of a dead link.",
     blurb:
       "The channel chips on Contact. Leave the URL blank to show the label greyed out as “· soon”.",
     labelKey: "label",
@@ -261,9 +261,9 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Upcoming",
     numeral: "I",
     showsOn:
-      "Upcoming (I) — the announcements hour. Anything still to come is listed first, anything already out drops into a Recently released group underneath. Rows with a video get a player; the lead slot goes to the first row that has a video or a poster, so a text-only row never takes the big card. Only published rows appear.",
+      "Upcoming (I), the announcements hour. Anything still to come is listed first, anything already out drops into a Recently released group underneath. Rows with a video get a player; the lead slot goes to the first row that has a video or a poster, so a text-only row never takes the big card. Only published rows appear.",
     blurb:
-      "What is next. A row only needs a Title to be worth showing — artwork, date and link are all optional and can be filled in as they are confirmed. Set Sort order to choose which one leads.",
+      "What is next. A row only needs a Title to be worth showing, artwork, date and link are all optional and can be filled in as they are confirmed. Set Sort order to choose which one leads.",
     labelKey: "title",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -275,7 +275,7 @@ export const ADMIN_TABLES: TableDef[] = [
         key: "sort_order",
         label: "Sort order",
         type: "number",
-        hint: "Lower numbers come first. The lowest row that has a video or a poster becomes the lead and gets the big card — a row with neither is never given the hero slot.",
+        hint: "Lower numbers come first. The lowest row that has a video or a poster becomes the lead and gets the big card, a row with neither is never given the hero slot.",
       },
       {
         key: "status",
@@ -289,14 +289,14 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Release date",
         type: "date",
         nullable: true,
-        hint: "Leave blank if the date is not confirmed — the badge says Announced rather than inventing one.",
+        hint: "Leave blank if the date is not confirmed, the badge says Announced rather than inventing one.",
       },
       {
         key: "video_url",
         label: "Video",
         type: "url",
         placeholder: "https://youtu.be/…",
-        hint: "A teaser, visualiser or full video. When this is set the card plays the video instead of the poster — so a release can lead with either.",
+        hint: "A teaser, visualiser or full video. When this is set the card plays the video instead of the poster, so a release can lead with either.",
       },
       {
         key: "artwork_url",
@@ -309,7 +309,7 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Link",
         type: "url",
         placeholder: "https://…",
-        hint: "Where to hear it or pre-save it. Leave blank until there is somewhere to send people — the button only appears when this is set.",
+        hint: "Where to hear it or pre-save it. Leave blank until there is somewhere to send people, the button only appears when this is set.",
       },
       {
         key: "link_label",
@@ -338,7 +338,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Music & Album",
     numeral: "III + IV",
     showsOn:
-      "Two hours, from two different columns. Music (IV) shows any row with a YouTube link. Album (III) shows any row with an audio file uploaded — that hour plays the record in full.",
+      "Two hours, from two different columns. Music (IV) shows any row with a YouTube link. Album (III) shows any row with an audio file uploaded, that hour plays the record in full.",
     blurb:
       "Albums and tracks. Add a YouTube link to put a row on the Music hour; upload an audio file to put it on the Album hour. A row can do both. To build a tracklist, make one row with Type = album, then paste its ID into each track's “Parent album ID”.",
     labelKey: "title",
@@ -441,7 +441,7 @@ export const ADMIN_TABLES: TableDef[] = [
     showsOn:
       "Events (VIII). Only published events dated in the future appear; past dates drop off on their own.",
     blurb:
-      "Shows. Only published events in the future appear — past dates drop off on their own.",
+      "Shows. Only published events in the future appear, past dates drop off on their own.",
     labelKey: "title",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -454,7 +454,7 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Date & time",
         type: "datetime",
         nullable: true,
-        hint: "Entered and displayed in New York time. Required — an event with no date cannot be saved.",
+        hint: "Entered and displayed in New York time. Required, an event with no date cannot be saved.",
       },
       { key: "location", label: "Location", type: "text" },
       { key: "description", label: "Description", type: "textarea" },
@@ -478,9 +478,9 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Gallery",
     numeral: "IX",
     showsOn:
-      "Gallery (IX) — every row, in sort order. This is the only place photographs appear on the clock.",
+      "Gallery (IX), every row, in sort order. This is the only place photographs appear on the clock.",
     blurb:
-      "The archive. Image rows render as photographs; an Instagram post or reel link renders as an embed under “Elsewhere”. Every row appears on IX — there is no longer a setting that moves one to a different hour.",
+      "The archive. Image rows render as photographs; an Instagram post or reel link renders as an embed under “Elsewhere”. Every row appears on IX, there is no longer a setting that moves one to a different hour.",
     labelKey: "alt",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -491,23 +491,23 @@ export const ADMIN_TABLES: TableDef[] = [
         key: "alt",
         label: "Caption",
         type: "text",
-        hint: "Also used as the image's alt text — describe what is shown.",
+        hint: "Also used as the image's alt text, describe what is shown.",
       },
       { key: "meta", label: "Meta", type: "text", placeholder: "Studio · 2026" },
-      { key: "image_url", label: "Image", type: "image", hint: "Upload at least 1200px on the long edge. The archive shows three columns on a laptop and screens are mostly 2x, so anything under ~700px wide gets scaled up and looks soft — that is the single biggest cause of a blurry gallery." },
+      { key: "image_url", label: "Image", type: "image", hint: "Upload at least 1200px on the long edge. The archive shows three columns on a laptop and screens are mostly 2x, so anything under ~700px wide gets scaled up and looks soft, that is the single biggest cause of a blurry gallery." },
       {
         key: "collection",
         label: "Collection",
         type: "select",
         options: ["archive", "videos", "sessions", "reel"],
-        hint: "Historical grouping from when the archive was split across four hours. Nothing reads it — changing it has no effect on the site.",
+        hint: "Historical grouping from when the archive was split across four hours. Nothing reads it, changing it has no effect on the site.",
       },
       {
         key: "aspect_ratio",
         label: "Shape",
         type: "select",
         options: ["landscape", "portrait", "square"],
-        hint: "The frame this photo is shown in. Set it to match the real photo — a portrait shot left on “landscape” gets cropped to a letterbox, which is what made the archive look flat. Blank behaves as landscape.",
+        hint: "The frame this photo is shown in. Set it to match the real photo, a portrait shot left on “landscape” gets cropped to a letterbox, which is what made the archive look flat. Blank behaves as landscape.",
       },
       {
         key: "media_type",
@@ -581,7 +581,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Journal",
     numeral: "V",
     showsOn:
-      "The Journal hour — V unless you have moved it in Sections. Also the /journal page behind “See more”.",
+      "The Journal hour, V unless you have moved it in Sections. Also the /journal page behind “See more”.",
     blurb:
       "Entries on the clock's Journal hour, and the full posts at /journal. Set Sort order to arrange them; ties fall back to newest first.",
     labelKey: "title",
@@ -619,7 +619,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Digital",
     numeral: "VII",
     showsOn:
-      "Digital (VII). Active rows appear with their preview clip only — there is no longer a Buy button on this hour.",
+      "Digital (VII). Active rows appear with their preview clip only, there is no longer a Buy button on this hour.",
     blurb:
       "Preview-only tracks. Active rows show on the clock with their preview clip; nothing here is for sale, so Price is kept for reference but is not displayed. Full tracks meant for listening belong on the Album hour (III) instead.",
     labelKey: "title",
@@ -666,7 +666,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Outreach",
     showsOn:
       "Nowhere public. Internal PR pipeline, admin-only.",
-    blurb: "Internal PR pipeline. Admin-only — never shown publicly.",
+    blurb: "Internal PR pipeline. Admin-only, never shown publicly.",
     labelKey: "contact_name",
     orderBy: [{ column: "created_at", ascending: false }],
     fields: [

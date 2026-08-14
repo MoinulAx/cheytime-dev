@@ -1,8 +1,8 @@
 -- The Album hour (III), and Digital (VII) becoming preview-only.
 --
 -- Hour III was one of two empty numerals on the dial. It now carries the
--- record: `music_releases.audio_url` — a column the admin could already write
--- to but nothing ever read — is streamed in full there.
+-- record: `music_releases.audio_url`, a column the admin could already write
+-- to but nothing ever read, is streamed in full there.
 --
 -- Nothing is dropped and no row is overwritten if it already exists, so this
 -- is safe to re-run and safe on a database an admin has already edited.
@@ -26,7 +26,7 @@ ON CONFLICT (section_id) DO NOTHING;
 -- ── 2. Digital is no longer a shop ───────────────────────────────────────
 -- The Buy button is gone from hour VII; the hour plays preview clips only.
 -- The `music_products` rows, their prices and their full-track files are all
--- left untouched — only the copy that told visitors they could buy changes.
+-- left untouched, only the copy that told visitors they could buy changes.
 UPDATE public.site_settings
 SET value = 'Previews only. The full record streams on the Album hour.'
 WHERE key = 'digital.note'

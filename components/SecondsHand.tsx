@@ -12,7 +12,7 @@ import {
 const C = VIEWBOX / 2;
 
 /**
- * SecondsHand — z-19, beneath the selection hand.
+ * SecondsHand, z-19, beneath the selection hand.
  *
  * The dial actually keeps time. It is the cheapest possible way to make the
  * piece feel alive rather than illustrated, and on a site called Chey's Time
@@ -65,7 +65,7 @@ export default function SecondsHand({ className }: { className?: string }) {
       animate={{ rotate: ticks * 6 }}
       transition={reduce ? { duration: 0 } : TICK_SPRING}
     >
-      {/* counterweight — balances the blade so the pivot reads as the centre */}
+      {/* counterweight, balances the blade so the pivot reads as the centre */}
       <circle cx={C} cy={556} r={9} fill="rgba(236,232,223,0.3)" />
       <line
         x1={C}
@@ -77,7 +77,7 @@ export default function SecondsHand({ className }: { className?: string }) {
         strokeLinecap="round"
       />
 
-      {/* the blade — thin enough to stay quiet behind the main hand */}
+      {/* the blade, thin enough to stay quiet behind the main hand */}
       <line
         x1={C}
         y1={512}
@@ -88,7 +88,7 @@ export default function SecondsHand({ className }: { className?: string }) {
         strokeLinecap="round"
       />
 
-      {/* lume pip near the tip — the one warm accent on an otherwise cool hand */}
+      {/* lume pip near the tip, the one warm accent on an otherwise cool hand */}
       <circle
         cx={C}
         cy={SECONDS_HAND_TIP + 26}

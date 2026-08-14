@@ -70,7 +70,7 @@ interface CheysClockProps {
 }
 
 /**
- * CheysClock — the full interactive experience, set like a magazine spread:
+ * CheysClock, the full interactive experience, set like a magazine spread:
  * masthead rule across the top, the quiet dial centre-stage over Chey's
  * portrait, and the home copy anchored to the bottom corners (never centred
  * under the dial, so nothing overlaps the numerals).
@@ -102,7 +102,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
     (hourIndex: number) => {
       const section = sectionByHour(sections, hourIndex);
       if (!section) return;
-      // XII (Home) acts as the reset — close any open panel.
+      // XII (Home) acts as the reset, close any open panel.
       setSelectedId(section.id === "home" ? null : section.id);
     },
     [sections],
@@ -111,7 +111,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
   const handleClose = useCallback(() => {
     setSelectedId(null);
     // Drop the deep-link fragment so a reload does not reopen a panel the
-    // visitor just closed. replaceState, not push — closing a drawer is not a
+    // visitor just closed. replaceState, not push, closing a drawer is not a
     // navigation and should not add a history entry to back out of.
     if (window.location.hash) {
       const { pathname, search } = window.location;
@@ -122,7 +122,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
   /**
    * Deep link: `/#blog` opens that section on arrival.
    *
-   * This is how the Journal pages get back to the panel they came from —
+   * This is how the Journal pages get back to the panel they came from,
    * "back to the clock" has to mean the tab you left, not a reset dial.
    *
    * The fragment rather than a query parameter because reading `searchParams`
@@ -155,21 +155,21 @@ export default function CheysClock({ sections }: CheysClockProps) {
       ref={ref}
       className="relative z-10 flex h-dvh w-full items-center justify-center overflow-hidden pb-28 pt-10 md:pb-24 [@media(max-height:480px)_and_(max-width:1023px)]:pb-10"
     >
-      {/* Masthead — full-width editorial header rule, always visible */}
+      {/* Masthead, full-width editorial header rule, always visible */}
       <header className="pointer-events-none fixed inset-x-0 top-0 z-40 px-5 pt-4 md:px-8 md:pt-5">
         <div className="flex items-baseline justify-between pb-3">
           <p className="font-display text-xl font-bold italic leading-none text-bone-50 md:text-2xl">
             Chey&apos;s&nbsp;Time
           </p>
           <p className="eyebrow hidden sm:block">
-            Hip Hop&apos;s Princess&ensp;—&ensp;Staten Island, NY
+            Hip Hop&apos;s Princess&ensp;·&ensp;Staten Island, NY
           </p>
           <p className="eyebrow sm:hidden">Hip Hop&apos;s Princess</p>
         </div>
         <div className="rule" />
       </header>
 
-      {/* The clock stage — lifted above the backdrop while open so the lit
+      {/* The clock stage, lifted above the backdrop while open so the lit
           clock stays interactive (you can jump straight to another hour). */}
       <motion.div
         className={`relative will-change-transform ${isOpen ? "z-[45]" : "z-10"}`}
@@ -181,19 +181,19 @@ export default function CheysClock({ sections }: CheysClockProps) {
       >
         {stageSize > 0 && (
           <>
-            {/* z-1 — single hairline face ring */}
+            {/* z-1, single hairline face ring */}
             <div
               aria-hidden="true"
               className="absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2 rounded-full border border-bone-100/15"
               style={{ width: ringDiameter, height: ringDiameter }}
             />
 
-            {/* z-2 — static dial marks */}
+            {/* z-2, static dial marks */}
             <div className="absolute inset-0 z-[2]">
               <ClockFace className="h-full w-full" />
             </div>
 
-            {/* z-[18] — hour hand, parked at XII.
+            {/* z-[18], hour hand, parked at XII.
                 It never moves. The dial is a navigation device, not a
                 timepiece: holding the hour at 12 means the pair always reads
                 as "twelve-something", and the minute hand alone carries where
@@ -206,10 +206,10 @@ export default function CheysClock({ sections }: CheysClockProps) {
               <ClockHand variant="hour" className="h-full w-full" />
             </div>
 
-            {/* z-[19] — live seconds, ticking real time beneath the hand */}
+            {/* z-[19], live seconds, ticking real time beneath the hand */}
             <SecondsHand className="absolute inset-0 z-[19] h-full w-full" />
 
-            {/* z-20 — minute hand: points at whichever section is open, and
+            {/* z-20, minute hand: points at whichever section is open, and
                 returns to XII when the panel closes. */}
             <motion.div
               className="absolute inset-0 z-20 drop-glow will-change-transform"
@@ -221,7 +221,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
               <ClockHand className="h-full w-full" />
             </motion.div>
 
-            {/* z-[21] — jewelled centre hub (static, sits over the hand base) */}
+            {/* z-[21], jewelled centre hub (static, sits over the hand base) */}
             <div
               aria-hidden="true"
               className="absolute left-1/2 top-1/2 z-[21] -translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -241,7 +241,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
               />
             </div>
 
-            {/* z-30 — numerals */}
+            {/* z-30, numerals */}
             <RomanNumerals
               sections={sections}
               stageSize={stageSize}
@@ -252,7 +252,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
         )}
       </motion.div>
 
-      {/* Home / base copy — anchored to the bottom corners (clear of the
+      {/* Home / base copy, anchored to the bottom corners (clear of the
           dial), fades out when a section opens */}
       <AnimatePresence>
         {!isOpen && stageSize > 0 && (
@@ -264,7 +264,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Data strip — the legacy home facts. Hidden on small screens,
+            {/* Data strip, the legacy home facts. Hidden on small screens,
                 where it would collide with the dial rather than sit under it. */}
             {homeData && homeData.facts.length > 0 && (
               <div className="mb-3 hidden items-baseline justify-between gap-6 md:flex">
@@ -282,7 +282,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
             )}
             <div className="rule mb-4" />
             <div className="flex items-end justify-between gap-4">
-              {/* Credits — quiet, bottom-left, clear of the dial. The
+              {/* Credits, quiet, bottom-left, clear of the dial. The
                   production mark sits above the build credit and only appears
                   once a logo has been uploaded; blank renders nothing at all
                   rather than a gap or a broken image. */}
@@ -313,7 +313,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
         )}
       </AnimatePresence>
 
-      {/* z-40 — content panel */}
+      {/* z-40, content panel */}
       <ContentPanel section={selected} isOpen={isOpen} onClose={handleClose} />
     </div>
   );
@@ -322,7 +322,7 @@ export default function CheysClock({ sections }: CheysClockProps) {
 /**
  * The production company's logo, bottom-left above the build credit.
  *
- * `unoptimized` because this is a supplied brand mark, not photography — it
+ * `unoptimized` because this is a supplied brand mark, not photography, it
  * is small, usually a PNG with transparency, and re-encoding it is how a logo
  * picks up fringing on a dark background. Height is fixed and width follows,
  * so the footer cannot shift when it loads.

@@ -6,7 +6,7 @@
 -- Neither URL could be resolved from the build environment (youtube.com is
 -- blocked at the egress proxy), so the titles are not known here. Writing a
 -- guess is how `music_links` ended up with two invented track names and two
--- real ones attached to the wrong videos — see the traps in HANDOFF. A blank
+-- real ones attached to the wrong videos, see the traps in HANDOFF. A blank
 -- title renders as the index number and the player, which claims nothing;
 -- filling it in takes ten seconds in the Music & Album tab.
 --
@@ -32,7 +32,7 @@ WHERE NOT EXISTS (
 );
 
 -- ── The SMG logo ─────────────────────────────────────────────────────────
--- The image itself cannot be committed from here — it was shared in chat, not
+-- The image itself cannot be committed from here, it was shared in chat, not
 -- as a file this environment can read. So this creates the slot rather than
 -- the asset: upload the logo against `brand.logo_url` in the admin's Copy tab
 -- and it appears in the footer. Blank renders nothing at all, so the site

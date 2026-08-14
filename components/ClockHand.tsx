@@ -12,7 +12,7 @@ const BASE = 502;
  * The two hands, as tip distance from the pivot and half-width at the waist.
  *
  * A real dial reads at a glance because the hands differ in *length* far more
- * than in decoration — so the hour hand is the same blade, cut to roughly
+ * than in decoration, so the hour hand is the same blade, cut to roughly
  * two-thirds and broadened a touch to keep its visual weight.
  */
 const GEOMETRY: Record<HandVariant, { tip: number; halfWidth: number; tail: number }> = {
@@ -21,13 +21,13 @@ const GEOMETRY: Record<HandVariant, { tip: number; halfWidth: number; tail: numb
 };
 
 /**
- * ClockHand — a faceted dauphine-style hand in diamond/silver, drawn pointing
+ * ClockHand, a faceted dauphine-style hand in diamond/silver, drawn pointing
  * straight up (the XII / 0° rest state). Rotation is applied by the parent
  * around the shared pivot at the stage centre (500,500). The jewelled centre
  * hub is rendered separately (static) so it never rotates.
  *
  * Two instances are mounted: the hour hand parked at XII, and the minute hand
- * that sweeps to the open section. Gradient ids are suffixed per variant —
+ * that sweeps to the open section. Gradient ids are suffixed per variant,
  * both hands are in the DOM at once, and duplicate ids would make the second
  * one silently borrow the first one's fills.
  */
@@ -37,7 +37,7 @@ export default function ClockHand({
 }: SVGProps<SVGSVGElement> & { variant?: HandVariant }) {
   const { tip, halfWidth, tail } = GEOMETRY[variant];
 
-  // Widest point of the blade, 8% up from the base — the proportion the
+  // Widest point of the blade, 8% up from the base, the proportion the
   // original hand was drawn at, held constant so both hands share a silhouette.
   const waist = BASE - (BASE - tip) * 0.08;
   const length = BASE - tip;
@@ -75,7 +75,7 @@ export default function ClockHand({
         </linearGradient>
 
         {/*
-          Gleam — a narrow band of light that travels down the blade every few
+          Gleam, a narrow band of light that travels down the blade every few
           seconds, the way a polished index catches a moving light source. It is
           a moving gradient stop rather than an overlay, so it reads as the
           metal brightening, not as a shape laid on top.
@@ -111,7 +111,7 @@ export default function ClockHand({
         opacity="0.85"
       />
 
-      {/* faceted blade — two halves catch light differently */}
+      {/* faceted blade, two halves catch light differently */}
       <path
         d={`M${C} ${tip} L${C} ${BASE} L${C - halfWidth} ${waist} Z`}
         fill={`url(#${id("handDark")})`}

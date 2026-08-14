@@ -4,7 +4,7 @@ import { MINUTE_TRACK_R, VIEWBOX } from "@/lib/clock";
 const C = VIEWBOX / 2; // centre
 
 /**
- * ClockFace — the static dial.
+ * ClockFace, the static dial.
  *
  * Twelve hour marks, a full sixty-step minute track, and two hairline chapter
  * rings bounding it. The minute track is what makes this read as a watch dial
@@ -55,7 +55,7 @@ export default function ClockFace(props: SVGProps<SVGSVGElement>) {
       focusable="false"
       {...props}
     >
-      {/* chapter ring — bounds the minute track top and bottom */}
+      {/* chapter ring, bounds the minute track top and bottom */}
       <circle
         cx={C}
         cy={C}

@@ -28,7 +28,7 @@ function dateLabelOf(value: string | null): string | undefined {
  * What the badge says.
  *
  * `status` is the editor's intent and wins, except that a date in the past
- * makes "coming soon" a lie — a release that shipped last month should not
+ * makes "coming soon" a lie, a release that shipped last month should not
  * still be teasing. That correction only ever moves a row forward to "Out
  * now"; it never un-releases anything.
  */
@@ -55,12 +55,12 @@ function linkOf(url: string | null): string | undefined {
 }
 
 /**
- * Upcoming (I) — announcements, from `upcoming_releases`.
+ * Upcoming (I), announcements, from `upcoming_releases`.
  *
  * Deliberately not derived from `music_releases`. That table is catalogue and
  * needs a thing to exist before it can show it; this hour is for what does not
  * exist yet, which is why the date is nullable and the link is optional. A row
- * with nothing but a title still renders — as an announcement, which is the
+ * with nothing but a title still renders, as an announcement, which is the
  * point.
  */
 export async function loadUpcoming(
