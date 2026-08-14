@@ -182,7 +182,7 @@ export const ADMIN_TABLES: TableDef[] = [
     table: "site_settings",
     title: "Copy",
     showsOn:
-      "Home (XII) and About (II) mostly, plus the YouTube handle on Music (IV) and the address on Contact (X). Each row says which section it belongs to.",
+      "Home (XII) and About (II) mostly, plus the YouTube handle and channel link on Music (IV) and the address on Contact (X). Each row says which section it belongs to.",
     blurb:
       "The written copy across the clock, the Home lines, the About biography and quote, the contact details. Editing a value here changes the site; the key is what the code looks up, so leave it alone.",
     labelKey: "label",
@@ -258,7 +258,7 @@ export const ADMIN_TABLES: TableDef[] = [
   },
   {
     table: "upcoming_releases",
-    title: "Upcoming",
+    title: "Upcoming / Singles",
     numeral: "I",
     showsOn:
       "Upcoming (I), the announcements hour. Anything still to come is listed first, anything already out drops into a Recently released group underneath. Rows with a video get a player; the lead slot goes to the first row that has a video or a poster, so a text-only row never takes the big card. Only published rows appear.",
@@ -296,7 +296,7 @@ export const ADMIN_TABLES: TableDef[] = [
         label: "Video",
         type: "url",
         placeholder: "https://youtu.be/…",
-        hint: "A teaser, visualiser or full video. When this is set the card plays the video instead of the poster, so a release can lead with either.",
+        hint: "Paste a YouTube link and the card plays that video: youtu.be, watch?v=, shorts and embed URLs all work. When this is set the video replaces the poster, so a release can lead with either. Clear it to go back to the artwork.",
       },
       {
         key: "artwork_url",
