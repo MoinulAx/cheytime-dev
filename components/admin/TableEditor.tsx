@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteRecord, saveRecord } from "@/app/admin/actions";
 import type {
@@ -376,6 +376,7 @@ export default function TableEditor({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
 
   // Recomputed from the live draft, so a warning appears while typing rather
@@ -391,6 +392,8 @@ export default function TableEditor({
   const canCreate = def.canCreate !== false && !def.readOnly;
   // `site_settings` is keyed on `key`, not `id`.
   const pk = def.primaryKey ?? "id";
+  // The open row lives in the form, not in the list below it.
+  const listed = rows.filter((row) => String(row[pk]) !== editingId);
 
   const openNew = () => {
     setEditingId("__new__");
@@ -409,6 +412,15 @@ export default function TableEditor({
     setDraft(null);
     setError(null);
   };
+
+  // The form renders above the list, so opening a row from halfway down used
+  // to leave the editor off-screen and nothing appeared to happen. This runs
+  // after the form has mounted, which the click handler cannot do: the ref is
+  // still null at the moment the row is clicked.
+  useEffect(() => {
+    if (!editingId) return;
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [editingId]);
 
   const save = async () => {
     if (!draft) return;
@@ -483,8 +495,21 @@ export default function TableEditor({
 
       {/* Editor form */}
       {draft && (
-        <div className="mt-6 border border-bone-100/20 p-5">
-          <p className="eyebrow mb-4">{isCreating ? "New entry" : "Editing"}</p>
+        <div ref={formRef} className="mt-6 scroll-mt-6 border border-bone-100/20 p-5">
+          {/* Naming the row matters because the same list sits underneath.
+              "Editing" alone left it ambiguous which one was open. */}
+          <p className="eyebrow mb-4">
+            {isCreating ? (
+              "New entry"
+            ) : (
+              <>
+                Editing
+                <span className="ml-2 normal-case tracking-normal text-bone-200">
+                  {str(draft?.[def.labelKey]) || "Untitled"}
+                </span>
+              </>
+            )}
+          </p>
           <div className="grid gap-5 md:grid-cols-2">
             {def.fields.map((f) => (
               <div
@@ -543,7 +568,15 @@ export default function TableEditor({
             Nothing here yet.
           </p>
         )}
-        {rows.map((row) => {
+        {rows.length > 0 && listed.length === 0 && (
+          <p className="py-8 text-center font-display text-lg italic text-bone-400">
+            Open in the editor above.
+          </p>
+        )}
+        {/* The row being edited is not repeated here. It is the form above,
+            and showing it twice, each copy with its own Edit and Delete, was
+            genuinely confusing. It returns to the list on save or cancel. */}
+        {listed.map((row) => {
           const id = String(row[pk]);
           const label = str(row[def.labelKey]) || "Untitled";
           const isUnread =
