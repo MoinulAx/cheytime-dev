@@ -261,7 +261,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Upcoming",
     numeral: "I",
     showsOn:
-      "Upcoming (I) — the announcements hour. Anything still to come is listed first, with the lead getting its video or poster full width; anything already out drops into a Recently released group underneath. Only published rows appear.",
+      "Upcoming (I) — the announcements hour. Anything still to come is listed first, anything already out drops into a Recently released group underneath. Rows with a video get a player; the lead slot goes to the first row that has a video or a poster, so a text-only row never takes the big card. Only published rows appear.",
     blurb:
       "What is next. A row only needs a Title to be worth showing — artwork, date and link are all optional and can be filled in as they are confirmed. Set Sort order to choose which one leads.",
     labelKey: "title",
@@ -275,7 +275,7 @@ export const ADMIN_TABLES: TableDef[] = [
         key: "sort_order",
         label: "Sort order",
         type: "number",
-        hint: "Lower numbers come first. The lowest is the lead release and gets the big poster.",
+        hint: "Lower numbers come first. The lowest row that has a video or a poster becomes the lead and gets the big card — a row with neither is never given the hero slot.",
       },
       {
         key: "status",

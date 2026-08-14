@@ -434,7 +434,7 @@ function LiteYouTube({ video }: { video: MusicVideo }) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label={`Play ${video.title}`}
+          aria-label={video.title ? `Play ${video.title}` : "Play video"}
           className="group absolute inset-0"
         >
           <MediaImage
@@ -832,9 +832,14 @@ function UpcomingBlock({
   // that already happened. Order within each group is still the admin's.
   const ahead = releases.filter((r) => !r.released);
   const out = releases.filter((r) => r.released);
-  const [lead, ...rest] = ahead.length > 0 ? ahead : out;
-  const secondary = ahead.length > 0 ? rest : [];
-  const recent = ahead.length > 0 ? out : rest;
+  const primary = ahead.length > 0 ? ahead : out;
+
+  // The lead slot is a showcase, so it goes to the first row that can fill
+  // one. Sort order still decides between rows that have media; it just does
+  // not hand the hero to a text-only row and push a video into a thumbnail.
+  const lead = primary.find((r) => r.youtubeId || r.artwork) ?? primary[0];
+  const secondary = primary.filter((r) => r.id !== lead.id);
+  const recent = ahead.length > 0 ? out : [];
 
   return (
     <Stagger>
@@ -852,9 +857,14 @@ function UpcomingBlock({
           <LeadMedia release={lead} />
           <div className="p-5">
             <Badge label={lead.statusLabel} released={lead.released} />
-            <h3 className="mt-3 font-display text-3xl leading-[1.05] text-bone-50">
-              {lead.title}
-            </h3>
+            {/* An untitled row is a real state — a video added before anyone
+                typed its name. The badge, date and video carry the card;
+                printing an empty heading would just leave a gap. */}
+            {lead.title && (
+              <h3 className="mt-3 font-display text-3xl leading-[1.05] text-bone-50">
+                {lead.title}
+              </h3>
+            )}
             {lead.dateLabel && (
               <p className="mt-2 font-sans text-[11px] uppercase tracking-wide2 text-bone-400">
                 {lead.dateLabel}
@@ -927,77 +937,104 @@ function LeadMedia({ release }: { release: UpcomingRelease }) {
   return null;
 }
 
-/** The compact rows under the lead, used for both groups. */
+/**
+ * The rows under the lead.
+ *
+ * A row with a video gets a player, not a thumbnail. This hour exists to show
+ * what is coming, and a teaser reduced to a 64px still is not showing it —
+ * `LiteYouTube` only loads a poster frame until someone presses play, so a
+ * handful of them costs one image each.
+ */
 function ReleaseList({ releases }: { releases: UpcomingRelease[] }) {
   return (
-    <div className="mt-4 divide-y divide-bone-100/10 border-t border-bone-100/10">
-      {releases.map((r) => (
-        <Item key={r.id}>
-          <article className="flex gap-4 py-4">
-            <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
-              {r.youtubeId ? (
-                // The video's own poster frame, so a row with a video still
-                // reads as one at a glance rather than falling back to a note.
-                <MediaImage
-                  src={`https://i.ytimg.com/vi/${r.youtubeId}/hqdefault.jpg`}
-                  alt=""
-                  fill
-                  sizes="64px"
-                  className="object-cover"
-                />
-              ) : r.artwork ? (
-                <MediaImage
-                  src={r.artwork}
-                  alt=""
-                  fill
-                  sizes="64px"
-                  className="object-cover"
-                />
-              ) : (
-                <span className="absolute inset-0 grid place-items-center font-display text-xl italic text-bone-100/15">
-                  ♪
-                </span>
-              )}
-              {r.youtubeId && (
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-0 grid place-items-center bg-black/30"
-                >
-                  <svg width="10" height="12" viewBox="0 0 18 20">
-                    <path d="M0 0l18 10L0 20z" fill="#f6f3ec" />
-                  </svg>
-                </span>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <Badge label={r.statusLabel} released={r.released} />
-              <p className="mt-1.5 font-display text-lg leading-tight text-bone-50">
-                {r.title}
-              </p>
-              {r.dateLabel && (
-                <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
-                  {r.dateLabel}
-                </p>
-              )}
-              {r.description && (
-                <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
-                  {r.description}
-                </p>
-              )}
-              {r.url && (
-                <a
-                  href={r.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 inline-block font-sans text-[10px] uppercase tracking-wide2 text-bone-300 underline decoration-bone-100/25 underline-offset-4 transition-colors hover:text-bone-50 hover:decoration-bone-100"
-                >
-                  {r.linkLabel}
-                </a>
-              )}
-            </div>
-          </article>
-        </Item>
-      ))}
+    <div className="mt-4 space-y-6">
+      {releases.map((r) =>
+        r.youtubeId ? (
+          <Item key={r.id}>
+            <article className="border border-bone-100/10">
+              <LiteYouTube
+                video={{ id: r.id, title: r.title, youtubeId: r.youtubeId }}
+              />
+              <div className="p-4">
+                <Badge label={r.statusLabel} released={r.released} />
+                {r.title && (
+                  <p className="mt-2 font-display text-xl leading-tight text-bone-50">
+                    {r.title}
+                  </p>
+                )}
+                {r.dateLabel && (
+                  <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                    {r.dateLabel}
+                  </p>
+                )}
+                {r.description && (
+                  <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
+                    {r.description}
+                  </p>
+                )}
+                {r.url && (
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-block font-sans text-[10px] uppercase tracking-wide2 text-bone-300 underline decoration-bone-100/25 underline-offset-4 transition-colors hover:text-bone-50 hover:decoration-bone-100"
+                  >
+                    {r.linkLabel}
+                  </a>
+                )}
+              </div>
+            </article>
+          </Item>
+        ) : (
+          <Item key={r.id}>
+            <article className="flex gap-4 border-t border-bone-100/10 pt-5">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
+                {r.artwork ? (
+                  <MediaImage
+                    src={r.artwork}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="absolute inset-0 grid place-items-center font-display text-xl italic text-bone-100/15">
+                    ♪
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <Badge label={r.statusLabel} released={r.released} />
+                {r.title && (
+                  <p className="mt-1.5 font-display text-lg leading-tight text-bone-50">
+                    {r.title}
+                  </p>
+                )}
+                {r.dateLabel && (
+                  <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                    {r.dateLabel}
+                  </p>
+                )}
+                {r.description && (
+                  <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
+                    {r.description}
+                  </p>
+                )}
+                {r.url && (
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-block font-sans text-[10px] uppercase tracking-wide2 text-bone-300 underline decoration-bone-100/25 underline-offset-4 transition-colors hover:text-bone-50 hover:decoration-bone-100"
+                  >
+                    {r.linkLabel}
+                  </a>
+                )}
+              </div>
+            </article>
+          </Item>
+        ),
+      )}
     </div>
   );
 }

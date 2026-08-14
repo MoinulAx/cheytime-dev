@@ -79,21 +79,25 @@ export async function loadUpcoming(
     const out: UpcomingRelease[] = [];
     for (const row of (data ?? []) as Row[]) {
       const title = text(row.title);
-      // A row with no title is nothing a visitor can read. Skip rather than
-      // render an empty card.
-      if (!title) continue;
+      const artwork = renderableImage(text(row.artwork_url));
+      const youtubeId = youtubeIdFrom(row.video_url) ?? undefined;
+      // A title is not required when there is something to look at: a video
+      // with a status badge is a complete announcement, and a name nobody has
+      // typed yet should not make the row vanish. With no title *and* no
+      // media there is nothing to render, so that row is still skipped.
+      if (!title && !artwork && !youtubeId) continue;
       const { label, released } = statusOf(row.status, row.release_date);
       const url = linkOf(row.link_url);
       out.push({
         id: row.id,
-        title,
+        title: title ?? "",
         dateLabel: dateLabelOf(row.release_date),
         statusLabel: label,
         released,
         description: text(row.description),
-        artwork: renderableImage(text(row.artwork_url)),
+        artwork,
         // A video wins over the still: the announcement is the teaser.
-        youtubeId: youtubeIdFrom(row.video_url) ?? undefined,
+        youtubeId,
         url,
         linkLabel: url ? (text(row.link_label) ?? (released ? "Listen" : "Pre-save")) : undefined,
       });
