@@ -140,6 +140,25 @@ the lines *above* "non-zero exit code: 2" in the log, which is where the real
 error is. Publish set to `out` instead of `.next` is the other common one:
 this is not a static export.
 
+### Verified on the live project, 2026-08-19
+
+Confirmed by the client running `supabase/VERIFY.sql` against the real
+database after a successful deploy:
+
+- **RLS is enabled on every table.** This closes a question the committed
+  migrations cannot answer on their own. A from-scratch replay of
+  `supabase/migrations/` leaves nine tables without RLS, including
+  `user_roles` and `purchases`, because the policies for those were applied
+  by the two remote migrations that were never committed
+  (`20260319201838`, `20260326213428`). The live project has them. Do not
+  read that replay gap as a live vulnerability, but equally do not assume a
+  rebuilt-from-migrations database is safe: it would not be.
+- The Netlify build succeeds with `netlify.toml` in place.
+
+Still unverified from a build environment, because `supabase.co` is blocked
+at the egress proxy here: a real create, edit, delete and image upload
+through `/admin`. Those four cover every code path the table editor has.
+
 ### Read these first
 
 - `CONTENT_MAP.md`, legacy content vs the clock, page by page
