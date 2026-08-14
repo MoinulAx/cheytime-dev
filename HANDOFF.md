@@ -125,6 +125,21 @@ render. The reverse is now true: `music_releases` carries twelve real tracks
 and `music_links` is empty. `loadMusic()` still falls back, but nothing is
 there to fall back to.
 
+### Deploying
+
+`netlify.toml` pins the build: `npm run build`, publish `.next`, Node 20, and
+the `@netlify/plugin-nextjs` runtime. It exists because this deploys to more
+than one Netlify account and a fresh site inherits that account's defaults —
+usually an old Node, which fails Next 15 before it compiles anything.
+
+The build does **not** need Supabase to succeed. Verified from a clean clone
+with env vars missing, malformed, half-set and pointing at an unreachable
+host: every one exits 0 and falls back to `lib/sections.static.ts`. So a
+failing Netlify build is a build-environment problem, not a data one — read
+the lines *above* "non-zero exit code: 2" in the log, which is where the real
+error is. Publish set to `out` instead of `.next` is the other common one:
+this is not a static export.
+
 ### Read these first
 
 - `CONTENT_MAP.md` — legacy content vs the clock, page by page

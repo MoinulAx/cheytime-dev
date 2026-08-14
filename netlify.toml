@@ -1,0 +1,22 @@
+# Netlify build configuration.
+#
+# Added because this deploys to more than one Netlify account, and a site
+# created fresh inherits whatever defaults that account happens to carry —
+# most often an old Node. Next 15 and React 19 need Node 18.18 or newer, and
+# an account still defaulting to Node 16 fails the build before it compiles a
+# single file. Pinning it here means every account builds the same way.
+
+[build]
+  command = "npm run build"
+  # The Next runtime reads .next and turns it into functions and static
+  # assets. It is not a static export — do not point this at `out`.
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Auto-detected on most sites, declared here so a site that did not detect it
+# still gets it. Without the runtime, a Next app deploys as raw files and
+# every route 404s.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
