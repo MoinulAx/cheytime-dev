@@ -33,6 +33,34 @@ export default function ContentPanel({
   const panelRef = useRef<HTMLDivElement>(null);
   const [isDesktop, setIsDesktop] = useState(false);
 
+  /**
+   * The hero's true shape, once it decodes.
+   *
+   * The frame was a fixed 16:9 with `object-cover`, so every hero that was not
+   * 16:9 lost its edges — a portrait press shot got carved down to a letterbox
+   * band, which is why Press, Digital, Journal and Contact all looked cut off.
+   * Starting at 16:9 reserves the height so the panel does not jump, then the
+   * photograph's own ratio takes over and `object-cover` has nothing to crop.
+   */
+  const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
+
+  // Reset when the panel switches section, or the next hero inherits the
+  // previous one's shape for a frame.
+  useEffect(() => {
+    setNaturalRatio(null);
+  }, [section?.id]);
+
+  /**
+   * Clamped, because this is a banner and not the whole panel. A 9:16 vertical
+   * at true ratio would be taller than the viewport and push every word of the
+   * section below the fold; held at 3:4 it loses a little top and bottom
+   * instead of most of its width. `image_position` in the admin decides which
+   * part survives in that case.
+   */
+  const heroRatio = naturalRatio
+    ? Math.min(Math.max(naturalRatio, 0.75), 2.4)
+    : 16 / 9;
+
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
     const onChange = () => setIsDesktop(mql.matches);
@@ -193,7 +221,10 @@ export default function ContentPanel({
               {/* Opening photograph — each section gets its own */}
               {section.image && (
                 <figure className="mt-8">
-                  <div className="relative aspect-video w-full overflow-hidden border border-bone-100/10">
+                  <div
+                    className="relative w-full overflow-hidden border border-bone-100/10"
+                    style={{ aspectRatio: String(heroRatio) }}
+                  >
                     <MediaImage
                       src={section.image.src}
                       alt={section.image.alt}
@@ -201,6 +232,12 @@ export default function ContentPanel({
                       sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
                       className="object-cover"
                       style={{ objectPosition: section.image.position ?? "50% 50%" }}
+                      onLoad={(e) => {
+                        const el = e.currentTarget;
+                        if (el.naturalWidth > 0 && el.naturalHeight > 0) {
+                          setNaturalRatio(el.naturalWidth / el.naturalHeight);
+                        }
+                      }}
                     />
                   </div>
                   <figcaption className="mt-2 flex items-baseline justify-between">
