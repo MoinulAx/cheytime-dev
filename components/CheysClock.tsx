@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import ClockFace from "./ClockFace";
 import ClockHand from "./ClockHand";
@@ -281,18 +282,26 @@ export default function CheysClock({ sections }: CheysClockProps) {
             )}
             <div className="rule mb-4" />
             <div className="flex items-end justify-between gap-4">
-              {/* Build credit — quiet, bottom-left, clear of the dial. */}
-              <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-600">
-                Site by{" "}
-                <a
-                  href="https://rummspace.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="pointer-events-auto transition-colors hover:text-bone-300"
-                >
-                  rummspace
-                </a>
-              </p>
+              {/* Credits — quiet, bottom-left, clear of the dial. The
+                  production mark sits above the build credit and only appears
+                  once a logo has been uploaded; blank renders nothing at all
+                  rather than a gap or a broken image. */}
+              <div className="min-w-0">
+                {homeData?.brandLogo && (
+                  <BrandMark logo={homeData.brandLogo} />
+                )}
+                <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-600">
+                  Site by{" "}
+                  <a
+                    href="https://rummspace.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pointer-events-auto transition-colors hover:text-bone-300"
+                  >
+                    rummspace
+                  </a>
+                </p>
+              </div>
               <div className="flex items-baseline justify-between gap-4 md:w-auto md:flex-col md:items-end md:gap-1.5">
                 <p className="eyebrow text-bone-100">{homeData?.cue}</p>
                 <p className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
@@ -306,6 +315,47 @@ export default function CheysClock({ sections }: CheysClockProps) {
 
       {/* z-40 — content panel */}
       <ContentPanel section={selected} isOpen={isOpen} onClose={handleClose} />
+    </div>
+  );
+}
+
+/**
+ * The production company's logo, bottom-left above the build credit.
+ *
+ * `unoptimized` because this is a supplied brand mark, not photography — it
+ * is small, usually a PNG with transparency, and re-encoding it is how a logo
+ * picks up fringing on a dark background. Height is fixed and width follows,
+ * so the footer cannot shift when it loads.
+ */
+function BrandMark({
+  logo,
+}: {
+  logo: NonNullable<Extract<Section["data"], { kind: "home" }>["brandLogo"]>;
+}) {
+  const mark = (
+    <Image
+      src={logo.src}
+      alt={logo.alt}
+      height={36}
+      width={124}
+      unoptimized
+      className="h-8 w-auto opacity-75 transition-opacity hover:opacity-100 md:h-9"
+    />
+  );
+  return (
+    <div className="mb-2">
+      {logo.url ? (
+        <a
+          href={logo.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pointer-events-auto inline-block focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+        >
+          {mark}
+        </a>
+      ) : (
+        mark
+      )}
     </div>
   );
 }

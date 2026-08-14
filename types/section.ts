@@ -277,6 +277,13 @@ export type SectionData =
       cue: string;
       /** The legacy home data strip: Based · Genre · Latest · Direction. */
       facts: Fact[];
+      /**
+       * Production credit mark shown beside the build credit in the footer.
+       *
+       * Absent when no logo has been uploaded — the footer then renders the
+       * text credit alone rather than a gap or a broken image.
+       */
+      brandLogo?: { src: string; alt: string; url?: string };
     }
   | {
       kind: "about";

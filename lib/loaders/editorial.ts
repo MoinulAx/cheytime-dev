@@ -1,5 +1,6 @@
 import type { SectionData, SocialLink } from "@/types/section";
 import { text, withSupabase } from "./utils";
+import { renderableImage } from "./images";
 import { setting, type SiteSettings } from "./settings";
 
 type HomeData = Extract<SectionData, { kind: "home" }>;
@@ -8,6 +9,24 @@ type ContactData = Extract<SectionData, { kind: "contact" }>;
 type MusicData = Extract<SectionData, { kind: "music" }>;
 
 /** Home (XII) — copy and the data strip, all from `site_settings`. */
+/**
+ * The production logo, when one has been uploaded.
+ *
+ * Runs through `renderableImage` like every other DB image: an unconfigured
+ * host thrown at `next/image` takes the whole page down, and the footer is on
+ * every view of the site.
+ */
+function brandLogoOf(s: SiteSettings): HomeData["brandLogo"] {
+  const src = renderableImage(s["brand.logo_url"]);
+  if (!src) return undefined;
+  const url = s["brand.logo_link"];
+  return {
+    src,
+    alt: s["brand.logo_alt"] || "Smoke Media Group",
+    url: url && /^https?:\/\//i.test(url) ? url : undefined,
+  };
+}
+
 export function applyHome(fallback: HomeData, s: SiteSettings): HomeData {
   // The strip's labels are fixed; only the values are editable, so each is a
   // settings key rather than a table. A blank value drops that pair entirely
@@ -24,6 +43,9 @@ export function applyHome(fallback: HomeData, s: SiteSettings): HomeData {
     intro: setting(s, "home.intro", fallback.intro),
     cue: setting(s, "home.cue", fallback.cue),
     facts,
+    // Falls back like every other field here: settings win, but an
+    // unreachable database must not blank the mark out.
+    brandLogo: brandLogoOf(s) ?? fallback.brandLogo,
   };
 }
 

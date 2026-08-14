@@ -440,8 +440,11 @@ export function MusicBlock({
         {shownVideos.map((v, i) => (
           <Item key={v.id}>
             <div className="mb-2 flex items-baseline justify-between border-b border-bone-100/10 pb-2">
+              {/* A row can legitimately have no title yet — a video added
+                  before anyone typed its name. The number carries the row on
+                  its own; inventing a title would be worse than showing none. */}
               <p className="font-sans text-sm text-bone-100">
-                <span className="mr-3 font-display italic text-bone-400">
+                <span className={v.title ? "mr-3 font-display italic text-bone-400" : "font-display italic text-bone-400"}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {v.title}
