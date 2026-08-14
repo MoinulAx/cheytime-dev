@@ -81,6 +81,21 @@ export function GalleryBlock({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const isPreview = limit !== undefined;
 
+  // Every other block has an empty state; this one rendered a bare panel with
+  // a description and nothing under it. Cannot happen with the archive as it
+  // stands, but "no rows yet" is a state, not an accident.
+  if (shownImages.length === 0 && (!shownLinks || shownLinks.length === 0)) {
+    return (
+      <div className="border-y border-bone-100/10 py-12">
+        <p className="font-display text-2xl italic text-bone-300">Nothing yet.</p>
+        <p className="measure mt-3 font-sans text-sm leading-relaxed text-bone-300/80">
+          The archive is empty. Photographs and posts added in the admin appear
+          here.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Stagger>
       {description && (
@@ -106,7 +121,10 @@ export function GalleryBlock({
           "mt-6 gap-4",
           isPreview
             ? "columns-1 min-[420px]:columns-2"
-            : "columns-1 min-[560px]:columns-2 lg:columns-3 md:gap-6",
+            // Full-bleed on the page, so the column count keeps climbing with
+            // the monitor instead of stopping at three and leaving the rest
+            // of a 1920 screen empty.
+            : "columns-1 min-[560px]:columns-2 lg:columns-3 xl:columns-4 2xl:columns-5 md:gap-6",
         ].join(" ")}
       >
         {shownImages.map((img, i) => (
@@ -122,7 +140,7 @@ export function GalleryBlock({
               sizes={
                 isPreview
                   ? "(max-width: 419px) 90vw, (max-width: 1023px) 45vw, 440px"
-                  : "(max-width: 559px) 92vw, (max-width: 1023px) 46vw, 330px"
+                  : "(max-width: 559px) 92vw, (max-width: 1023px) 46vw, (max-width: 1279px) 31vw, (max-width: 1535px) 24vw, 19vw"
               }
             />
             <figcaption className="mt-2 flex items-baseline justify-between gap-3">
@@ -144,16 +162,25 @@ export function GalleryBlock({
         ))}
       </div>
 
-      {/* Off-site entries — appearances that only exist as posts. Grouped
-          below the photographs rather than interleaved: they are a different
-          kind of object, and threading them through the photo stack breaks
-          its rhythm. */}
+      {/*
+        Off-site entries live in the same masonry as the photographs.
+
+        They used to sit in a full-width list underneath, which broke once the
+        page went full-bleed: an Instagram embed stretched across 1900px
+        renders its card adrift in a sea of white and clips its own content.
+        Instagram's embed is happiest between about 326 and 540px, which is
+        almost exactly a masonry column — so it goes in the column, as the
+        legacy gallery had it.
+      */}
       {shownLinks && shownLinks.length > 0 && (
-        <div className="mt-12">
+        <div className="mt-10">
           <Item>
             <p className="eyebrow border-b border-bone-100/10 pb-2">Elsewhere</p>
           </Item>
-          <ul className="mt-4 space-y-8">
+          {/* Column count tuned so each embed lands in Instagram's comfortable
+              range (roughly 326-540px) at every width — too narrow and it
+              clips its own card, too wide and it floats in white. */}
+          <div className="mt-5 columns-1 gap-4 min-[560px]:columns-2 lg:columns-3 2xl:columns-4 min-[2200px]:columns-5 md:gap-6">
             {shownLinks.map((link) => {
               const label = [link.platform, link.kind, link.meta]
                 .filter(Boolean)
@@ -164,75 +191,76 @@ export function GalleryBlock({
               // treatment available when there is nothing to embed.
               if (!link.embedUrl) {
                 return (
-                  <li key={link.url}>
-                    <Item>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex items-baseline gap-3 border border-bone-100/10 px-4 py-3 transition-colors hover:border-bone-100/35 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+                  <div key={link.url} className="mb-4 break-inside-avoid md:mb-6">
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-baseline gap-3 border border-bone-100/10 px-4 py-3 transition-colors hover:border-bone-100/35 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-sans text-[13px] leading-snug text-bone-100">
+                          {link.title}
+                        </span>
+                        <span className="mt-1 block font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                          {label}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className="shrink-0 font-sans text-[11px] text-bone-500 transition-colors group-hover:text-bone-100"
                       >
-                        <span className="min-w-0 flex-1">
-                          <span className="block font-sans text-[13px] leading-snug text-bone-100">
-                            {link.title}
-                          </span>
-                          <span className="mt-1 block font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
-                            {label}
-                          </span>
-                        </span>
-                        <span
-                          aria-hidden="true"
-                          className="shrink-0 font-sans text-[11px] text-bone-500 transition-colors group-hover:text-bone-100"
-                        >
-                          ↗
-                        </span>
-                      </a>
-                    </Item>
-                  </li>
+                        ↗
+                      </span>
+                    </a>
+                  </div>
                 );
               }
 
               return (
-                <li key={link.url}>
-                  <Item>
-                    <figure>
-                      <div className="flex items-baseline justify-between pb-2">
-                        <span className="font-sans text-[13px] leading-snug text-bone-100">
-                          {link.title}
-                        </span>
-                        <span className="shrink-0 pl-3 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
-                          {label}
-                        </span>
-                      </div>
-                      {/* Instagram's embed renders its own white card, so the
-                          container is light on purpose — a dark frame around it
-                          reads as a rendering fault rather than a choice. */}
-                      <div className="overflow-hidden border border-bone-100/10 bg-white">
-                        <iframe
-                          src={link.embedUrl}
-                          title={link.title}
-                          loading="lazy"
-                          referrerPolicy="strict-origin-when-cross-origin"
-                          className="block w-full border-0"
-                          height={link.kind === "Reel" ? 620 : 500}
-                        />
-                      </div>
-                      <figcaption className="mt-2">
-                        <a
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500 transition-colors hover:text-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
-                        >
-                          Open on {link.platform} ↗
-                        </a>
-                      </figcaption>
-                    </figure>
-                  </Item>
-                </li>
+                <figure
+                  key={link.url}
+                  className="mb-4 break-inside-avoid md:mb-6"
+                >
+                  <div className="flex items-baseline justify-between gap-3 pb-2">
+                    <span className="min-w-0 truncate font-sans text-[13px] leading-snug text-bone-100">
+                      {link.title}
+                    </span>
+                    <span className="shrink-0 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                      {label}
+                    </span>
+                  </div>
+                  {/* Instagram's embed renders its own white card, so the
+                      container is light on purpose — a dark frame around it
+                      reads as a rendering fault rather than a choice.
+                      `overflow-hidden` clips the embed's own horizontal
+                      scrollbar, which is what pushed the card past the right
+                      edge of its column. */}
+                  <div className="overflow-hidden border border-bone-100/10 bg-white">
+                    <iframe
+                      src={link.embedUrl}
+                      title={link.title}
+                      loading="lazy"
+                      scrolling="no"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      className="block w-full border-0"
+                      height={link.kind === "Reel" ? 560 : 480}
+                    />
+                  </div>
+                  <figcaption className="mt-2">
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-sans text-[10px] uppercase tracking-wide2 text-bone-500 transition-colors hover:text-bone-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-bone-100"
+                    >
+                      Open on {link.platform} ↗
+                    </a>
+                  </figcaption>
+                </figure>
               );
             })}
-          </ul>
+          </div>
         </div>
       )}
 
@@ -262,18 +290,31 @@ export function GalleryBlock({
   );
 }
 
-const ASPECT: Record<NonNullable<GalleryImage["aspect"]>, string> = {
-  square: "aspect-square",
-  portrait: "aspect-[3/4]",
-  landscape: "aspect-[4/3]",
+/**
+ * Starting shape for a tile, from `gallery_items.aspect_ratio`.
+ *
+ * Only used to reserve space before the photograph arrives. Once it loads the
+ * tile switches to the image's real ratio, so a 16:9 shot no longer has its
+ * sides cut off to fit a 4:3 box.
+ */
+const HINT_RATIO: Record<NonNullable<GalleryImage["aspect"]>, number> = {
+  square: 1,
+  portrait: 3 / 4,
+  landscape: 4 / 3,
 };
 
 /**
  * One photograph in the masonry.
  *
- * The frame comes from the row's own `aspect_ratio`, so the container has a
- * known height before the image arrives — nothing reflows as the archive
- * loads, which is what "lazy loading breaks the layout" actually was.
+ * The frame starts at the row's declared shape — which reserves height, so
+ * nothing reflows as the archive streams in — and then adopts the image's
+ * true ratio the moment it decodes. That is what stops photographs being
+ * cropped: `object-cover` only ever crops when the frame disagrees with the
+ * picture, and after load it never does.
+ *
+ * Reading `naturalWidth` rather than storing dimensions in the database
+ * because nothing uploads them and asking the client to measure every
+ * photograph by hand is not a real workflow.
  */
 function GalleryTile({
   image,
@@ -288,10 +329,13 @@ function GalleryTile({
   onOpen: () => void;
   sizes: string;
 }) {
-  const frame = ASPECT[image.aspect ?? "landscape"];
+  const [ratio, setRatio] = useState<number | null>(null);
+  const hint = HINT_RATIO[image.aspect ?? "landscape"];
+
   const inner = (
     <div
-      className={`relative w-full overflow-hidden border border-bone-100/10 bg-void-800 ${frame}`}
+      className="relative w-full overflow-hidden border border-bone-100/10 bg-void-800"
+      style={{ aspectRatio: String(ratio ?? hint) }}
     >
       <MediaImage
         src={image.src}
@@ -302,6 +346,12 @@ function GalleryTile({
         style={{ objectPosition: image.position ?? "50% 50%" }}
         // The first few are above the fold on most screens; the rest stay lazy.
         priority={index < 2}
+        onLoad={(e) => {
+          const el = e.currentTarget;
+          if (el.naturalWidth > 0 && el.naturalHeight > 0) {
+            setRatio(el.naturalWidth / el.naturalHeight);
+          }
+        }}
       />
     </div>
   );
