@@ -1,6 +1,6 @@
 import type { Database } from "@/lib/supabase/database.types";
 import type { SectionData, UpcomingRelease } from "@/types/section";
-import { text, withSupabase } from "./utils";
+import { text, withSupabase, youtubeIdFrom } from "./utils";
 import { renderableImage } from "./images";
 
 type UpcomingData = Extract<SectionData, { kind: "upcoming" }>;
@@ -92,6 +92,8 @@ export async function loadUpcoming(
         released,
         description: text(row.description),
         artwork: renderableImage(text(row.artwork_url)),
+        // A video wins over the still: the announcement is the teaser.
+        youtubeId: youtubeIdFrom(row.video_url) ?? undefined,
         url,
         linkLabel: url ? (text(row.link_label) ?? (released ? "Listen" : "Pre-save")) : undefined,
       });

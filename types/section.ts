@@ -241,6 +241,11 @@ export interface UpcomingRelease {
   released: boolean;
   description?: string;
   artwork?: string;
+  /**
+   * YouTube id, when the announcement has a video rather than just a still.
+   * Takes priority over `artwork` — a teaser is the thing people click.
+   */
+  youtubeId?: string;
   url?: string;
   /** Button wording, e.g. "Listen". Falls back to a sensible default. */
   linkLabel?: string;

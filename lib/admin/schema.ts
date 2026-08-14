@@ -261,7 +261,7 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Upcoming",
     numeral: "I",
     showsOn:
-      "Upcoming (I) — the announcements hour. The first row is the lead and gets its poster full width; the rest run underneath as a list. Only published rows appear.",
+      "Upcoming (I) — the announcements hour. Anything still to come is listed first, with the lead getting its video or poster full width; anything already out drops into a Recently released group underneath. Only published rows appear.",
     blurb:
       "What is next. A row only needs a Title to be worth showing — artwork, date and link are all optional and can be filled in as they are confirmed. Set Sort order to choose which one leads.",
     labelKey: "title",
@@ -292,10 +292,17 @@ export const ADMIN_TABLES: TableDef[] = [
         hint: "Leave blank if the date is not confirmed — the badge says Announced rather than inventing one.",
       },
       {
+        key: "video_url",
+        label: "Video",
+        type: "url",
+        placeholder: "https://youtu.be/…",
+        hint: "A teaser, visualiser or full video. When this is set the card plays the video instead of the poster — so a release can lead with either.",
+      },
+      {
         key: "artwork_url",
         label: "Poster / artwork",
         type: "image",
-        hint: "The lead release shows this full width, so use the largest version you have.",
+        hint: "Used when there is no video. The lead release shows this full width, so use the largest version you have.",
       },
       {
         key: "link_url",
@@ -317,6 +324,7 @@ export const ADMIN_TABLES: TableDef[] = [
     defaults: {
       title: "",
       status: "announced",
+      video_url: "",
       artwork_url: "",
       link_url: "",
       link_label: "",

@@ -826,7 +826,15 @@ function UpcomingBlock({
     );
   }
 
-  const [lead, ...rest] = releases;
+  // Split rather than one mixed list. "Upcoming" that opens on something
+  // released last spring is not an announcement hour, it is a feed — and the
+  // one thing a visitor is here for, what is next, was buried among things
+  // that already happened. Order within each group is still the admin's.
+  const ahead = releases.filter((r) => !r.released);
+  const out = releases.filter((r) => r.released);
+  const [lead, ...rest] = ahead.length > 0 ? ahead : out;
+  const secondary = ahead.length > 0 ? rest : [];
+  const recent = ahead.length > 0 ? out : rest;
 
   return (
     <Stagger>
@@ -838,21 +846,10 @@ function UpcomingBlock({
         </Item>
       )}
 
-      {/* Lead release — the poster leads when there is one. */}
+      {/* Lead release — its video if it has one, otherwise its poster. */}
       <Item>
         <article className="mt-6 border border-bone-100/10">
-          {lead.artwork && (
-            <div className="relative aspect-[4/5] w-full overflow-hidden border-b border-bone-100/10 bg-void-800 sm:aspect-[16/10]">
-              <MediaImage
-                src={lead.artwork}
-                alt={`${lead.title} — artwork`}
-                fill
-                sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
-                className="object-cover"
-                priority
-              />
-            </div>
-          )}
+          <LeadMedia release={lead} />
           <div className="p-5">
             <Badge label={lead.statusLabel} released={lead.released} />
             <h3 className="mt-3 font-display text-3xl leading-[1.05] text-bone-50">
@@ -882,58 +879,126 @@ function UpcomingBlock({
         </article>
       </Item>
 
-      {rest.length > 0 && (
-        <div className="mt-6 divide-y divide-bone-100/10 border-t border-bone-100/10">
-          {rest.map((r) => (
-            <Item key={r.id}>
-              <article className="flex gap-4 py-4">
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
-                  {r.artwork ? (
-                    <MediaImage
-                      src={r.artwork}
-                      alt=""
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <span className="absolute inset-0 grid place-items-center font-display text-xl italic text-bone-100/15">
-                      ♪
-                    </span>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <Badge label={r.statusLabel} released={r.released} />
-                  <p className="mt-1.5 font-display text-lg leading-tight text-bone-50">
-                    {r.title}
-                  </p>
-                  {r.dateLabel && (
-                    <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
-                      {r.dateLabel}
-                    </p>
-                  )}
-                  {r.description && (
-                    <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
-                      {r.description}
-                    </p>
-                  )}
-                  {r.url && (
-                    <a
-                      href={r.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-block font-sans text-[10px] uppercase tracking-wide2 text-bone-300 underline decoration-bone-100/25 underline-offset-4 transition-colors hover:text-bone-50 hover:decoration-bone-100"
-                    >
-                      {r.linkLabel}
-                    </a>
-                  )}
-                </div>
-              </article>
-            </Item>
-          ))}
+      {secondary.length > 0 && <ReleaseList releases={secondary} />}
+
+      {recent.length > 0 && (
+        <div className="mt-10">
+          <Item>
+            <p className="eyebrow border-b border-bone-100/10 pb-2">
+              Recently released
+            </p>
+          </Item>
+          <ReleaseList releases={recent} />
         </div>
       )}
     </Stagger>
+  );
+}
+
+/** The lead card's media: video first, then poster, then nothing. */
+function LeadMedia({ release }: { release: UpcomingRelease }) {
+  if (release.youtubeId) {
+    return (
+      <div className="border-b border-bone-100/10">
+        <LiteYouTube
+          video={{
+            id: release.id,
+            title: release.title,
+            youtubeId: release.youtubeId,
+          }}
+        />
+      </div>
+    );
+  }
+  if (release.artwork) {
+    return (
+      <div className="relative aspect-[4/5] w-full overflow-hidden border-b border-bone-100/10 bg-void-800 sm:aspect-[16/10]">
+        <MediaImage
+          src={release.artwork}
+          alt={`${release.title} — artwork`}
+          fill
+          sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 780px, 920px"
+          className="object-cover"
+          priority
+        />
+      </div>
+    );
+  }
+  return null;
+}
+
+/** The compact rows under the lead, used for both groups. */
+function ReleaseList({ releases }: { releases: UpcomingRelease[] }) {
+  return (
+    <div className="mt-4 divide-y divide-bone-100/10 border-t border-bone-100/10">
+      {releases.map((r) => (
+        <Item key={r.id}>
+          <article className="flex gap-4 py-4">
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-bone-100/10 bg-void-800">
+              {r.youtubeId ? (
+                // The video's own poster frame, so a row with a video still
+                // reads as one at a glance rather than falling back to a note.
+                <MediaImage
+                  src={`https://i.ytimg.com/vi/${r.youtubeId}/hqdefault.jpg`}
+                  alt=""
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+              ) : r.artwork ? (
+                <MediaImage
+                  src={r.artwork}
+                  alt=""
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+              ) : (
+                <span className="absolute inset-0 grid place-items-center font-display text-xl italic text-bone-100/15">
+                  ♪
+                </span>
+              )}
+              {r.youtubeId && (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 grid place-items-center bg-black/30"
+                >
+                  <svg width="10" height="12" viewBox="0 0 18 20">
+                    <path d="M0 0l18 10L0 20z" fill="#f6f3ec" />
+                  </svg>
+                </span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <Badge label={r.statusLabel} released={r.released} />
+              <p className="mt-1.5 font-display text-lg leading-tight text-bone-50">
+                {r.title}
+              </p>
+              {r.dateLabel && (
+                <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
+                  {r.dateLabel}
+                </p>
+              )}
+              {r.description && (
+                <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
+                  {r.description}
+                </p>
+              )}
+              {r.url && (
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-block font-sans text-[10px] uppercase tracking-wide2 text-bone-300 underline decoration-bone-100/25 underline-offset-4 transition-colors hover:text-bone-50 hover:decoration-bone-100"
+                >
+                  {r.linkLabel}
+                </a>
+              )}
+            </div>
+          </article>
+        </Item>
+      ))}
+    </div>
   );
 }
 

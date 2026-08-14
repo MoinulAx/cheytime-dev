@@ -59,7 +59,7 @@ export default function MediaImage({
         quality={quality}
         className={`${className} transition-opacity duration-500 ${
           state === "loaded" ? "opacity-100" : "opacity-0"
-        }`}
+        } ${state === "failed" ? "invisible" : ""}`}
         onLoad={(e) => {
           setState("loaded");
           onLoad?.(e);

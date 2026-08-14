@@ -393,6 +393,7 @@ export type Database = {
           sort_order: number
           status: string
           title: string
+          video_url: string
         }
         Insert: {
           artwork_url?: string
@@ -406,6 +407,7 @@ export type Database = {
           sort_order?: number
           status?: string
           title?: string
+          video_url?: string
         }
         Update: {
           artwork_url?: string
@@ -419,6 +421,7 @@ export type Database = {
           sort_order?: number
           status?: string
           title?: string
+          video_url?: string
         }
         Relationships: []
       }
