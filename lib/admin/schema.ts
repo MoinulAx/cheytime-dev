@@ -619,9 +619,9 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Digital",
     numeral: "VII",
     showsOn:
-      "Digital (VII). Active rows appear with their preview clip only, there is no longer a Buy button on this hour.",
+      "Digital (VII). Active rows appear with their preview clip. A row ticked as a free download shows a Free badge and gives visitors the full track instead.",
     blurb:
-      "Preview-only tracks. Active rows show on the clock with their preview clip; nothing here is for sale, so Price is kept for reference but is not displayed. Full tracks meant for listening belong on the Album hour (III) instead.",
+      "Preview-only tracks, with one exception. Active rows show on the clock with their preview clip; nothing here is for sale, so Price is kept for reference but is not displayed. Tick “Free download” to give a track away: the site then publishes the full file for anyone to keep, so only tick it for a track meant to be free. Full tracks meant for listening rather than keeping belong on the Album hour (III).",
     labelKey: "title",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -635,11 +635,17 @@ export const ADMIN_TABLES: TableDef[] = [
       { key: "description", label: "Description", type: "textarea" },
       { key: "cover_url", label: "Cover", type: "image" },
       {
+        key: "is_free",
+        label: "Free download",
+        type: "boolean",
+        hint: "Gives the full track away. The file below becomes public and anyone can keep it, so leave this off for anything you might sell.",
+      },
+      {
         key: "audio_url",
         label: "Full track",
         type: "audio",
         bucket: "music-files",
-        hint: "Never sent to the site. Kept for the legacy download flow only. To publish a full track for listening, add it under Music & Album instead.",
+        hint: "Only reaches the site when “Free download” is ticked above. Otherwise it stays private and the hour plays the preview clip. To publish a full track for listening, add it under Music & Album instead.",
       },
       {
         key: "preview_audio_url",
@@ -654,6 +660,7 @@ export const ADMIN_TABLES: TableDef[] = [
       title: "",
       artist: "",
       price: 0,
+      is_free: false,
       description: "",
       cover_url: "",
       audio_url: "",

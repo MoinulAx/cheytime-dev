@@ -2,26 +2,10 @@ import type { Database } from "@/lib/supabase/database.types";
 import type { AlbumRecord, AlbumTrack, SectionData } from "@/types/section";
 import { text, withSupabase, yearOf } from "./utils";
 import { renderableImage } from "./images";
+import { streamableAudio } from "./audio";
 
 type AlbumData = Extract<SectionData, { kind: "album" }>;
 type ReleaseRow = Database["public"]["Tables"]["music_releases"]["Row"];
-
-/**
- * Only public Storage URLs are streamable from the browser.
- *
- * A signed URL would expire and leave a dead player on a cached page, and a
- * non-https URL is blocked as mixed content. Anything else is dropped so the
- * track still lists, just without a player, rather than rendering a control
- * that silently fails.
- */
-function streamableAudio(url: string | null | undefined): string | undefined {
-  const value = text(url);
-  if (!value) return undefined;
-  if (!value.startsWith("https://")) return undefined;
-  if (value.includes("/storage/v1/object/sign/")) return undefined;
-  if (value.includes("token=")) return undefined;
-  return value;
-}
 
 const toTrack = (row: ReleaseRow): AlbumTrack => ({
   id: row.id,

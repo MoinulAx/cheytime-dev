@@ -176,13 +176,39 @@ export function warningsFor(
       if (row.active === false) {
         out.push({ field: "active", message: "Not active, so this will not appear in the Store." });
       }
+      // There is no free merch. Stripe refuses a checkout whose total is zero,
+      // so a shopper with only this in the basket gets an error at the last
+      // step rather than a free item. Free giveaways live on Digital (VII).
+      if (has("price") && Number(row.price) === 0) {
+        out.push({
+          field: "price",
+          message:
+            "A price of 0 is not a free item: checkout fails for a basket that totals nothing. Set a real price, or give the item away on the Digital hour instead.",
+        });
+      }
       break;
 
     case "music_products": {
       if (row.active === false) {
         out.push({ field: "active", message: "Not active, so this will not appear on the Digital hour." });
       }
-      if (!has("preview_audio_url")) {
+      if (row.is_free === true) {
+        // A free row promises a download. Saying "Free" and then offering
+        // nothing to take is worse than not marking it free at all.
+        if (!has("audio_url")) {
+          out.push({
+            field: "audio_url",
+            message:
+              "Marked as a free download but no full track is uploaded, so there is nothing to download. Upload the file here, or untick “Free download”.",
+          });
+        } else if (!audioWillStream(str(row.audio_url))) {
+          out.push({
+            field: "audio_url",
+            message:
+              "This file cannot be given away as it stands: the link expires or is not a public one. Use the Upload button so the site can serve it.",
+          });
+        }
+      } else if (!has("preview_audio_url")) {
         out.push({
           field: "preview_audio_url",
           message: "Without a preview clip this row shows its text only, with nothing to play.",

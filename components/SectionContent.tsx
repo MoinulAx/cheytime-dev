@@ -1254,21 +1254,47 @@ function DigitalBlock({
                 {/* No price, no Add. Digital is preview-only, the tracks are
                     here to be heard, not sold. `music_products.price` is still
                     read by the loader and still editable in the admin, so
-                    turning sales back on is a UI change, not a data migration. */}
+                    turning sales back on is a UI change, not a data migration.
+
+                    The one thing that does leave this hour is a free track,
+                    below, and only when the client has ticked it as such. */}
+                {r.free && (
+                  <span className="h-fit shrink-0 border border-bone-100/25 px-2 py-1 font-sans text-[9px] uppercase tracking-wide2 text-bone-200">
+                    Free
+                  </span>
+                )}
               </div>
-              {r.previewUrl && (
+              {/* A free track plays in full and can be kept. Anything else
+                  gets the preview clip only: `audio_url` stays server-side,
+                  and full files meant for listening live on Album (III). */}
+              {r.downloadUrl ? (
                 <div className="border-t border-bone-100/10 px-4 py-3">
-                  <p className="eyebrow mb-2">Preview</p>
-                  {/* Still the preview clip, not the master. `audio_url` stays
-                      server-side, full files belong on the Album hour (III),
-                      where they are uploaded deliberately for streaming. */}
+                  <p className="eyebrow mb-2">Free download</p>
                   <audio
                     controls
                     preload="none"
-                    src={r.previewUrl}
+                    src={r.downloadUrl}
                     className="w-full"
                   />
+                  <a
+                    href={r.downloadUrl}
+                    className="btn-editorial mt-3 inline-block"
+                  >
+                    Download
+                  </a>
                 </div>
+              ) : (
+                r.previewUrl && (
+                  <div className="border-t border-bone-100/10 px-4 py-3">
+                    <p className="eyebrow mb-2">Preview</p>
+                    <audio
+                      controls
+                      preload="none"
+                      src={r.previewUrl}
+                      className="w-full"
+                    />
+                  </div>
+                )
               )}
             </article>
           </Item>

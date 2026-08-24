@@ -251,7 +251,7 @@ export interface UpcomingRelease {
   linkLabel?: string;
 }
 
-/** A paid digital release (music_products). */
+/** A digital release (music_products). */
 export interface DigitalRelease {
   id: string;
   title: string;
@@ -259,8 +259,17 @@ export interface DigitalRelease {
   price: number;
   description?: string;
   cover?: string;
-  /** Short preview clip, the only audio playable without buying. */
+  /** Short preview clip. Present on every row, free or not. */
   previewUrl?: string;
+  /** Marked as a giveaway in the admin. Drives the badge and the button. */
+  free?: boolean;
+  /**
+   * Full track, downloadable. Only ever set on a free row: the loader reads
+   * `audio_url` for those alone, so a paid master never reaches the browser
+   * even as a URL. Absent on a free row means the file is missing or is a
+   * signed URL that would expire, and the row falls back to its preview.
+   */
+  downloadUrl?: string;
 }
 
 /** A social or platform link. `url: null` => known channel, URL still missing. */

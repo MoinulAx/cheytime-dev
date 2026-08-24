@@ -297,6 +297,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          is_free: boolean
           preview_audio_url: string | null
           price: number
           sort_order: number
@@ -310,6 +311,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_free?: boolean
           preview_audio_url?: string | null
           price?: number
           sort_order?: number
@@ -323,6 +325,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_free?: boolean
           preview_audio_url?: string | null
           price?: number
           sort_order?: number

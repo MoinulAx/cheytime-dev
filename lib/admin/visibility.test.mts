@@ -51,5 +51,25 @@ t("inactive merch warns", () => assert.match(msgs("merch_products", { active: fa
 t("unpublished press warns", () => assert.match(msgs("press_features", { published: false }), /not appear on the Press/));
 t("digital with no preview warns", () => assert.match(msgs("music_products", { active: true }), /nothing to play/));
 
+console.log("\nfree downloads");
+const PUBLIC_MP3 = "https://x.supabase.co/storage/v1/object/public/music-files/a.mp3";
+t("free with a public file is silent", () =>
+  assert.equal(msgs("music_products", { active: true, is_free: true, audio_url: PUBLIC_MP3 }), ""));
+t("free with no file warns", () =>
+  assert.match(msgs("music_products", { active: true, is_free: true }), /nothing to download/));
+t("free with a signed url warns", () =>
+  assert.match(
+    msgs("music_products", { active: true, is_free: true, audio_url: "https://x.supabase.co/storage/v1/object/sign/music-files/a.mp3?token=abc" }),
+    /cannot be given away/,
+  ));
+t("free row is not nagged about a preview clip", () =>
+  assert.doesNotMatch(msgs("music_products", { active: true, is_free: true, audio_url: PUBLIC_MP3 }), /nothing to play/));
+t("a paid row is never asked for a full track", () =>
+  assert.doesNotMatch(msgs("music_products", { active: true, preview_audio_url: PUBLIC_MP3 }), /download/));
+t("zero-priced merch warns rather than being free", () =>
+  assert.match(msgs("merch_products", { active: true, price: 0 }), /not a free item/));
+t("priced merch is silent", () =>
+  assert.equal(msgs("merch_products", { active: true, price: 65 }), ""));
+
 console.log(fail ? `\n${fail} FAILED\n` : "\nall passed\n");
 process.exit(fail ? 1 : 0);

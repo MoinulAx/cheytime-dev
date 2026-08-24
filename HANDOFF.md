@@ -26,7 +26,7 @@ Supabase is unreachable.
 | IV | Music | `music_releases`, falling back to `music_links` |
 | V | Journal | `blog_posts` |
 | VI | Store | `merch_products` (+ `merch_product_images`) |
-| VII | Digital | `music_products` (preview clips only) |
+| VII | Digital | `music_products` (preview clips, plus free downloads) |
 | VIII | Events | `events` |
 | IX | Gallery | `gallery_items` |
 | X | Contact | `site_settings` (`contact.*`) + `social_links` |
@@ -343,3 +343,32 @@ the static fallback.
 Ask me before: changing the clock's geometry or animations, deciding anything
 in the "Open decisions" list, or applying a migration.
 ```
+
+## Free downloads on Digital (VII)
+
+`music_products.is_free` decides whether a track is given away. When it is
+true and the row is active, the loader publishes `audio_url` as a download and
+the hour shows a Free badge, the full track, and a Download button. When it is
+false, `audio_url` never leaves the server and the hour plays the preview clip,
+exactly as before.
+
+Three things worth knowing before changing any of this:
+
+**It is not driven by price.** `price` is `NOT NULL DEFAULT 0`, so most rows
+already sit at zero. Treating zero as free would have published every master on
+the hour the moment it deployed. The flag defaults to false and has to be
+ticked per row.
+
+**One read, one guard.** `lib/loaders/digital.ts` touches `row.audio_url` on
+exactly one line, behind `free ? … : undefined`. `lib/loaders/audio.test.mts`
+asserts that and fails if a second read appears or the ternary goes, which is
+the only thing standing between a paid master and the page source.
+
+**The download header comes from Storage.** `downloadableAudio` appends
+`?download=<filename>`, which makes Supabase send `Content-Disposition:
+attachment`. The `download` attribute on an anchor is ignored cross-origin, so
+without the query the browser streams the file in a tab instead of saving it.
+
+There is still no free merch. Stripe refuses a checkout that totals zero, so a
+$0 merch row fails at the last step; the admin warns about this and points the
+client at Digital instead.
