@@ -1128,7 +1128,13 @@ function AlbumBlock({
                     </h3>
                     <p className="mt-1 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
                       {album.year ? `${album.year} · ` : ""}
-                      {playable} track{playable === 1 ? "" : "s"}
+                      {/* A record we do not hold the files for has no track
+                          count to give. "0 tracks" would read as broken. */}
+                      {playable > 0
+                        ? `${playable} track${playable === 1 ? "" : "s"}`
+                        : album.link
+                          ? "Streaming"
+                          : "0 tracks"}
                     </p>
                     {album.description && (
                       <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-200/80">
@@ -1176,6 +1182,23 @@ function AlbumBlock({
                     </li>
                   ))}
                 </ol>
+
+                {/* Where to hear it, for a record that streams elsewhere. Sits
+                    below the tracklist so a record with both keeps its player
+                    first: the point of this hour is that the music plays here
+                    when we hold the files. */}
+                {album.link && (
+                  <div className="border-t border-bone-100/10 px-4 py-4">
+                    <a
+                      href={album.link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-editorial"
+                    >
+                      {album.link.label}
+                    </a>
+                  </div>
+                )}
               </section>
             </Item>
           );

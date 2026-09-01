@@ -122,19 +122,24 @@ export function warningsFor(
     case "music_releases": {
       const yt = hasYouTubeId(str(row.platform_link));
       const audio = audioWillStream(str(row.audio_url));
+      // An album or mixtape carries the record itself, so a streaming link is
+      // enough to put it on the Album hour even with nothing uploaded.
+      const record = ["album", "mixtape"].includes(str(row.release_type));
+      const streams = record && str(row.platform_link).startsWith("https://");
       // The specific reason first. Telling someone who just pasted a Spotify
       // link that the row "needs a link" is technically true and useless.
       if (!yt && str(row.platform_link)) {
         out.push({
           field: "platform_link",
-          message:
-            "This is not a YouTube link the site can embed, so the row will not appear on the Music hour. Spotify and Apple links are stored but cannot be played here.",
+          message: record
+            ? "This is not a YouTube link, so the row will not appear on the Music hour. It still shows on the Album hour with a Listen button."
+            : "This is not a YouTube link the site can embed, so the row will not appear on the Music hour. Spotify and Apple links are stored but cannot be played here.",
         });
       }
-      if (!yt && !audio) {
+      if (!yt && !audio && !streams) {
         out.push({
           message:
-            "This row will not appear anywhere yet. Add a YouTube link to put it on the Music hour, or upload audio to put it on the Album hour. A row can do both.",
+            "This row will not appear anywhere yet. Add a YouTube link to put it on the Music hour, upload audio to play it on the Album hour, or set Type to album or mixtape and paste a streaming link to list it there. A row can do all three.",
         });
       }
       break;

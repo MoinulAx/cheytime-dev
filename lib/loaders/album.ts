@@ -4,7 +4,51 @@ import { text, withSupabase, yearOf } from "./utils";
 import { renderableImage } from "./images";
 import { streamableAudio } from "./audio";
 
+/**
+ * A record can live on a streaming service rather than in our bucket.
+ *
+ * `platform` is a free-text column, so this maps the values the admin offers
+ * and falls back to the host name for anything typed by hand. Returns
+ * undefined for a link we cannot send a visitor to, which keeps a malformed
+ * row from rendering a dead button.
+ */
+const PLATFORM_LABELS: Record<string, string> = {
+  apple_music: "Apple Music",
+  itunes: "Apple Music",
+  spotify: "Spotify",
+  youtube: "YouTube",
+  soundcloud: "SoundCloud",
+  bandcamp: "Bandcamp",
+  tidal: "Tidal",
+};
+
+function listenLink(
+  platform: string | null | undefined,
+  link: string | null | undefined,
+): { url: string; label: string } | undefined {
+  const url = text(link);
+  if (!url || !url.startsWith("https://")) return undefined;
+  const key = text(platform)?.toLowerCase();
+  let name = key ? PLATFORM_LABELS[key] : undefined;
+  if (!name) {
+    try {
+      name = new URL(url).hostname.replace(/^www\./, "");
+    } catch {
+      return undefined;
+    }
+  }
+  return { url, label: `Listen on ${name}` };
+}
+
 type AlbumData = Extract<SectionData, { kind: "album" }>;
+
+/**
+ * Release types that group child tracks under one sleeve. A mixtape is an
+ * album as far as this hour is concerned; the word is the only difference,
+ * and the client thinks in mixtapes.
+ */
+const isRecord = (releaseType: string | null | undefined): boolean =>
+  releaseType === "album" || releaseType === "mixtape";
 type ReleaseRow = Database["public"]["Tables"]["music_releases"]["Row"];
 
 const toTrack = (row: ReleaseRow): AlbumTrack => ({
@@ -54,7 +98,7 @@ export async function loadAlbum(fallback: AlbumData): Promise<AlbumData> {
     const records: AlbumRecord[] = [];
 
     for (const row of rows) {
-      if (row.parent_album_id || row.release_type !== "album") continue;
+      if (row.parent_album_id || !isRecord(row.release_type)) continue;
       const tracks = (children.get(row.id) ?? []).map(toTrack);
       // An album row can carry its own file too, a single-file record, or the
       // full mix alongside the split tracks.
@@ -66,7 +110,12 @@ export async function loadAlbum(fallback: AlbumData): Promise<AlbumData> {
           audioUrl: own,
         });
       }
-      if (!tracks.some((t) => t.audioUrl)) continue;
+      // A record with nothing playable is still worth showing when it streams
+      // somewhere else: a mixtape released to Apple Music has no file for us
+      // to host, and dropping it would leave the hour looking empty while the
+      // record is out. With neither audio nor a link there is nothing to show.
+      const link = listenLink(row.platform, row.platform_link);
+      if (!tracks.some((t) => t.audioUrl) && !link) continue;
       records.push({
         id: row.id,
         title: text(row.title) ?? "Untitled",
@@ -74,11 +123,12 @@ export async function loadAlbum(fallback: AlbumData): Promise<AlbumData> {
         cover: renderableImage(text(row.artwork_url)),
         year: yearOf(row.created_at),
         tracks,
+        link,
       });
     }
 
     for (const row of rows) {
-      if (row.parent_album_id || row.release_type === "album") continue;
+      if (row.parent_album_id || isRecord(row.release_type)) continue;
       if (!streamableAudio(row.audio_url)) continue;
       records.push({
         id: row.id,

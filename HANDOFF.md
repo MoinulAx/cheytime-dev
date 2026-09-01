@@ -372,3 +372,23 @@ without the query the browser streams the file in a tab instead of saving it.
 There is still no free merch. Stripe refuses a checkout that totals zero, so a
 $0 merch row fails at the last step; the admin warns about this and points the
 client at Digital instead.
+
+## Records that stream elsewhere (III)
+
+The Album hour used to drop any record with no uploaded audio, which meant a
+release that lives on Apple Music or Spotify could not appear at all. A row
+typed `album` or `mixtape` now shows with a Listen button when it carries a
+platform link, and plays in full when audio has been uploaded. A row with
+neither is still dropped, and a loose `track` still needs a YouTube link or a
+file, so nothing else changed.
+
+`release_type` accepts `mixtape` alongside `album`; the two behave identically
+and `isRecord` in the album loader is the only place that decides.
+
+**"Chey's Time" is seeded with title and link only.** No tracklist, artwork or
+release date, because none was supplied and both music.apple.com and
+itunes.apple.com are blocked by the build environment's egress proxy, so it
+could not be read from the source either. That is deliberate rather than
+unfinished: inventing a tracklist is exactly the failure that put fabricated
+copy on the live site once before. Artwork uploads onto the row itself, and
+each track is its own row with the mixtape's ID as "Parent album ID".

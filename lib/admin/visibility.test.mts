@@ -51,6 +51,19 @@ t("inactive merch warns", () => assert.match(msgs("merch_products", { active: fa
 t("unpublished press warns", () => assert.match(msgs("press_features", { published: false }), /not appear on the Press/));
 t("digital with no preview warns", () => assert.match(msgs("music_products", { active: true }), /nothing to play/));
 
+console.log("\nrecords that stream elsewhere");
+const APPLE = "https://music.apple.com/us/album/cheys-time/6804045277";
+t("a mixtape with an Apple link is not called invisible", () =>
+  assert.doesNotMatch(msgs("music_releases", { release_type: "mixtape", platform_link: APPLE }), /will not appear anywhere/));
+t("an album with an Apple link is not called invisible", () =>
+  assert.doesNotMatch(msgs("music_releases", { release_type: "album", platform_link: APPLE }), /will not appear anywhere/));
+t("a mixtape is told it still shows on the Album hour", () =>
+  assert.match(msgs("music_releases", { release_type: "mixtape", platform_link: APPLE }), /still shows on the Album hour/));
+t("a loose track with an Apple link is still invisible", () =>
+  assert.match(msgs("music_releases", { release_type: "track", platform_link: APPLE }), /will not appear anywhere/));
+t("a mixtape with no link at all is invisible", () =>
+  assert.match(msgs("music_releases", { release_type: "mixtape" }), /will not appear anywhere/));
+
 console.log("\nfree downloads");
 const PUBLIC_MP3 = "https://x.supabase.co/storage/v1/object/public/music-files/a.mp3";
 t("free with a public file is silent", () =>

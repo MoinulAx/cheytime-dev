@@ -220,6 +220,14 @@ export interface AlbumRecord {
   /** Pre-formatted on the server so the client never re-formats a date. */
   year?: string;
   tracks: AlbumTrack[];
+  /**
+   * Where to hear it when the files are not hosted here.
+   *
+   * A record released to Apple Music or Spotify has nothing to upload: the
+   * streaming service holds it. Without this the hour could only show music
+   * we hold the audio for, so such a release could not appear at all.
+   */
+  link?: { url: string; label: string };
 }
 
 /**

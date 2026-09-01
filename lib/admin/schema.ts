@@ -338,9 +338,9 @@ export const ADMIN_TABLES: TableDef[] = [
     title: "Music & Album",
     numeral: "III + IV",
     showsOn:
-      "Two hours, from two different columns. Music (IV) shows any row with a YouTube link. Album (III) shows any row with an audio file uploaded, that hour plays the record in full.",
+      "Two hours, from two different columns. Music (IV) shows any row with a YouTube link. Album (III) shows any album or mixtape, playing it in full when audio is uploaded and linking out to the streaming service when it is not.",
     blurb:
-      "Albums and tracks. Add a YouTube link to put a row on the Music hour; upload an audio file to put it on the Album hour. A row can do both. To build a tracklist, make one row with Type = album, then paste its ID into each track's “Parent album ID”.",
+      "Albums, mixtapes and tracks. Add a YouTube link to put a row on the Music hour; upload an audio file to put it on the Album hour. A row can do both. A record released to Apple Music or Spotify needs no upload: set Type to album or mixtape and paste the streaming link, and the Album hour shows it with a Listen button. To build a tracklist, make one row with Type = album or mixtape, then paste its ID into each track's “Parent album ID”.",
     labelKey: "title",
     orderBy: [
       { column: "sort_order", ascending: true },
@@ -352,7 +352,8 @@ export const ADMIN_TABLES: TableDef[] = [
         key: "release_type",
         label: "Type",
         type: "select",
-        options: ["track", "album"],
+        options: ["track", "album", "mixtape"],
+        hint: "Album and mixtape both group tracks under one sleeve on the Album hour (III) and behave identically. Track is a single release.",
       },
       {
         key: "platform",
