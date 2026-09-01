@@ -22,7 +22,7 @@ const PLATFORM_LABELS: Record<string, string> = {
   tidal: "Tidal",
 };
 
-function listenLink(
+export function listenLink(
   platform: string | null | undefined,
   link: string | null | undefined,
 ): { url: string; label: string } | undefined {
@@ -47,7 +47,7 @@ type AlbumData = Extract<SectionData, { kind: "album" }>;
  * album as far as this hour is concerned; the word is the only difference,
  * and the client thinks in mixtapes.
  */
-const isRecord = (releaseType: string | null | undefined): boolean =>
+export const isRecord = (releaseType: string | null | undefined): boolean =>
   releaseType === "album" || releaseType === "mixtape";
 type ReleaseRow = Database["public"]["Tables"]["music_releases"]["Row"];
 
