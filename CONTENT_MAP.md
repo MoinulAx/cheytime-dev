@@ -87,6 +87,19 @@ of these pairings were previously recorded wrongly in this file:
 | `4T6mFd2Sz_Y` | Long kiss goodnight |
 | `l62mMBXck70` | CHEY - Bar talk ft Hue Hef & Jmaul |
 
+## Apple Music album → III
+
+| Content | Status |
+|---|---|
+| *Chey's Time* | LIVE from the canonical Apple Music album link |
+| Artwork, 11-song track list and previews | LIVE through Apple's official embed player |
+| Full audio hosted by this site | **MISSING**, original audio files have not been supplied to this repository or Storage |
+
+Hour III deliberately embeds Apple Music instead of copying its static media
+URLs; those files are origin-restricted and are not a lawful or reliable audio
+source for the site. The existing `music_releases` row remains the source of
+the album title and canonical outbound link.
+
 ---
 
 ## `/store` Store → VI

@@ -385,10 +385,19 @@ file, so nothing else changed.
 `release_type` accepts `mixtape` alongside `album`; the two behave identically
 and `isRecord` in the album loader is the only place that decides.
 
-**"Chey's Time" is seeded with title and link only.** No tracklist, artwork or
-release date, because none was supplied and both music.apple.com and
-itunes.apple.com are blocked by the build environment's egress proxy, so it
-could not be read from the source either. That is deliberate rather than
-unfinished: inventing a tracklist is exactly the failure that put fabricated
-copy on the live site once before. Artwork uploads onto the row itself, and
-each track is its own row with the mixtape's ID as "Parent album ID".
+**"Chey's Time" is seeded with its canonical Apple Music link.** Hour III
+converts that link to Apple's official `embed.music.apple.com` player, which
+supplies the album artwork, track list and legal previews without copying
+Apple's origin-restricted media URLs. The database row still has no uploaded
+audio or child-track rows. Full on-site playback therefore still requires the
+client's original audio files; each uploaded track is its own row with the
+mixtape's ID as "Parent album ID".
+
+## Admin JPEG uploads
+
+New JPEGs uploaded to the public `site-assets` bucket are prepared in the
+browser before upload. Camera originals larger than 2400px on their longest
+edge, or larger than 1 MB, are resized/re-encoded at 82% quality when that
+actually makes the file smaller. Non-JPEG formats pass through untouched so
+SVG, transparency and animated-image behavior is preserved. Existing Storage
+objects are not rewritten; re-upload an oversized legacy image to compress it.

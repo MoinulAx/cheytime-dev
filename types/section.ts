@@ -227,7 +227,12 @@ export interface AlbumRecord {
    * streaming service holds it. Without this the hour could only show music
    * we hold the audio for, so such a release could not appear at all.
    */
-  link?: { url: string; label: string };
+  link?: {
+    url: string;
+    label: string;
+    /** Official streaming-service player when the platform supports one. */
+    embedUrl?: string;
+  };
 }
 
 /**

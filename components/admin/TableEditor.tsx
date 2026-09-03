@@ -10,6 +10,7 @@ import type {
   TableDef,
 } from "@/lib/admin/schema";
 import { fromInputValue, toInputValue } from "@/lib/admin/datetime";
+import { prepareImageUpload } from "@/lib/admin/image-upload";
 import { warningsFor, type Warning } from "@/lib/admin/visibility";
 import { createClient } from "@/lib/supabase/browser";
 
@@ -31,12 +32,14 @@ const str = (v: unknown): string =>
  */
 async function uploadTo(file: File, bucket: StorageBucket): Promise<string> {
   const db = createClient();
-  const safeName = file.name.replace(/[^\w.-]+/g, "-");
+  const prepared =
+    bucket === "site-assets" ? await prepareImageUpload(file) : file;
+  const safeName = prepared.name.replace(/[^\w.-]+/g, "-");
   const prefix = bucket === "music-files" ? "audio" : "admin";
   const path = `${prefix}/${Date.now()}-${safeName}`;
   const { data, error } = await db.storage
     .from(bucket)
-    .upload(path, file, { upsert: true });
+    .upload(path, prepared, { upsert: true });
   if (error) throw error;
   return db.storage.from(bucket).getPublicUrl(data.path).data.publicUrl;
 }

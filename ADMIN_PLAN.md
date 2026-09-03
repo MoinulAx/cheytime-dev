@@ -161,6 +161,10 @@ Artwork and gallery images go to the existing public `site-assets` bucket
 already in place. Upload from the client with the browser client, then write
 the returned public URL to the row.
 
+The shared upload path runs JPEGs through `lib/admin/image-upload.ts` first.
+It caps the longest edge at 2400px and uses 82% JPEG quality when recompression
+reduces the file size. Other image types and audio files are not transformed.
+
 `next.config.ts` already allows `*.supabase.co/storage/v1/object/public/**`, so
 uploaded images render through `next/image` with no further config.
 
@@ -266,7 +270,7 @@ injects it. Never put it in `.env.local`, and never in a `NEXT_PUBLIC_*` var.
 
 | Table | Feeds | Notes |
 | --- | --- | --- |
-| `music_releases` | Music (IV) | Albums + tracks; `parent_album_id` nests tracks. Only YouTube links embed. |
+| `music_releases` | Album (III) + Music (IV) | `parent_album_id` nests tracks. Album/mixtape rows can use the official Apple Music embed; YouTube links embed for loose tracks. |
 | `merch_products` | Store (VI) | `active = true` only. |
 | `events` | Events (VIII) | Published + future only; RLS enforces published. |
 | `gallery_items` | Gallery (IX) | Images render in the grid; Instagram permalinks render as link cards. |

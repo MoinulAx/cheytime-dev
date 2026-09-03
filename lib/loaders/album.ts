@@ -25,7 +25,7 @@ const PLATFORM_LABELS: Record<string, string> = {
 export function listenLink(
   platform: string | null | undefined,
   link: string | null | undefined,
-): { url: string; label: string } | undefined {
+): { url: string; label: string; embedUrl?: string } | undefined {
   const url = text(link);
   if (!url || !url.startsWith("https://")) return undefined;
   const key = text(platform)?.toLowerCase();
@@ -37,7 +37,25 @@ export function listenLink(
       return undefined;
     }
   }
-  return { url, label: `Listen on ${name}` };
+  let embedUrl: string | undefined;
+  if (key === "apple_music" || key === "itunes") {
+    try {
+      const parsed = new URL(url);
+      if (
+        parsed.hostname === "music.apple.com" ||
+        parsed.hostname === "itunes.apple.com"
+      ) {
+        parsed.hostname = "embed.music.apple.com";
+        parsed.search = "";
+        parsed.hash = "";
+        embedUrl = parsed.toString();
+      }
+    } catch {
+      // The outbound URL is still valid; omit only the optional embed.
+    }
+  }
+
+  return { url, label: `Listen on ${name}`, embedUrl };
 }
 
 type AlbumData = Extract<SectionData, { kind: "album" }>;

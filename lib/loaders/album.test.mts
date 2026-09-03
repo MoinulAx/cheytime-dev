@@ -25,8 +25,21 @@ t("names Apple Music from the platform column", () =>
     listenLink("apple_music", "https://music.apple.com/us/album/x/1")?.label,
     "Listen on Apple Music",
   ));
+t("builds the official Apple Music embed URL", () =>
+  assert.equal(
+    listenLink(
+      "apple_music",
+      "https://music.apple.com/us/album/cheys-time/6804045277?i=123#track",
+    )?.embedUrl,
+    "https://embed.music.apple.com/us/album/cheys-time/6804045277",
+  ));
 t("names Spotify", () =>
   assert.equal(listenLink("spotify", "https://open.spotify.com/album/x")?.label, "Listen on Spotify"));
+t("does not invent an embed for an unsupported platform", () =>
+  assert.equal(
+    listenLink("spotify", "https://open.spotify.com/album/x")?.embedUrl,
+    undefined,
+  ));
 t("falls back to the host for an unknown platform", () =>
   assert.equal(listenLink("carrier pigeon", "https://bandcamp.com/a")?.label, "Listen on bandcamp.com"));
 t("refuses a non-https link", () =>

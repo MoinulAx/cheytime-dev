@@ -1144,44 +1144,64 @@ function AlbumBlock({
                   </div>
                 </div>
 
+                {/* Apple owns the stream and supplies the canonical artwork,
+                    track list and previews. This is deliberately an iframe,
+                    not a copied audio URL: Apple's static media endpoints are
+                    origin-restricted and direct requests return 403. */}
+                {album.link?.embedUrl && (
+                  <div className="border-b border-bone-100/10 bg-bone-50 p-2">
+                    <iframe
+                      src={album.link.embedUrl}
+                      title={`${album.title} on Apple Music`}
+                      width="100%"
+                      height="450"
+                      loading="lazy"
+                      allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+                      className="block w-full border-0"
+                    />
+                  </div>
+                )}
+
                 {/* Tracklist */}
-                <ol className="divide-y divide-bone-100/10">
-                  {album.tracks.map((track, i) => (
-                    <li key={track.id} className="px-4 py-4">
-                      <div className="flex items-baseline gap-3">
-                        <span className="font-display text-sm italic tabular-nums text-bone-500">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-sans text-[14px] leading-tight text-bone-100">
-                            {track.title}
-                          </p>
-                          {track.description && (
-                            <p className="mt-1 font-sans text-[12px] leading-relaxed text-bone-200/70">
-                              {track.description}
+                {album.tracks.length > 0 && (
+                  <ol className="divide-y divide-bone-100/10">
+                    {album.tracks.map((track, i) => (
+                      <li key={track.id} className="px-4 py-4">
+                        <div className="flex items-baseline gap-3">
+                          <span className="font-display text-sm italic tabular-nums text-bone-500">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-sans text-[14px] leading-tight text-bone-100">
+                              {track.title}
                             </p>
-                          )}
+                            {track.description && (
+                              <p className="mt-1 font-sans text-[12px] leading-relaxed text-bone-200/70">
+                                {track.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      {track.audioUrl ? (
-                        <audio
-                          controls
-                          preload="none"
-                          src={track.audioUrl}
-                          aria-label={`${track.title}, from ${album.title}`}
-                          className="mt-3 w-full"
-                        />
-                      ) : (
-                        // The row exists but no file has been uploaded. Said
-                        // plainly, so the admin can see what is still missing
-                        // rather than wondering why a track has no player.
-                        <p className="mt-3 font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
-                          Audio coming soon
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ol>
+                        {track.audioUrl ? (
+                          <audio
+                            controls
+                            preload="none"
+                            src={track.audioUrl}
+                            aria-label={`${track.title}, from ${album.title}`}
+                            className="mt-3 w-full"
+                          />
+                        ) : (
+                          // The row exists but no file has been uploaded. Said
+                          // plainly, so the admin can see what is still missing
+                          // rather than wondering why a track has no player.
+                          <p className="mt-3 font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
+                            Audio coming soon
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                )}
 
                 {/* Where to hear it, for a record that streams elsewhere. Sits
                     below the tracklist so a record with both keeps its player
