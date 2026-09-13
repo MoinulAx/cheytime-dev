@@ -112,17 +112,220 @@ function UploadButton({
   );
 }
 
+/**
+ * An image field that shows what was uploaded and where it lands.
+ *
+ * The old control was a URL box, a small button and a 48px chip, which left
+ * two questions unanswered at exactly the moment they are asked: what does
+ * this picture look like at a usable size, and where will it show up? Worse,
+ * on a music release it sat directly above the audio upload and looked
+ * identical to it, so a cover and a song were two indistinguishable "Upload"
+ * buttons.
+ *
+ * So: a real square preview, the destination stated in words, the format and
+ * size stated before a file is chosen rather than after the wrong one is in
+ * the bucket, and an upload state that is always named.
+ *
+ * Optimisation, bucket and the saved URL are untouched, this is the same
+ * `uploadTo` every other field uses.
+ */
+type UploadState =
+  | { status: "idle" }
+  | { status: "uploading" }
+  | { status: "done" }
+  | { status: "failed"; message: string };
+
+function ImageField({
+  def,
+  value,
+  onChange,
+  hideLabel = false,
+}: {
+  def: FieldDef;
+  value: string;
+  onChange: (v: unknown) => void;
+  /** Suppressed when a group heading above already names this field. */
+  hideLabel?: boolean;
+}) {
+  const [state, setState] = useState<UploadState>({ status: "idle" });
+  // Distinguishes "this file is unreachable" from "no file yet": both render
+  // an empty frame otherwise, and they need different fixes.
+  const [broken, setBroken] = useState(false);
+  const square = def.preview !== "wide";
+  const hasImage = value.trim().length > 0 && !broken;
+
+  const choose = async (file: File) => {
+    setState({ status: "uploading" });
+    setBroken(false);
+    try {
+      const url = await uploadTo(file, def.bucket ?? "site-assets");
+      onChange(url);
+      setState({ status: "done" });
+    } catch (err) {
+      setState({
+        status: "failed",
+        message: err instanceof Error ? err.message : "Upload failed.",
+      });
+    }
+  };
+
+  const STATUS: Record<UploadState["status"], string | null> = {
+    idle: null,
+    uploading: "Uploading\u2026",
+    done: "Uploaded",
+    failed: null,
+  };
+
+  return (
+    <div>
+      {!hideLabel && (
+        <p className="mb-1.5 font-sans text-[12px] font-medium text-bone-200">
+          {def.label}
+        </p>
+      )}
+      {def.hint && (
+        <p className="mb-3 font-sans text-[12px] leading-snug text-bone-400">
+          {def.hint}
+        </p>
+      )}
+
+      <div className="flex items-start gap-4">
+        {/* Preview. Deliberately modest: large enough to recognise the image,
+            small enough that the field does not dominate the form. */}
+        <div
+          className={[
+            "relative shrink-0 overflow-hidden rounded-sm border border-bone-100/20 bg-void-800",
+            square
+              ? "h-[104px] w-[104px] sm:h-[144px] sm:w-[144px]"
+              : "h-[76px] w-[135px] sm:h-[96px] sm:w-[171px]",
+          ].join(" ")}
+        >
+          {hasImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={value}
+              alt=""
+              onError={() => setBroken(true)}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="absolute inset-0 grid place-items-center px-2 text-center font-sans text-[11px] leading-snug text-bone-600">
+              {broken ? "Image will not load" : (def.emptyLabel ?? "No image")}
+            </span>
+          )}
+          {state.status === "uploading" && (
+            <span className="absolute inset-0 grid place-items-center bg-void/75 font-sans text-[11px] text-bone-100">
+              Uploading&#8230;
+            </span>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <label
+              className={[
+                "inline-flex min-h-[40px] cursor-pointer items-center rounded-sm border px-3 font-sans text-[12px] transition-colors",
+                "focus-within:ring-2 focus-within:ring-bone-100 focus-within:ring-offset-2 focus-within:ring-offset-void-900",
+                state.status === "uploading"
+                  ? "cursor-wait border-bone-100/20 text-bone-500"
+                  : "border-bone-100/30 text-bone-100 hover:bg-bone-100 hover:text-void",
+              ].join(" ")}
+            >
+              {state.status === "uploading"
+                ? "Uploading\u2026"
+                : hasImage
+                  ? "Replace image"
+                  : "Upload"}
+              <input
+                id={def.key ? `${def.key}-file` : undefined}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                disabled={state.status === "uploading"}
+                aria-label={`${hasImage ? "Replace" : "Upload"} ${def.label}`}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (file) void choose(file);
+                }}
+              />
+            </label>
+
+            {hasImage && (
+              <button
+                type="button"
+                onClick={() => {
+                  onChange("");
+                  setState({ status: "idle" });
+                  setBroken(false);
+                }}
+                className="min-h-[40px] rounded-sm px-3 font-sans text-[12px] text-bone-400 transition-colors hover:bg-red-400/10 hover:text-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone-100 focus-visible:ring-offset-2 focus-visible:ring-offset-void-900"
+              >
+                Remove
+                <span className="sr-only"> {def.label}</span>
+              </button>
+            )}
+          </div>
+
+          <div aria-live="polite" className="empty:hidden">
+            {STATUS[state.status] && (
+              <p className="font-sans text-[12px] text-bone-300">
+                {STATUS[state.status]}
+              </p>
+            )}
+            {state.status === "failed" && (
+              <p role="alert" className="font-sans text-[12px] text-red-200">
+                Failed: {state.message}
+              </p>
+            )}
+          </div>
+
+          {def.spec && (
+            <p className="font-sans text-[12px] leading-snug text-bone-500">
+              {def.spec}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Secondary, for pasting a Storage URL by hand. Kept because that is a
+          real workflow, demoted because uploading is the common one. */}
+      <label
+        htmlFor={def.key}
+        className="mt-3 block font-sans text-[11px] text-bone-600"
+      >
+        Or paste an image URL
+      </label>
+      <input
+        id={def.key}
+        type="url"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setBroken(false);
+          setState({ status: "idle" });
+        }}
+        className={`${INPUT} mt-1 text-[13px]`}
+        placeholder="https://\u2026"
+      />
+    </div>
+  );
+}
+
 function Field({
   def,
   value,
   onChange,
   warnings = [],
+  labelledByGroup = false,
 }: {
   def: FieldDef;
   value: unknown;
   onChange: (v: unknown) => void;
   /** Reasons this value will stop the row appearing on the site. */
   warnings?: string[];
+  /** The group heading above already carries this field's name. */
+  labelledByGroup?: boolean;
 }) {
   const control = () => {
     switch (def.type) {
@@ -202,32 +405,12 @@ function Field({
         );
       case "image":
         return (
-          <div className="space-y-2">
-            <input
-              id={def.key}
-              type="url"
-              value={str(value)}
-              onChange={(e) => onChange(e.target.value)}
-              className={INPUT}
-              placeholder="https://… or upload below"
-            />
-            <div className="flex items-center gap-3">
-              <UploadButton
-                accept="image/*"
-                bucket={def.bucket ?? "site-assets"}
-                onUploaded={onChange}
-                label={def.label}
-              />
-              {str(value) && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={str(value)}
-                  alt=""
-                  className="h-12 w-12 border border-bone-100/15 object-cover"
-                />
-              )}
-            </div>
-          </div>
+          <ImageField
+            def={def}
+            value={str(value)}
+            onChange={onChange}
+            hideLabel={labelledByGroup}
+          />
         );
       case "audio":
         return (
@@ -281,16 +464,23 @@ function Field({
     }
   };
 
+  // An image field draws its own label and hint alongside the preview, so the
+  // wrapper must not draw them again.
+  const selfLabelled = def.type === "image";
+  const hideOwnLabel = selfLabelled || labelledByGroup;
+
   return (
     <div>
-      <label
-        htmlFor={def.key}
-        className="mb-1.5 block font-sans text-[12px] font-medium text-bone-200"
-      >
-        {def.label}
-      </label>
+      {!hideOwnLabel && (
+        <label
+          htmlFor={def.key}
+          className="mb-1.5 block font-sans text-[12px] font-medium text-bone-200"
+        >
+          {def.label}
+        </label>
+      )}
       {control()}
-      {def.hint && (
+      {!selfLabelled && def.hint && (
         <p className="mt-1.5 font-sans text-[12px] leading-snug text-bone-500">
           {def.hint}
         </p>
@@ -734,17 +924,46 @@ export default function TableEditor({
               </div>
             )}
             <div className="space-y-5">
-              {def.fields.map((f) => (
-                <Field
-                  key={f.key}
-                  def={f}
-                  value={draft[f.key]}
-                  onChange={(v) => setDraft({ ...draft, [f.key]: v })}
-                  warnings={fieldWarnings
-                    .filter((w) => w.field === f.key)
-                    .map((w) => w.message)}
-                />
-              ))}
+              {def.fields.map((f, i) => {
+                // A group heading is drawn when the group changes, so
+                // consecutive fields sharing one sit in a single block. On
+                // Music & Album this is what separates the cover image from
+                // the audio file, which were previously two identical-looking
+                // Upload buttons stacked on top of each other.
+                const startsGroup = f.group && f.group !== def.fields[i - 1]?.group;
+                return (
+                  <div
+                    key={f.key}
+                    className={
+                      startsGroup
+                        ? "rounded-sm border border-bone-100/15 bg-bone-100/[0.02] p-4"
+                        : undefined
+                    }
+                  >
+                    {startsGroup && (
+                      <div className="mb-3">
+                        <h3 className="font-sans text-[13px] font-medium text-bone-100">
+                          {f.group}
+                        </h3>
+                        {f.groupNote && (
+                          <p className="mt-0.5 font-sans text-[12px] leading-snug text-bone-500">
+                            {f.groupNote}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    <Field
+                      def={f}
+                      labelledByGroup={f.group === f.label}
+                      value={draft[f.key]}
+                      onChange={(v) => setDraft({ ...draft, [f.key]: v })}
+                      warnings={fieldWarnings
+                        .filter((w) => w.field === f.key)
+                        .map((w) => w.message)}
+                    />
+                  </div>
+                );
+              })}
             </div>
             {error && (
               <p className="mt-5 rounded-sm border border-red-400/40 bg-red-400/5 px-3 py-2.5 font-sans text-[13px] text-red-200">

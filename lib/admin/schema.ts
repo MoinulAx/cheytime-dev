@@ -38,6 +38,24 @@ export interface FieldDef {
   placeholder?: string;
   /** Rendered under the input, use for anything non-obvious. */
   hint?: string;
+  /**
+   * Format and dimensions, e.g. "Square JPG or PNG, recommended 2000 x 2000px".
+   * Shown beside the preview on image fields, where it is read at the moment
+   * of choosing a file rather than after the wrong one is already uploaded.
+   */
+  spec?: string;
+  /** Preview shape for an image field. Square suits covers and sleeves. */
+  preview?: "square" | "wide";
+  /** Empty-state wording, e.g. "No album cover". Defaults to "No image". */
+  emptyLabel?: string;
+  /**
+   * Section heading this field sits under in the editor. Consecutive fields
+   * sharing a group are drawn as one titled block, which is what keeps a
+   * cover image and an audio file from reading as the same kind of upload.
+   */
+  group?: string;
+  /** One line under the group heading saying what the section is for. */
+  groupNote?: string;
   /** Upload target for `image` / `audio` fields. Defaults to `site-assets`. */
   bucket?: StorageBucket;
   /**
@@ -375,12 +393,24 @@ export const ADMIN_TABLES: TableDef[] = [
         nullable: true,
         hint: "Leave blank for a standalone release. Paste an album's ID to nest this track under it.",
       },
-      { key: "artwork_url", label: "Artwork", type: "image" },
+      {
+        key: "artwork_url",
+        label: "Album cover artwork",
+        type: "image",
+        preview: "square",
+        emptyLabel: "No album cover",
+        hint: "This image appears as the album cover in Hour III.",
+        spec: "Square JPG or PNG, recommended 2000 \u00d7 2000px.",
+        group: "Album cover artwork",
+        groupNote: "A picture, not the music file.",
+      },
       {
         key: "audio_url",
-        label: "Audio",
+        label: "Track audio file",
         type: "audio",
         bucket: "music-files",
+        group: "Track audio",
+        groupNote: "The music itself, not the cover picture.",
         hint: "The full track. Uploading one puts this row on the Album hour (III) and streams it there. The bucket is public, so only upload what you are happy for anyone to download.",
       },
       { key: "description", label: "Description", type: "textarea" },
