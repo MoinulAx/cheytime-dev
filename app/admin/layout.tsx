@@ -34,7 +34,10 @@ export const dynamic = "force-dynamic";
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="fixed inset-0 overflow-y-auto bg-void">
-      <div className="mx-auto min-h-full w-full max-w-6xl px-5 py-8 md:px-8">
+      {/* Wider than the old shell because the navigation now sits beside the
+          content rather than wrapping above it. Padding is tighter: the page
+          was mostly margin. */}
+      <div className="mx-auto min-h-full w-full max-w-[80rem] px-4 py-5 sm:px-6 md:py-6 lg:px-8">
         {children}
       </div>
     </div>

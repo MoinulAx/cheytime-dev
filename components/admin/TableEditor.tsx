@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deleteRecord, saveRecord } from "@/app/admin/actions";
 import type {
@@ -12,13 +12,22 @@ import type {
 import { fromInputValue, toInputValue } from "@/lib/admin/datetime";
 import { prepareImageUpload } from "@/lib/admin/image-upload";
 import { warningsFor, type Warning } from "@/lib/admin/visibility";
+import { badgesFor, metaFor, thumbnailKey, type Badge } from "@/lib/admin/rows";
 import { createClient } from "@/lib/supabase/browser";
+import RecordDrawer from "./RecordDrawer";
 
 type Row = Record<string, unknown>;
 type Draft = Record<string, unknown>;
 
 const INPUT =
-  "w-full border border-bone-100/20 bg-transparent px-3 py-2 font-sans text-sm text-bone-50 outline-none transition-colors placeholder:text-bone-600 focus:border-bone-100";
+  "w-full rounded-sm border border-bone-100/20 bg-void-800/60 px-3 py-2.5 font-sans text-sm text-bone-50 outline-none transition-colors placeholder:text-bone-600 focus:border-bone-100 focus-visible:ring-2 focus-visible:ring-bone-100/70 focus-visible:ring-offset-2 focus-visible:ring-offset-void-900";
+
+/** Row badge colours. Restrained: a hairline and a tint, never a filled chip. */
+const BADGE_TONE: Record<Badge["tone"], string> = {
+  warn: "border-amber-300/40 text-amber-200/90",
+  accent: "border-cosmic-400/50 text-cosmic-200",
+  note: "border-bone-100/20 text-bone-400",
+};
 
 const str = (v: unknown): string =>
   v === null || v === undefined ? "" : String(v);
@@ -49,22 +58,36 @@ function UploadButton({
   accept,
   bucket,
   onUploaded,
+  label,
+  compact = false,
 }: {
   accept: string;
   bucket: StorageBucket;
   onUploaded: (url: string) => void;
+  /** What is being replaced, e.g. "Cover". A form can hold several of these,
+      and "Upload" on its own tells a screen reader nothing about which. */
+  label: string;
+  /** Inline variant for the row strip, where a full button dominates. */
+  compact?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
 
   return (
     <>
-      <label className="btn-editorial cursor-pointer text-[10px]">
+      <label
+        className={
+          compact
+            ? "cursor-pointer rounded-sm border border-bone-100/25 px-2 py-1 font-sans text-[11px] text-bone-300 transition-colors hover:border-bone-100 hover:text-bone-50 focus-within:ring-2 focus-within:ring-bone-100 focus-within:ring-offset-2 focus-within:ring-offset-void"
+            : "btn-editorial cursor-pointer text-[12px] focus-within:ring-2 focus-within:ring-bone-100 focus-within:ring-offset-2 focus-within:ring-offset-void-900"
+        }
+      >
         {busy ? "Uploading…" : "Upload"}
         <input
           type="file"
           accept={accept}
-          className="hidden"
+          aria-label={busy ? `Uploading ${label}` : `Upload ${label}`}
+          className="sr-only"
           disabled={busy}
           onChange={async (e) => {
             const file = e.target.files?.[0];
@@ -83,7 +106,7 @@ function UploadButton({
         />
       </label>
       {failed && (
-        <p className="mt-1 font-sans text-[11px] text-cosmic-400">{failed}</p>
+        <p className="mt-1 font-sans text-[12px] text-red-200" role="alert">{failed}</p>
       )}
     </>
   );
@@ -193,6 +216,7 @@ function Field({
                 accept="image/*"
                 bucket={def.bucket ?? "site-assets"}
                 onUploaded={onChange}
+                label={def.label}
               />
               {str(value) && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -221,6 +245,7 @@ function Field({
                 accept="audio/*"
                 bucket={def.bucket ?? "music-files"}
                 onUploaded={onChange}
+                label={def.label}
               />
               {str(value) && (
                 <button
@@ -258,19 +283,22 @@ function Field({
 
   return (
     <div>
-      <label htmlFor={def.key} className="eyebrow mb-1.5 block">
+      <label
+        htmlFor={def.key}
+        className="mb-1.5 block font-sans text-[12px] font-medium text-bone-200"
+      >
         {def.label}
       </label>
       {control()}
       {def.hint && (
-        <p className="mt-1 font-sans text-[11px] leading-snug text-bone-500">
+        <p className="mt-1.5 font-sans text-[12px] leading-snug text-bone-500">
           {def.hint}
         </p>
       )}
       {warnings.map((w) => (
         <p
           key={w}
-          className="mt-1.5 border-l-2 border-cosmic-400/60 pl-2 font-sans text-[11px] leading-snug text-cosmic-400"
+          className="mt-1.5 border-l-2 border-amber-300/60 pl-2.5 font-sans text-[12px] leading-snug text-amber-200/90"
         >
           {w}
         </p>
@@ -318,25 +346,30 @@ function ChildImages({
   };
 
   return (
-    // order-3 keeps the full-width strip below the row's own controls rather
-    // than wrapping between the title and the buttons.
-    <div className="order-3 mt-3 w-full border-t border-bone-100/10 pt-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="eyebrow">
+    // Full-width and last in the row, indented to line up with the row's text
+    // so it reads as belonging to that product rather than as a row of its
+    // own. It used to carry a top border, which made it look like one.
+    <div className="order-last w-full pb-1 pl-[3.75rem]">
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="font-sans text-[12px] text-bone-500">
           {child.title}
           {images.length > 0 && (
-            <span className="ml-2 text-bone-500">{images.length}</span>
+            <span className="ml-1.5 tabular-nums text-bone-600">
+              {images.length}
+            </span>
           )}
         </p>
         <UploadButton
           accept="image/*"
           bucket={child.bucket ?? "site-assets"}
           onUploaded={add}
+          label={`${child.title} for this product`}
+          compact
         />
       </div>
 
       {images.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {images.map((img) => (
             <div key={String(img.id)} className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -349,7 +382,7 @@ function ChildImages({
                 type="button"
                 onClick={() => remove(String(img.id))}
                 aria-label="Remove image"
-                className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center border border-bone-100/30 bg-void text-[10px] text-bone-300 hover:border-cosmic-400 hover:text-cosmic-400"
+                className="absolute -right-1.5 -top-1.5 grid h-6 w-6 place-items-center rounded-sm border border-bone-100/30 bg-void text-[11px] text-bone-300 transition-colors hover:border-red-300 hover:text-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone-100 focus-visible:ring-offset-1 focus-visible:ring-offset-void"
               >
                 ✕
               </button>
@@ -359,7 +392,7 @@ function ChildImages({
       )}
 
       {error && (
-        <p className="mt-2 font-sans text-[11px] text-cosmic-400">{error}</p>
+        <p className="mt-2 font-sans text-[12px] text-red-200" role="alert">{error}</p>
       )}
     </div>
   );
@@ -379,7 +412,6 @@ export default function TableEditor({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const formRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
 
   // Recomputed from the live draft, so a warning appears while typing rather
@@ -390,18 +422,20 @@ export default function TableEditor({
   const rowWarnings = allWarnings.filter((w) => !w.field);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  // Shown briefly after a write lands. A save that closes the drawer and
+  // changes nothing visible otherwise reads as a save that did not happen.
+  const [saved, setSaved] = useState(false);
 
   const isCreating = editingId === "__new__";
   const canCreate = def.canCreate !== false && !def.readOnly;
   // `site_settings` is keyed on `key`, not `id`.
   const pk = def.primaryKey ?? "id";
-  // The open row lives in the form, not in the list below it.
-  const listed = rows.filter((row) => String(row[pk]) !== editingId);
 
   const openNew = () => {
     setEditingId("__new__");
     setDraft({ ...def.defaults });
     setError(null);
+    setSaved(false);
   };
 
   const openEdit = (row: Row) => {
@@ -416,14 +450,13 @@ export default function TableEditor({
     setError(null);
   };
 
-  // The form renders above the list, so opening a row from halfway down used
-  // to leave the editor off-screen and nothing appeared to happen. This runs
-  // after the form has mounted, which the click handler cannot do: the ref is
-  // still null at the moment the row is clicked.
+  // The success note clears itself. Left up, it goes stale and starts
+  // describing an older save than the one you are looking at.
   useEffect(() => {
-    if (!editingId) return;
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [editingId]);
+    if (!saved) return;
+    const timer = window.setTimeout(() => setSaved(false), 4000);
+    return () => window.clearTimeout(timer);
+  }, [saved]);
 
   const save = async () => {
     if (!draft) return;
@@ -440,6 +473,7 @@ export default function TableEditor({
       return;
     }
     close();
+    setSaved(true);
     startTransition(() => router.refresh());
   };
 
@@ -453,182 +487,183 @@ export default function TableEditor({
     startTransition(() => router.refresh());
   };
 
+  const count = rows.length;
+  const thumbKey = thumbnailKey(def);
+
   return (
     <section>
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <div className="max-w-xl">
-          <h2 className="font-display text-2xl text-bone-50">
+      {/* Header: what this is, how many, and the one action that creates. */}
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h2 className="font-display text-2xl text-bone-50">{def.title}</h2>
             {def.numeral && (
-              <span className="mr-2 font-sans text-xs tracking-wide2 text-bone-500">
-                {def.numeral}
+              <span className="font-sans text-[12px] text-bone-600">
+                Hour {def.numeral}
               </span>
             )}
-            {def.title}
-          </h2>
-          {/* Where an edit here actually lands. Stated first, and stated for
-              the internal tables too, so "does this show anywhere?" is never
-              a guess. */}
-          <p className="mt-2 border-l-2 border-cosmic-600/50 pl-3 font-sans text-[13px] leading-relaxed text-bone-200">
-            <span className="mr-1.5 font-sans text-[10px] uppercase tracking-wide2 text-bone-500">
-              Appears on
+            <span className="font-sans text-[12px] tabular-nums text-bone-600">
+              {count} {count === 1 ? "entry" : "entries"}
             </span>
+          </div>
+          {/* One line, always visible: nobody should have to open anything to
+              learn whether an edit here is publicly visible. The longer
+              guidance moves into the details below. */}
+          <p className="mt-1.5 font-sans text-[13px] leading-relaxed text-bone-400">
             {def.showsOn}
           </p>
-          <p className="mt-2 font-sans text-[13px] leading-relaxed text-bone-400">
-            {def.blurb}
-          </p>
         </div>
-        {canCreate && !editingId && (
-          <button type="button" onClick={openNew} className="btn-editorial">
-            + New
+        {canCreate && (
+          <button
+            type="button"
+            onClick={openNew}
+            className="btn-editorial shrink-0 text-[12px]"
+          >
+            New
           </button>
         )}
       </div>
 
-      {loadError && (
-        <p className="mt-4 border border-cosmic-600/40 px-3 py-2 font-sans text-[12px] text-cosmic-400">
-          Could not load: {loadError}
+      {/* Secondary guidance, collapsed. It was three stacked paragraphs on
+          every tab, read once and then permanently in the way. */}
+      <details className="group mt-3">
+        <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 font-sans text-[12px] text-bone-500 transition-colors hover:text-bone-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone-100 focus-visible:ring-offset-2 focus-visible:ring-offset-void">
+          <span
+            aria-hidden="true"
+            className="transition-transform group-open:rotate-90"
+          >
+            ›
+          </span>
+          How this tab works
+        </summary>
+        <p className="measure mt-2 border-l border-bone-100/15 pl-3 font-sans text-[13px] leading-relaxed text-bone-400">
+          {def.blurb}
         </p>
-      )}
-      {error && (
-        <p className="mt-4 border border-cosmic-600/40 px-3 py-2 font-sans text-[12px] text-cosmic-400">
-          {error}
-        </p>
-      )}
+      </details>
 
-      {/* Editor form */}
-      {draft && (
-        <div ref={formRef} className="mt-6 scroll-mt-6 border border-bone-100/20 p-5">
-          {/* Naming the row matters because the same list sits underneath.
-              "Editing" alone left it ambiguous which one was open. */}
-          <p className="eyebrow mb-4">
-            {isCreating ? (
-              "New entry"
-            ) : (
-              <>
-                Editing
-                <span className="ml-2 normal-case tracking-normal text-bone-200">
-                  {str(draft?.[def.labelKey]) || "Untitled"}
-                </span>
-              </>
-            )}
+      {/* Status. One region, spoken politely, so a save or a failure is
+          announced rather than only drawn. */}
+      <div aria-live="polite" className="empty:hidden">
+        {loadError && (
+          <p className="mt-4 rounded-sm border border-red-400/40 bg-red-400/5 px-3 py-2.5 font-sans text-[13px] text-red-200">
+            Could not load this table: {loadError}
           </p>
-          <div className="grid gap-5 md:grid-cols-2">
-            {def.fields.map((f) => (
-              <div
-                key={f.key}
-                className={
-                  f.type === "textarea" ? "md:col-span-2" : undefined
-                }
-              >
-                <Field
-                  def={f}
-                  value={draft[f.key]}
-                  onChange={(v) => setDraft({ ...draft, [f.key]: v })}
-                  warnings={fieldWarnings
-                    .filter((w) => w.field === f.key)
-                    .map((w) => w.message)}
-                />
-              </div>
-            ))}
-          </div>
-          {rowWarnings.length > 0 && (
-            <div className="mt-4 border border-cosmic-400/40 px-4 py-3">
-              {rowWarnings.map((w) => (
-                <p
-                  key={w.message}
-                  className="font-sans text-[12px] leading-relaxed text-cosmic-400"
-                >
-                  {w.message}
-                </p>
-              ))}
-            </div>
-          )}
-          <div className="mt-6 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={save}
-              disabled={saving}
-              className="btn-editorial disabled:opacity-50"
-            >
-              {saving ? "Saving…" : "Save"}
-            </button>
-            <button
-              type="button"
-              onClick={close}
-              className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500 hover:text-bone-100"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+        {error && (
+          <p className="mt-4 rounded-sm border border-red-400/40 bg-red-400/5 px-3 py-2.5 font-sans text-[13px] text-red-200">
+            {error}
+          </p>
+        )}
+        {saved && (
+          <p className="mt-4 rounded-sm border border-bone-100/25 bg-bone-100/5 px-3 py-2.5 font-sans text-[13px] text-bone-200">
+            Saved. The site updates within a minute.
+          </p>
+        )}
+        {pending && !saved && (
+          <p className="mt-4 font-sans text-[12px] text-bone-500">Refreshing…</p>
+        )}
+      </div>
 
       {/* Rows */}
-      <div className="mt-6 divide-y divide-bone-100/10 border-y border-bone-100/10">
+      <ul className="mt-5 divide-y divide-bone-100/10 border-y border-bone-100/10">
         {rows.length === 0 && (
-          <p className="py-8 text-center font-display text-lg italic text-bone-400">
-            Nothing here yet.
-          </p>
+          <li className="px-1 py-12 text-center">
+            <p className="font-display text-lg italic text-bone-300">
+              Nothing here yet.
+            </p>
+            {canCreate && (
+              <button
+                type="button"
+                onClick={openNew}
+                className="btn-editorial mt-4 text-[12px]"
+              >
+                Add the first one
+              </button>
+            )}
+          </li>
         )}
-        {rows.length > 0 && listed.length === 0 && (
-          <p className="py-8 text-center font-display text-lg italic text-bone-400">
-            Open in the editor above.
-          </p>
-        )}
-        {/* The row being edited is not repeated here. It is the form above,
-            and showing it twice, each copy with its own Edit and Delete, was
-            genuinely confusing. It returns to the list on save or cancel. */}
-        {listed.map((row) => {
+
+        {rows.map((row) => {
           const id = String(row[pk]);
           const label = str(row[def.labelKey]) || "Untitled";
-          const isUnread =
-            def.table === "contact_submissions" && !row.read ? true : false;
+          const badges = badgesFor(def, row);
+          const meta = metaFor(def, row);
+          const thumb = thumbKey ? str(row[thumbKey]) : "";
+          const isOpen = id === editingId;
+
           return (
-            <div
+            <li
               key={id}
-              className="flex flex-wrap items-center justify-between gap-3 py-3"
+              className={[
+                "flex flex-wrap items-center gap-x-4 gap-y-2 px-1 py-2.5 transition-colors",
+                isOpen ? "bg-bone-100/[0.06]" : "hover:bg-bone-100/[0.03]",
+              ].join(" ")}
             >
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-sans text-sm text-bone-100">
-                  {isUnread && (
-                    <span className="mr-2 text-cosmic-400" aria-label="Unread">
-                      ●
+              {thumbKey && (
+                <div className="h-11 w-11 shrink-0 overflow-hidden rounded-sm border border-bone-100/15 bg-void-800">
+                  {thumb ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={thumb}
+                      alt=""
+                      loading="lazy"
+                      // Not every image_url is an image: the gallery stores
+                      // Instagram permalinks in the same column. Hiding a
+                      // failed load beats a broken-image glyph in every row.
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="grid h-full w-full place-items-center font-display text-base italic text-bone-100/20"
+                    >
+                      ♪
                     </span>
                   )}
-                  {label}
-                </p>
-                <p className="mt-0.5 truncate font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
-                  {[
-                    str(row.outlet),
-                    str(row.email),
-                    str(row.release_type),
-                    str(row.location),
-                    row.price !== undefined && row.price !== null
-                      ? `$${str(row.price)}`
-                      : "",
-                    row.active === false ? "inactive" : "",
-                    row.published === false ? "unpublished" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
+                </div>
+              )}
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="min-w-0 truncate font-sans text-[14px] text-bone-100">
+                    {label}
+                  </p>
+                  {badges.map((b) => (
+                    <span
+                      key={b.label}
+                      className={`shrink-0 rounded-sm border px-1.5 py-0.5 font-sans text-[10px] uppercase tracking-wide ${BADGE_TONE[b.tone]}`}
+                    >
+                      {b.label}
+                    </span>
+                  ))}
+                </div>
+                {meta && (
+                  <p className="mt-0.5 truncate font-sans text-[12px] text-bone-500">
+                    {meta}
+                  </p>
+                )}
               </div>
+
               {!def.readOnly && (
-                <div className="order-2 flex shrink-0 items-center gap-3">
+                <div className="flex shrink-0 items-center gap-1">
                   <button
                     type="button"
                     onClick={() => openEdit(row)}
-                    className="font-sans text-[11px] uppercase tracking-wide2 text-bone-300 hover:text-bone-50"
+                    className="min-h-[40px] rounded-sm px-3 font-sans text-[12px] text-bone-200 transition-colors hover:bg-bone-100/10 hover:text-bone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone-100 focus-visible:ring-offset-2 focus-visible:ring-offset-void"
                   >
                     Edit
+                    <span className="sr-only"> {label}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => remove(id)}
-                    className="font-sans text-[11px] uppercase tracking-wide2 text-bone-500 hover:text-cosmic-400"
+                    className="min-h-[40px] rounded-sm px-3 font-sans text-[12px] text-bone-500 transition-colors hover:bg-red-400/10 hover:text-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-2 focus-visible:ring-offset-void"
                   >
                     Delete
+                    <span className="sr-only"> {label}</span>
                   </button>
                 </div>
               )}
@@ -643,16 +678,82 @@ export default function TableEditor({
                   onChanged={() => startTransition(() => router.refresh())}
                 />
               )}
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
 
-      {pending && (
-        <p className="mt-4 font-sans text-[11px] uppercase tracking-wide2 text-bone-500">
-          Refreshing…
-        </p>
-      )}
+      {/* The editor, over the list rather than above it, so closing it puts
+          you back exactly where you were. */}
+      <RecordDrawer
+        open={draft !== null}
+        eyebrow={isCreating ? `New in ${def.title}` : `Editing ${def.title}`}
+        title={
+          isCreating
+            ? "New entry"
+            : str(draft?.[def.labelKey]) || "Untitled"
+        }
+        onClose={close}
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="btn-editorial text-[12px] disabled:opacity-50"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+            <button
+              type="button"
+              onClick={close}
+              className="min-h-[40px] rounded-sm px-3 font-sans text-[12px] text-bone-400 transition-colors hover:text-bone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone-100 focus-visible:ring-offset-2 focus-visible:ring-offset-void-900"
+            >
+              Cancel
+            </button>
+            {error && (
+              <span className="ml-auto font-sans text-[12px] text-red-200">
+                Not saved
+              </span>
+            )}
+          </>
+        }
+      >
+        {draft && (
+          <>
+            {rowWarnings.length > 0 && (
+              <div className="mb-5 rounded-sm border border-amber-300/40 bg-amber-300/5 px-3 py-2.5">
+                {rowWarnings.map((w) => (
+                  <p
+                    key={w.message}
+                    className="font-sans text-[12px] leading-relaxed text-amber-200/90"
+                  >
+                    {w.message}
+                  </p>
+                ))}
+              </div>
+            )}
+            <div className="space-y-5">
+              {def.fields.map((f) => (
+                <Field
+                  key={f.key}
+                  def={f}
+                  value={draft[f.key]}
+                  onChange={(v) => setDraft({ ...draft, [f.key]: v })}
+                  warnings={fieldWarnings
+                    .filter((w) => w.field === f.key)
+                    .map((w) => w.message)}
+                />
+              ))}
+            </div>
+            {error && (
+              <p className="mt-5 rounded-sm border border-red-400/40 bg-red-400/5 px-3 py-2.5 font-sans text-[13px] text-red-200">
+                {error}
+              </p>
+            )}
+          </>
+        )}
+      </RecordDrawer>
     </section>
   );
 }

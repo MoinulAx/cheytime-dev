@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminUser } from "@/lib/admin/auth";
 import { ADMIN_TABLES } from "@/lib/admin/schema";
-import AdminTabs, { type TableRows } from "@/components/admin/AdminTabs";
+import AdminShell, { type TableRows } from "@/components/admin/AdminShell";
 
 export const metadata = { title: "Admin · Chey Time" };
 
@@ -51,5 +51,5 @@ export default async function AdminPage() {
     }),
   );
 
-  return <AdminTabs user={user} data={results} />;
+  return <AdminShell user={user} data={results} />;
 }
